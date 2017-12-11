@@ -94,3 +94,7 @@ Restart apache, and login with default user/pass.
 ## Admin SQLite DB
 
 Adding https://www.phpliteadmin.org/ file to base folder add a menu entry to access sqlite DB file (need to configure db file and user).
+
+## Screenshots
+
+[Galery](https://postimg.org/gallery/k0qi1t9y/)
