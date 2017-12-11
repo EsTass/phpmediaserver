@@ -81,3 +81,16 @@ extension=zip.so
 ```
 
 Restart apache, and login with default user/pass.
+
+## Needed
+ - [Filebot](https://www.filebot.net)
+ - [ffmpeg and ffprobe](https://ffmpeg.org/)
+ 
+## Recomended
+ - [wget](https://www.gnu.org/software/wget/)
+ - [omdbapi APIKEY](https://www.omdbapi.com)
+ - [www.thetvdb.com APIKEY](https://www.thetvdb.com)
+
+## Admin SQLite DB
+
+Adding https://www.phpliteadmin.org/ file to base folder add a menu entry to access sqlite DB file (need to configure db file and user).
