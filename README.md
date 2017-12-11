@@ -11,3 +11,9 @@ A bunch of utilities for:
  - IP whitelist/blacklist.
  - Media info in configured language (if possible).
  - Lazy Load Images thanks to: http://jquery.eisbehr.de/lazy
+ - Extract files on cron (php support needed Zip and Rar)
+
+#Default User (Important: change pass on first login)
+ admin
+ admin01020304
+ 
