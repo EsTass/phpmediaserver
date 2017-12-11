@@ -61,6 +61,20 @@ $(function () {
 		};
 		show_msg( url, data, 'result' );
 	});
+	
+	$( '.userchangepass' ).click( function(){
+		var url = '?r=r&action=userspass';
+		var user = $( this ).attr( 'data-name' );
+		var data = { 
+			"user": user,
+			"pass1": $( '#' + user + '_passa' ).val(),
+			"pass2": $( '#' + user + '_passb' ).val(),
+		};
+		$.post( url, data )
+        .done( function( data ){
+            msgbox( data );
+        });
+	});
 });
 </script>
 <?php
@@ -96,9 +110,9 @@ $(function () {
 					echo "</td>";
 					
 					echo "<td>";
-					echo "<input placeholder='password1' type='password' id='passa' id='passa' class='" . $row[ 'username' ] . "' />";
-					echo "<input placeholder='password2' type='password' id='passb' id='passb' class='" . $row[ 'username' ] . "' />";
-					echo "<input type='button' id='userchangepass' value='Change' data-name='" . $row[ 'username' ] . "' />";
+					echo "<input placeholder='password1' type='password' name='passa' id='" . $row[ 'username' ] . "_passa' class='" . $row[ 'username' ] . "' />";
+					echo "<input placeholder='password2' type='password' name='passb' id='" . $row[ 'username' ] . "_passb' class='" . $row[ 'username' ] . "' />";
+					echo "<input type='button' class='userchangepass' id='userchangepass' value='Change' data-name='" . $row[ 'username' ] . "' />";
 					echo "</td>";
 					
 					echo "<td>";

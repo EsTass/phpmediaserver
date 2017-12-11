@@ -356,6 +356,22 @@
 		return $result;
 	}
 	
+	function sqlite_users_update_pass( $user, $pass ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'UPDATE users SET ';
+			$sql .= '';
+			$sql .= ' password = "' . sha1( $pass ) . '" ';
+			$sql .= ' WHERE username = \'' . $user . '\' ';
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
 	function sqlite_users_delete( $user ){
 		//Vars
 		$result = FALSE;
