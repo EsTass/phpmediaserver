@@ -10,3 +10,4 @@ A bunch of utilities for:
  - Country IP block thanks to geoplugin.net.
  - IP whitelist/blacklist.
  - Media info in configured language (if possible).
+ - Lazy Load Images thanks to: http://jquery.eisbehr.de/lazy
