@@ -1,0 +1,38 @@
+DirectoryIndex index.php
+
+RewriteEngine On
+RewriteRule ^.*js/(.+) js/$1 [L]
+RewriteRule ^.*imgs/(.+) imgs/$1 [L]
+RewriteRule ^.*/(.+) /index.php [L]
+
+#Order Allow,Deny 
+#Deny from all 
+#<FilesMatch "\.(jpg|gif|png|php)$">
+#<FilesMatch "\.(php|js|css|m3u8|ts|svg|swf|ico|png|gif|jpg|jpeg)$">
+#	Order Deny,Allow
+#	Allow from all
+#</FilesMatch>
+
+# Video support
+AddType video/ogg .ogv
+AddType video/mp4 .mp4
+AddType video/webm .webm
+AddType video/ogv .ogv
+
+# Audio support
+AddType audio/mp3 .mp3
+AddType audio/oga .oga
+AddType audio/ogg .ogg
+AddType audio/wav .wav
+
+# For HLS support
+AddType application/x-mpegURL .m3u8
+AddType vnd.apple.mpegURL .m3u8
+AddType video/MP2T .ts
+
+# For M(PEG)-DASH support
+AddType application/dash+xml .mpd
+
+# For subtitles support
+AddType text/vtt .vtt
+AddType text/srt .srt
