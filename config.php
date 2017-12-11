@@ -89,7 +89,7 @@
 	//SCRAPPERS API KEY ( title => function ) filled in each scrapper
 	$G_SCRAPPERS_KEY = array( 
         'omdb' => 'YOURKEY',
-        'thetvdb' => 'YOURKEY',
+        'thetvdb' => '120F8A1A0E6322F3',
     );
 	//SCRAPPER FOR CRON FILE SCRAPPER filebot recomended
 	define( 'O_SCRAP_CRON', 'filebot' );
@@ -146,7 +146,7 @@
 	
 	//CRON Enable
 	
-	define( 'O_CRON', TRUE );
+	define( 'O_CRON', FALSE );
 	//CRON admin user (needed active)
 	define( 'O_CRON_ADMINUSER', 'admin' );
 	//CRON short cron minutes
