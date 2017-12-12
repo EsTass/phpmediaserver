@@ -830,7 +830,7 @@
 		return $result;
 	}
 	
-	function sqlite_media_getdata_filtered_ext( $search, $year = FALSE, $rating = FALSE, $genres = FALSE, $orderby = FALSE, $limit = 1000, $page = 0 ){
+	function sqlite_media_getdata_filtered_ext( $search, $year = FALSE, $year2 = FALSE, $rating = FALSE, $genres = FALSE, $orderby = FALSE, $limit = 1000, $page = 0 ){
 		//Vars
 		$result = FALSE;
 		
@@ -850,8 +850,15 @@
 				$sql .= ' OR mediainfo.titleepisode LIKE \'%' . $search . '%\' ';
 				$sql .= ')';
 			}
-			if( $year > 0 ){
+			if( $year > 0 
+			&& $year2 == FALSE
+			){
                 $sql .= ' AND mediainfo.year = \'' . $year . '\' ';
+			}elseif( $year > 0 
+			&& $year2 > 0
+			){
+                $sql .= ' AND mediainfo.year > \'' . $year . '\' ';
+                $sql .= ' AND mediainfo.year < \'' . $year2 . '\' ';
 			}
 			if( $rating > 0 ){
                 $sql .= ' AND mediainfo.rating > \'' . $rating . '\' ';
