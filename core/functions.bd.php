@@ -1155,6 +1155,7 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'SELECT * FROM media ';
 			//$sql .= ' WHERE idmediainfo <= 0';
+			$sql .= ' WHERE 1 = 1';
 			if( strlen( $search ) > 0 ){
                 $sql .= ' AND file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\'';
 			}
