@@ -140,7 +140,7 @@
             //audio track (change 1 to num video tracks)
             $audiotrack = ' -map 0:0 -map 0:' . ( $audiotrack ) . ' ';
             
-            //subs track
+            //subs track (testing)
             if( $subtrack > -1 
             && is_numeric( $subtrack )
             ){
@@ -155,6 +155,7 @@
             
             switch( $G_MODE ){
                 case 'mp4':
+                    //testing
                     $encoder_outformat = 'mpegts';
                     $encoder = 'h264';
                     //$encoder = 'libx264';
@@ -166,15 +167,17 @@
                     header('Content-type: video/mpeg');
                 break;
                 case 'webm2':
+                    //slow
                     $AUDIOCODEC = 'libvorbis';
                     $encoder_outformat = 'webm';
                     $encoder = 'libvpx-vp9'; //webm 9
-                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -bufsize 1000k -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -preset baseline " . $QUALITY . " -level " . $G_FFMPEGLVL . " -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -f " . $encoder_outformat . " - ";
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -threads 4 -speed 8 -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -bufsize 1000k -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -preset baseline " . $QUALITY . " -level " . $G_FFMPEGLVL . " -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -f " . $encoder_outformat . " - ";
                     
                     header('Content-type: video/webm');
                 break;
                 case 'webm':
                 default:
+                    //better option
                     $AUDIOCODEC = 'libvorbis';
                     $encoder_outformat = 'webm';
                     $encoder = 'libvpx';
