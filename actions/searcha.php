@@ -5,6 +5,7 @@
 	//action
 	//search
 	//year
+	//year2
 	//rating
 	//genre1
 	//genre2
@@ -43,6 +44,15 @@
         $G_YEAR = FALSE;
 	}
 	
+	if( array_key_exists( 'year2', $G_DATA ) 
+	&& is_numeric( $G_DATA[ 'year2' ] )
+	&& (int)$G_DATA[ 'year2' ] >= 0
+	){
+        $G_YEAR2 = (int)$G_DATA[ 'year2' ];
+	}else{
+        $G_YEAR2 = FALSE;
+	}
+	
 	if( array_key_exists( 'rating', $G_DATA ) 
 	&& is_numeric( $G_DATA[ 'rating' ] )
 	&& (int)$G_DATA[ 'rating' ] >= 0
@@ -68,7 +78,7 @@
 	}
 	
     $TITLE = get_msg( 'LIST_SEARCH_RESULT', FALSE );
-    if( ( $edata = sqlite_media_getdata_filtered_ext( $G_SEARCH, $G_YEAR, $G_RATING, $G_GENRES, $G_ORDERBY, 1000, $G_PAGE ) ) != FALSE 
+    if( ( $edata = sqlite_media_getdata_filtered_ext( $G_SEARCH, $G_YEAR, $G_YEAR2, $G_RATING, $G_GENRES, $G_ORDERBY, 1000, $G_PAGE ) ) != FALSE 
     ){
         $TITLE = get_msg( 'LIST_SEARCH_RESULT', FALSE );
         echo get_html_list( $edata, $TITLE, $G_PAGE, FALSE );

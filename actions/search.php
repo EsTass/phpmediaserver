@@ -57,6 +57,15 @@ function ident_search_list(){
                 </select>
             </td>
             <td>
+                <?php echo get_msg( 'MENU_YEAR', FALSE ) ?>: 
+                <select id='year2' name='year2'>
+                    <option value=''></option>
+                    <?php for( $y = (int)date( 'Y' ) + 1; $y >= 1900; $y-- ){ ?>
+                    <option value='<?php echo $y; ?>'><?php echo $y; ?></option>
+                    <?php } ?>
+                </select>
+            </td>
+            <td>
                 <?php echo get_msg( 'MENU_RATING', FALSE ) ?>: 
                 <select id='rating' name='rating'>
                     <option value=''></option>
