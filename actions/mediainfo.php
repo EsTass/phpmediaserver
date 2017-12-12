@@ -191,9 +191,6 @@ function infovideo_playlater( idmedia, idmediainfo ){
                     if( check_user_admin()
 					){
                         $listidmedia = array();
-                        if( $IDMEDIA > 0 ){
-                            $listidmedia[ $IDMEDIA ] = basename( $MEDIAINFO[ 'file' ] );
-                        }
                         if( $IDMEDIAINFO > 0
                         && ( $medialist = sqlite_media_getdata_mediainfo( $IDMEDIAINFO, 3 ) ) != FALSE
                         && is_array( $medialist )
