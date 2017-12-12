@@ -164,9 +164,14 @@ $(function () {
 		if( $( this ).attr( 'data-last' ) != '1' ){
 			$( this ).remove();
 		}
-		//whit errors try playsafe
-		playerTimeChanged( playedtotaltime );
-		
+		playererrors++;
+		if( playererrors > playererrors_max ){
+            send_video_error();
+		}else{
+            playedtotaltime += playerskiptime;
+            //whit errors try playsafe
+            playerTimeChanged( playedtotaltime );
+        }
 	});
 	//error source 1
 	$( '#my-player source[1]' ).on( "error", function( event ) {
@@ -174,9 +179,14 @@ $(function () {
 		if( $( this ).attr( 'data-last' ) != '1' ){
 			$( this ).remove();
 		}
-		//whit errors try playsafe
-		playerTimeChanged( playedtotaltime );
-		
+		playererrors++;
+		if( playererrors > playererrors_max ){
+            send_video_error();
+		}else{
+            playedtotaltime += playerskiptime;
+            //whit errors try playsafe
+            playerTimeChanged( playedtotaltime );
+        }
 	});
 	//error source 2
 	$( '#my-player source[2]' ).on( "error", function( event ) {
@@ -184,9 +194,14 @@ $(function () {
 		if( $( this ).attr( 'data-last' ) != '1' ){
 			$( this ).remove();
 		}
-		//whit errors try playsafe
-		playerTimeChanged( playedtotaltime );
-		
+		playererrors++;
+		if( playererrors > playererrors_max ){
+            send_video_error();
+		}else{
+            playedtotaltime += playerskiptime;
+            //whit errors try playsafe
+            playerTimeChanged( playedtotaltime );
+        }
 	});
 	//play
 	$( '#my-player' ).on( "play", function( event ) {
@@ -324,6 +339,8 @@ var retrytimer = false;
 var playedtotaltime = <?php echo $playedtimebefore; ?>;
 var startplayedtotaltime = <?php echo $playedtimebefore; ?>;
 var playerskiptime = <?php echo $PLAYERSKIPTIME; ?>;
+var playererrors = 0;
+var playererrors_max = 3;
 
 function checkVideoUsable(){
 	if( DEBUG ) console.log( 'video usable: ' + $( "#my-player" ).prop( 'readyState' ) );
@@ -350,7 +367,7 @@ function playerTimeChanged( seconds, audiotrack, subtrack, quality ){
 	audiotrack = typeof audiotrack !== 'undefined' ? audiotrack : audiotracknow;
 	subtrack = typeof subtrack !== 'undefined' ? subtrack : subtracknow;
 	quality = typeof quality !== 'undefined' ? quality : qualitynow;
-	if( DEBUG ) console.log('changeTime ' + $( '#my-player' ).currentTime() );
+	if( DEBUG ) console.log('changeTime ' + $( '#my-player' ).currentTime );
 	var url = $( "#my-player source" ).attr( 'src' );
 	if( typeof url != 'undefined' ){
 		url = url.substring( 0, url.indexOf( '&timeplayed=' ) );
@@ -502,6 +519,19 @@ function toggleFullScreen() {
   }
 }
 
+//VIDEO ERROR
+
+function send_video_error(){
+    //Stop Player and info
+    document.getElementById( 'my-player' ).load();
+    $( "#my-player source" ).attr( 'src', url );
+    document.getElementById( 'my-player' ).load();
+    //send error
+    var url = '?action=playervideoerror&idmedia=<?php echo $IDMEDIA; ?>';
+    var data = [];
+    show_msgbox( url, data );
+}
+
 </script>
 
 <style type='text/css'>
@@ -539,7 +569,7 @@ html, body
 	autoplay
 	>
         <source id='my-player-source' src="?r=r&action=playtime&mode=webm&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/webm">
-		<source id='my-player-source' src="?r=r&action=playtime&mode=webm2&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/webm">
+        <source id='my-player-source' src="?r=r&action=playtime&mode=webm2&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/webm">
         <source id='my-player-source' src="?r=r&action=playtime&mode=mp4&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/mp4" data-last='1'>
         Your browser does not support the video tag.
 	</video>
