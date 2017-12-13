@@ -241,6 +241,7 @@
 	/* text-shadow: 2px 2px black; */
 	font-weight: bold;
 	background-color: transparent;
+    border-right: 1px solid dimgray;
 }
 
 .listMenuElementAdmin{
@@ -248,7 +249,8 @@
 	text-transform: uppercase;
 	/* text-shadow: 2px 2px black; */
 	font-weight: bold;
-	background-color: red;
+	background-color: indigo;
+    border-right: 1px solid dimgray;
 }
 
 .listMenuElement a{
