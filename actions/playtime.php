@@ -156,15 +156,16 @@
             switch( $G_MODE ){
                 case 'mp4':
                     //testing
-                    $encoder_outformat = 'mpegts';
-                    $encoder = 'h264';
-                    //$encoder = 'libx264';
+                    //$encoder_outformat = 'mpegts';
+                    $encoder_outformat = 'mp4';
+                    //$encoder = 'h264';
+                    $encoder = 'libx264';
                     $AUDIOCODEC = 'aac';
                     //$AUDIOCODEC = 'mp3';
                     //$AUDIOCODEC = 'opus';
-                    $cmd = O_FFMPEG . " -nostdin -re " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -movflags +faststart -bufsize 1M -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -level " . $G_FFMPEGLVL . " -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -f " . $encoder_outformat . " - ";
+                    $cmd = O_FFMPEG . " -nostdin -re " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -movflags +faststart -bufsize 500k -g 74 -strict experimental -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -level " . $G_FFMPEGLVL . " -profile:v baseline -level 3.0 -preset ultrafast -tune zerolatency -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 64k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
                     
-                    header('Content-type: video/mpeg');
+                    header('Content-type: video/mp4');
                 break;
                 case 'webm2':
                     //slow

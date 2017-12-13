@@ -569,8 +569,8 @@ html, body
 	autoplay
 	>
         <source id='my-player-source' src="?r=r&action=playtime&mode=webm&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/webm">
-        <source id='my-player-source' src="?r=r&action=playtime&mode=webm2&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/webm">
-        <source id='my-player-source' src="?r=r&action=playtime&mode=mp4&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/mp4" data-last='1'>
+        <source id='my-player-source' src="?r=r&action=playtime&mode=mp4&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/mp4">
+        <source id='my-player-source' src="?r=r&action=playtime&mode=webm2&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/webm" data-last='1'>
         Your browser does not support the video tag.
 	</video>
 	<div id='playerBoxC' class='playerBoxC'>
