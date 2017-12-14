@@ -102,6 +102,16 @@
         media_extract_files( 20, TRUE );
     }
 	
+	//CLEAN MEDIAINFO DUPLICATES
+	if( defined( 'O_CRON_EXTRACTFILES' ) 
+	&& O_CRON_EXTRACTFILES == TRUE
+	){
+        echo "<br />" . date( 'Y-m-d H:i:s' );
+        echo "<br />Clean and assing duplicates mediainfo: ";
+        echo "<br />";
+        mediainfo_clean_duplicates( TRUE );
+    }
+	
 	//Search New Elements WebScrapp
 	if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
 	&& ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
