@@ -16,7 +16,7 @@
 		}else{
 			$error = '';
 			$G_DB = new SQLite3( $filedb, SQLITE3_OPEN_READWRITE );
-			$G_DB->busyTimeout( 5000 );
+			$G_DB->busyTimeout( 10000 );
 			// WAL mode has better control over concurrency.
 			// Source: https://www.sqlite.org/wal.html
 			$G_DB->exec( 'PRAGMA journal_mode = MEMORY;' );

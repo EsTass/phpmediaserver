@@ -555,14 +555,19 @@
 	//MIME
 	
 	function getFileMimeType($file) {
-		$type = mime_content_type( $file );
+        $type = '';
+        if( file_exists( $file ) ){
+            $type = mime_content_type( $file );
+        }
 		return $type;
 	}
 	
 	function getFileMimeTypeVideo( $file ) {
 		$result = FALSE;
-		if( ( $type = mime_content_type( $file ) ) != FALSE
-		&& stripos( $type, 'video' ) !== FALSE ){
+		if( file_exists( $file )
+		&& ( $type = mime_content_type( $file ) ) != FALSE
+		&& stripos( $type, 'video' ) !== FALSE 
+		){
             $result = TRUE;
 		}
 		return $result;
@@ -570,7 +575,8 @@
 	
 	function getFileMimeTypeImg( $file ) {
 		$result = FALSE;
-		if( ( $type = mime_content_type( $file ) ) != FALSE
+		if( file_exists( $file )
+		&& ( $type = mime_content_type( $file ) ) != FALSE
 		&& ( 
             stripos( $type, 'image' ) !== FALSE 
             || stripos( $type, 'img' ) !== FALSE 
