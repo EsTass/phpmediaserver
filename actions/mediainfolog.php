@@ -20,7 +20,7 @@
         'titleepisode' => 'TitleEpisode',
 	);
 	
-	if( ( $edata = sqlite_mediainfo_search( $G_SEARCH ) ) ){
+	if( ( $edata = sqlite_mediainfo_search( $G_SEARCH, 100 ) ) ){
 ?>
 
 <script type="text/javascript">

@@ -22,7 +22,7 @@
         'year' => 'Year',
 	);
 	
-	if( ( $edata = sqlite_media_getdata_filtered( $G_SEARCH ) ) ){
+	if( ( $edata = sqlite_media_getdata_filtered( $G_SEARCH, 100 ) ) ){
 ?>
 
 <script type="text/javascript">
