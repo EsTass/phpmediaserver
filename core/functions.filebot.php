@@ -156,14 +156,22 @@
             if( array_key_exists( $f, $xml ) 
             && is_string( $xml[ $f ] ) 
             ){
-                if( ( $d = explode( ' :: ', $xml[ $f ] ) ) != FALSE
-                && array_key_exists( 1, $d )
+                $added = FALSE;
+                if( ( $d = explode( '::', $xml[ $f ] ) ) != FALSE
                 ){
-                    $rtesult[ $fi ] = $d[ 1 ];
-                }elseif( array_key_exists( 'year', $xml ) ){
-                    $rtesult[ $fi ] = $xml[ 'year' ] . '00-00';
-                }else{
-                    $rtesult[ $fi ] = '0000-00-00';
+                    foreach( $d AS $dat ){
+                        if( strtotime( $dat ) != FALSE ){
+                            $rtesult[ $fi ] = $dat;
+                            $added = TRUE;
+                        }
+                    }
+                }
+                if( !$added ){
+                    if( array_key_exists( 'year', $xml ) ){
+                        $rtesult[ $fi ] = $xml[ 'year' ] . '00-00';
+                    }else{
+                        $rtesult[ $fi ] = '0000-00-00';
+                    }
                 }
             }
             //SEASON
