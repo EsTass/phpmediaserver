@@ -160,6 +160,7 @@
                 if( ( $d = explode( '::', $xml[ $f ] ) ) != FALSE
                 ){
                     foreach( $d AS $dat ){
+                        $dat = trim( $dat );
                         if( strtotime( $dat ) != FALSE ){
                             $rtesult[ $fi ] = $dat;
                             $added = TRUE;
