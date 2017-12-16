@@ -72,7 +72,6 @@ Needed extension in php:
 ```
 extension=curl.so
 extension=iconv.so
-extension=mcrypt.so
 extension=pdo_sqlite.so
 extension=sqlite3.so
 extension=sockets.so
