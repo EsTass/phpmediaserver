@@ -1026,15 +1026,6 @@
 			$sql = 'SELECT * FROM media ';
 			$sql .= ' INNER JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
 			$sql .= ' WHERE media.idmediainfo > 0 ';
-			$strdate = date( 'Y-m', strtotime( 'NOW - 3 months' ) );
-			$sql .= ' AND ( mediainfo.sorttitle LIKE \'' . $strdate . '%\'';
-			$strdate = date( 'Y-m', strtotime( 'NOW - 2 months' ) );
-			$sql .= ' OR mediainfo.sorttitle LIKE \'' . $strdate . '%\'';
-			$strdate = date( 'Y-m', strtotime( 'NOW - 1 months' ) );
-			$sql .= ' OR mediainfo.sorttitle LIKE \'' . $strdate . '%\'';
-			$strdate = date( 'm' );
-			$sql .= ' OR mediainfo.sorttitle LIKE \'' . $strdate . '%\'';
-			$sql .= ' ) ';
 			$sql .= ' GROUP BY mediainfo.title ';
 			$sql .= ' ORDER BY mediainfo.sorttitle DESC LIMIT ' . $limit;
 			//die( $sql );
