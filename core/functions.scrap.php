@@ -232,19 +232,23 @@
 		if( ( $links = searchImagesBing( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
 		}
+		
 		if( count( $result ) < $max
-		&& ( $links = searchImagesIXQick( $search, ( $max - count( $result  ) ), $getthumb ) ) != FALSE ){
+		&& ( $links = searchImagesIXQick( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
 		}
+		
 		if( count( $result ) < $max
-		&& ( $links = searchImagesDuckDuckGo( $search, ( $max - count( $result  ) ), $getthumb ) ) != FALSE ){
+		&& ( $links = searchImagesDuckDuckGo( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
 		}
-		//Captchas
+		
 		if( count( $result ) < $max
-		&& ( $links = searchImagesYandex( $search, ( $max - count( $result  ) ), $getthumb ) ) != FALSE ){
+		&& ( $links = searchImagesYandex( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
 		}
+		
+		$result = array_slice( $result, 0, $max );
 		
 		return $result;
 	}
@@ -279,9 +283,9 @@
                             if( filter_var( $turl, FILTER_VALIDATE_URL )
                             ){
                                 $result[] = $turl;
+                                $n++;
+                                if( $n > $max ) break;
                             }
-                            if( $n > $max ) break;
-                            $n++;
                         }
                     }
                     if( $n > $max ) break;
