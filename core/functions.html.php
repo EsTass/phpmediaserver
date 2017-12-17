@@ -2,12 +2,17 @@
 	
 	defined( 'ACCESS' ) or die( 'HTTP/1.0 401 Unauthorized.<br />' );
 	
-	function get_html_list( $data, $title, $page = FALSE, $totalpages = FALSE ){
+	function get_html_list( $data, $title, $page = FALSE, $totalpages = FALSE, $toplayer = FALSE, $urltitle = FALSE ){
         $result = '';
         global $G_DATA;
         
         $result .= "<div class='boxList'>";
-        $result .= "<h2>" . $title;
+        $result .= "<h2>";
+        if( $urltitle != FALSE ){
+            $result .= "<a href='" . $urltitle . "'>" . $title . '</a>';
+        }else{
+            $result .= $title;
+        }
         if( $totalpages !== FALSE ){
             $result .= " (" . get_msg( 'LIST_TITLE_PAGE', FALSE ) . " " . $page . "";
             if( $page !== FALSE ){
@@ -71,8 +76,12 @@
                 }
             }
             
-            //href='" . $urlplayer . "'
-            $result .= "<div class='listElement " . $css_extra . "' onclick='list_show_info( this, " . $element[ 'idmediainfo' ] . " );'><a href='#' title='" . $plot . "'><img class='listElementImg lazy' data-src='" . $urlposter . "' src='' title='" . $ftitle . "' /><span class='" . $css_played . "'>" . $ftitle . "" . $played . "</span></a></div>";
+            if( $toplayer ){
+                $onclick = 'goToURL( "' . $urlplayer . '" );';
+            }else{
+                $onclick = "list_show_info( this, " . $element[ 'idmediainfo' ] . " );";
+            }
+            $result .= "<div class='listElement " . $css_extra . "' onclick='" . $onclick .  "'><a href='#' title='" . $plot . "'><img class='listElementImg lazy' data-src='" . $urlposter . "' src='' title='" . $ftitle . "' /><span class='" . $css_played . "'>" . $ftitle . "" . $played . "</span></a></div>";
         }
         
         //Next

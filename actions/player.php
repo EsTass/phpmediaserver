@@ -64,7 +64,8 @@
         $inforul = getURLInfo( FALSE, $IDMEDIAINFO );
         $nextfileinfo = getURLNextInfo( FALSE, $IDMEDIAINFO );
         
-        if( ( $mi = sqlite_mediainfo_getdata( $IDMEDIAINFO, 1 ) ) != FALSE 
+        if( $IDMEDIAINFO > 0
+        && ( $mi = sqlite_mediainfo_getdata( $IDMEDIAINFO, 1 ) ) != FALSE 
         && is_array( $mi )
         && array_key_exists( 0, $mi )
         && is_array( $mi[ 0 ] )
@@ -219,9 +220,14 @@ $(function () {
 	//stalled
 	$( '#my-player source' ).on( "stalled", function( event ) {
 		if( DEBUG ) console.log( 'VIDEO stalled: ' + parseInt( playedtotaltime ) + ' - ' + this.duration + ' - ' + this.networkState );
-		playedtotaltime += playerskiptime;
-		//whit errors try playsafe
-		playerTimeChanged( playedtotaltime );
+		playererrors++;
+		if( playererrors > playererrors_max ){
+            send_video_error();
+		}else{
+            playedtotaltime += playerskiptime;
+            //whit errors try playsafe
+            playerTimeChanged( playedtotaltime );
+        }
 	});
 	//suspend
 	$( '#my-player source' ).on( "suspend", function( event ) {
@@ -523,9 +529,7 @@ function toggleFullScreen() {
 
 function send_video_error(){
     //Stop Player and info
-    document.getElementById( 'my-player' ).load();
-    $( "#my-player source" ).attr( 'src', url );
-    document.getElementById( 'my-player' ).load();
+    $( "#my-player" ).remove();
     //send error
     var url = '?action=playervideoerror&idmedia=<?php echo $IDMEDIA; ?>';
     var data = [];

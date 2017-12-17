@@ -30,7 +30,8 @@
         && count( $edata ) > 0
         ){
             $TITLE = get_msg( 'LIST_TITLE_PREMIERE', FALSE );
-            echo get_html_list( $edata, $TITLE );
+            $urltitle = '?action=searcha&orderby=sorttitle';
+            echo get_html_list( $edata, $TITLE, FALSE, FALSE, FALSE, $urltitle );
         }
         
         //Continue
@@ -38,7 +39,8 @@
         && count( $edata ) > 0
         ){
             $TITLE = get_msg( 'LIST_TITLE_CONTINUE', FALSE );
-            echo get_html_list( $edata, $TITLE );
+            $urltitle = FALSE;
+            echo get_html_list( $edata, $TITLE, FALSE, FALSE, FALSE, $urltitle );
         }
         
         //Recommended
@@ -47,6 +49,25 @@
         ){
             $TITLE = get_msg( 'LIST_TITLE_RECOMENDED', FALSE );
             echo get_html_list( $edata, $TITLE );
+        }
+        
+        //not ident
+        if( ( $edata = sqlite_media_getdata_identify( '', O_LIST_MINI_QUANTITY ) ) != FALSE 
+        && count( $edata ) > 0
+        ){
+            $r = array();
+            foreach( $edata AS $row ){
+                if( (int)$row[ 'idmediainfo' ] <= 0 ){
+                    $row[ 'title' ] = basename( $row[ 'file' ] );
+                    $row[ 'plot' ] = basename( $row[ 'file' ] );
+                    $row[ 'season' ] = '';
+                    $r[] = $row;
+                }
+            }
+            $edata = $r;
+            $TITLE = get_msg( 'MENU_IDENTIFY', FALSE );
+            $urltitle = '?action=searcha&orderby=dateadded';
+            echo get_html_list( $edata, $TITLE, FALSE, FALSE, TRUE, $urltitle );
         }
         
         //Last Added
