@@ -87,8 +87,9 @@
         }
         //Subfolders
         foreach( $folders AS $folder ){
-            if( ( $more = getFilesFilterLimit( $file, $quantity, $pattern ) ) != FALSE
+            if( ( $more = getFilesFilterLimit( $folder, $quantity, $pattern, $debug ) ) != FALSE
             && is_array( $more )
+            && count( $more ) > 0
             ){
                 if( $debug ) echo "<br />ADDING FOLDER RESULT: " . count( $more );
                 $result = array_merge( $result, $more );
@@ -246,15 +247,15 @@
         $result = TRUE;
         
         $all = 100000;
-        if( ( $elements = getFilesFilterLimit( PPATH_DOWNLOADS, $all ) ) != FALSE 
+        if( ( $elements = getFilesFilterLimit( PPATH_DOWNLOADS, $all, '/./', FALSE ) ) != FALSE 
         ){
             foreach( $elements AS $file ){
-                //var_dump( $file );
+                //var_dump( $file );echo '<br />';
                 if( media_scan_exclude_files( $file ) == FALSE
                 && media_scan_exclude_folders( $file ) == FALSE
+                && sqlite_media_check_exist( $file ) == FALSE
                 && file_exists( $file ) 
                 && stripos( getFileMimeType( $file ), 'video' ) !== FALSE
-                && sqlite_media_check_exist( $file ) == FALSE
                 && sqlite_media_insert( $file )
                 ){
                     $quantity--;
