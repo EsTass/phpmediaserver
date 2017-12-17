@@ -255,6 +255,10 @@ function goTo( action ){
     window.location.href = url;
 }
 
+function goToURL( url ){
+    window.location.href = url;
+}
+
 </script>
 
 <?php
