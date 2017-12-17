@@ -65,13 +65,13 @@
                             && is_array( $wsdata[ 'passdata' ][ 0 ] )
                             && array_key_exists( 'linksappend', $wsdata[ 'passdata' ][ 0 ] )
                             && strlen( $wsdata[ 'passdata' ][ 0 ][ 'linksappend' ] ) > 0
-                            && startsWith( $href, $wsdata[ 'searchdata' ][ 0 ][ 'linksappend' ] )
+                            && startsWith( $href, $wsdata[ 'passdata' ][ 0 ][ 'linksappend' ] )
                             ) || (
                             array_key_exists( 0, $wsdata[ 'passdata' ] )
                             && is_array( $wsdata[ 'passdata' ][ 0 ] )
                             && array_key_exists( 'urlbase', $wsdata[ 'passdata' ][ 0 ] )
                             && strlen( $wsdata[ 'passdata' ][ 0 ][ 'urlbase' ] ) > 0
-                            && startsWith( $href, $wsdata[ 'searchdata' ][ 0 ][ 'urlbase' ] )
+                            && startsWith( $href, $wsdata[ 'passdata' ][ 0 ][ 'urlbase' ] )
                             )
                         )
                         ){
