@@ -66,6 +66,7 @@
         'MENU_ORDERBY' => 'Ordenar Por',
         'MENU_DELETE_IMGS' => 'Borrar Imágenes',
         'MENU_IMGS_SEARCH' => 'Añadir Poster',
+        'MENU_MEDIAINFO_NEW' => 'Nuevo MediaInfo',
         
         'MEDIA_TYPE_SERIE' => 'Series',
         'MEDIA_TYPE_MOVIES' => 'Peliculas',

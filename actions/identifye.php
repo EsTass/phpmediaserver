@@ -125,6 +125,19 @@ function ident_list_set_title( newtitle ){
     
     return false;
 }
+function new_mediainfo(){
+    $( '#fElementIdentE #action' ).val( 'mediainfonew' );
+    var url = '<?php getURL(); ?>?' + $( '#fElementIdentE' ).serialize();
+    loading_show();
+    $.get( url )
+    .done( function( data ){
+        scrolltop();
+        $( '#dResultidentS' ).html( data );
+        loading_hide();
+    });
+    
+    return false;
+}
 </script>
 
 <br />
@@ -235,6 +248,7 @@ function ident_list_set_title( newtitle ){
                 <input onclick='ident_set_title();' type='button' id='bSetTitle' name='bSetTitle' value='<?php echo get_msg( 'MENU_SETTITLE', FALSE ); ?>' />
                 <input onclick='ident_force_title();' type='button' id='bForceTitle' name='bForceTitle' value='<?php echo get_msg( 'MENU_SETTITLE_FORCE', FALSE ); ?>' />
                 <input onclick='ident_unset_idmedia();' type='button' id='bUnsetIdMedia' name='bUnsetIdMedia' value='<?php echo get_msg( 'MENU_MEDIA_DELETE_ASSING', FALSE ); ?>' />
+                <input onclick='new_mediainfo();' type='button' id='bNewMediaInfo' name='bNewMediaInfo' value='<?php echo get_msg( 'MENU_MEDIAINFO_NEW', FALSE ); ?>' />
             </td>
         </tr>
     </table>

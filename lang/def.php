@@ -66,6 +66,7 @@
         'MENU_ORDERBY' => 'Order by',
         'MENU_DELETE_IMGS' => 'Delete Images',
         'MENU_IMGS_SEARCH' => 'Search Images',
+        'MENU_MEDIAINFO_NEW' => 'New MediaInfo',
         
         'MEDIA_TYPE_SERIE' => 'Series',
         'MEDIA_TYPE_MOVIES' => 'Movies',
