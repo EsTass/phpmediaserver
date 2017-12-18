@@ -65,9 +65,11 @@
                 }
             }
             $edata = $r;
-            $TITLE = get_msg( 'MENU_IDENTIFY', FALSE );
-            $urltitle = '?action=searcha&orderby=dateadded';
-            echo get_html_list( $edata, $TITLE, FALSE, FALSE, TRUE, $urltitle );
+            if( count( $edata ) > 0 ){
+                $TITLE = get_msg( 'INFO_NEXT', FALSE ) . ' ' . get_msg( 'MENU_IDENTIFY', FALSE );
+                $urltitle = '?action=searcha&orderby=dateadded';
+                echo get_html_list( $edata, $TITLE, FALSE, FALSE, TRUE, $urltitle );
+            }
         }
         
         //Last Added
