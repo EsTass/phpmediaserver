@@ -6,6 +6,7 @@
 	
 	//idmediainfo
 	//user
+	
 	$HTMLDATA = get_msg( 'DEF_EMPTYLIST', FALSE );
 	if( !array_key_exists( 'idmediainfo', $G_DATA ) 
 	|| !is_numeric( $G_DATA[ 'idmediainfo' ] )
@@ -70,6 +71,7 @@
 $(function () {
     
 });
+
 function mediainfo_image_add( idmediainfo, type, tfolder, tfile ){
     var url = '<?php getURL(); ?>';
     url += '?r=r&action=mediainfoaddimg&idmediainfo=' + idmediainfo;
@@ -82,8 +84,54 @@ function mediainfo_image_add( idmediainfo, type, tfolder, tfile ){
     show_msg( url, data, 'result' );
     return false;
 }
+
+function mediainfo_url_add( idmediainfo, type, tfolder, ifield ){
+    var url = '<?php getURL(); ?>';
+    url += '?r=r&action=mediainfoaddurl&idmediainfo=' + idmediainfo;
+    url += '&type=' + type;
+    url += '&tfolder=' + tfolder;
+    url += '&url=' + encodeURI( $( '#' + ifield ).val() );
+    var data = { 
+        //"user": user
+    };
+    show_msg( url, data, 'result' );
+    return false;
+}
+
 </script>
 
+<table class='tList'>
+    <tr>
+<?php
+    foreach( $HTMLDATA AS $title => $links ) {
+?>
+        <th colspan='2'>URL Img <?php echo $title; ?></th>
+<?php
+    }
+?>
+    </tr>
+    <tr>
+<?php
+    foreach( $HTMLDATA AS $title => $links ) {
+?>
+        <td>
+            <input type='text' id="url<?php echo $title; ?>" name="url<?php echo $title; ?>" value='' />
+        </td>
+        <td>
+            <input 
+            onclick='mediainfo_url_add( <?php echo $G_DATA[ 'idmediainfo' ]; ?>, "<?php echo $title; ?>", "<?php echo $fileimgpathrnd; ?>", "url<?php echo $title; ?>" );'
+            type='button' 
+            value='<?php echo get_msg( 'MENU_UPDATE', FALSE ); ?>' 
+            id='bAddImageURL<?php echo $title; ?>' 
+            name='bAddImageURL<?php echo $title; ?>' 
+            />
+        </td>
+<?php
+    }
+?>
+    </tr>
+</table>
+    
     <h2><?php echo $MEDIAINFO[ 'title' ]; ?> (<?php echo $MEDIAINFO[ 'year' ]; ?>)</h2>
 <?php
         foreach( $HTMLDATA AS $title => $links ) {
@@ -98,7 +146,7 @@ function mediainfo_image_add( idmediainfo, type, tfolder, tfile ){
                     $css_extra = '';
                     foreach( $links AS $img ){
                 ?>
-            <td class='pointer' onclick='mediainfo_image_add( <?php echo $G_DATA[ 'idmediainfo' ]; ?>, "<?php echo $title; ?>", "<?php echo basename( dirname( $img ) ); ?>", "<?php echo basename( $img ); ?>" );'>
+            <td class='pointer' onclick='mediainfo_image_add( <?php echo $G_DATA[ 'idmediainfo' ]; ?>, "<?php echo $title; ?>", "<?php echo $fileimgpathrnd; ?>", "<?php echo basename( $img ); ?>" );'>
                 <img rel='noreferrer' class='listElementPosterTinyFreeSize' src='<?php echo getURLImgTmp( $img ); ?>' />
             </td>
                 <?php
