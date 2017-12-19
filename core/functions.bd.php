@@ -1151,13 +1151,14 @@
 		$result = FALSE;
 		
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
-			$sql = 'SELECT * FROM media ';
+			$sql = 'SELECT *, media.idmediainfo AS idmediainfo FROM media ';
+			$sql .= ' LEFT JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
 			//$sql .= ' WHERE idmediainfo <= 0';
 			$sql .= ' WHERE 1 = 1';
 			if( strlen( $search ) > 0 ){
                 $sql .= ' AND file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\'';
 			}
-			$sql .= ' ORDER BY idmediainfo, idmedia ASC LIMIT ' . $limit;
+			$sql .= ' ORDER BY media.idmediainfo ASC LIMIT ' . $limit;
 			//var_dump( $sql );
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
 			sqlite_db_close();

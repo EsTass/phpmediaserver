@@ -10,6 +10,15 @@
         $G_SEARCH = '';
 	}
 	
+	$fields = array(
+        'idmedia',
+        'file',
+        'idmediainfo',
+        'title',
+        'season',
+        'episode',
+	);
+	
 	if( ( $edata = sqlite_media_getdata_identify( $G_SEARCH ) ) ){
 ?>
 
@@ -79,9 +88,10 @@ function ident_autoset_idmedia( idmedia ){
             <th>Poster</th>
             <th>idmedia</th>
             <th>File</th>
-            <th>AudioT</th>
-            <th>SubsT</th>
             <th>idmediainfo</th>
+            <th>Title</th>
+            <th>Season</th>
+            <th>Episode</th>
             <th><?php echo get_msg( 'MENU_ACTION', FALSE ); ?></th>
         </tr>
                 <?php
@@ -93,10 +103,12 @@ function ident_autoset_idmedia( idmedia ){
                 <img class='listElementImg listElementImgMini lazy' src='' data-src='<?php echo getURLImg( $lrow[ 'idmedia' ], FALSE, 'poster' ); ?>' class='listElementPosterTiny' />
             </td>
                 <?php
-                        foreach( $lrow AS $data ){
+                        foreach( $lrow AS $field => $data ){
+                            if( in_array( $field, $fields ) ){
                 ?>
             <td class='<?php echo $css_extra; ?>' title='<?php echo $data; ?>'><?php echo substr( $data, 0, 250 ); ?></td>
                 <?php
+                            }
                         }
                 ?>
             <td>
