@@ -24,6 +24,8 @@
             ),
             //Search Data In Web
             'searchdata' => array(
+                //Own search function
+                'searchfunction' => '',
                 //Web URL to search: 'torrents.com/?q='
                 'urlsearch' => '',
                 //Web URL to baselist used for 0 search and cron autodownloads: 'torrents.com/'
@@ -85,6 +87,8 @@
                     'filtersizefunction' => '',
                     //DOWNLOAD MULTIPLE
                     'downloadmultiple' => FALSE,
+                    //DOWNLOAD function
+                    'downloadfunction' => FALSE,
                 ),
                 //Pass 2 config
                 //...
@@ -102,7 +106,18 @@
         $result = FALSE;
         
         $exturl = '';
-        if( array_key_exists( $wscrapper, $G_WEBSCRAPPER )
+        //searchfunction
+        if( array_key_exists( $wscrapper, $G_WEBSCRAPPER ) 
+        && ( $scrapperdata = $G_WEBSCRAPPER[ $wscrapper ] ) != FALSE
+        && is_array( $scrapperdata )
+        && array_key_exists( 'searchdata', $scrapperdata )
+        && is_array( $scrapperdata[ 'searchdata' ] )
+        && array_key_exists( 'searchfunction', $scrapperdata[ 'searchdata' ] )
+        && function_exists( $scrapperdata[ 'searchdata' ][ 'searchfunction' ] )
+        ){
+            if( $debug ) echo "<br />Search function: " . $scrapperdata[ 'searchdata' ][ 'searchfunction' ];
+            $result = $scrapperdata[ 'searchdata' ][ 'searchfunction' ]( $scrapperdata, $search, $debug );
+        }elseif( array_key_exists( $wscrapper, $G_WEBSCRAPPER )
         && ( $scrapperdata = $G_WEBSCRAPPER[ $wscrapper ] ) != FALSE
         && is_array( $scrapperdata )
         && array_key_exists( 'searchdata', $scrapperdata )
@@ -343,7 +358,17 @@
             if( array_key_exists( 'passnext', $scrapperdata[ 'passdata' ][ $pass ] )
             && $scrapperdata[ 'passdata' ][ $pass ][ 'passnext' ] == FALSE
             ){
-                if( array_key_exists( 'type', $scrapperdata )
+                if( array_key_exists( 'downloadfunction', $scrapperdata[ 'passdata' ][ $pass ] )
+                && function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'downloadfunction' ] )
+                ){
+                    //own function
+                    if( $scrapperdata[ 'passdata' ][ $pass ][ 'downloadfunction' ]( $url, $debug ) != FALSE ){
+                        if( $echo ) echo get_msg( 'WEBSCRAP_FILEDOWNLOADED', FALSE ) . $url;
+                        $result = TRUE;
+                    }else{
+                        if( $echo ) echo get_msg( 'WEBSCRAP_FILEDOWNLOADED_ERROR', FALSE ) . $url;
+                    }
+                }elseif( array_key_exists( 'type', $scrapperdata )
                 && $scrapperdata[ 'type' ] == 'amule'
                 ){
                     //Amule
