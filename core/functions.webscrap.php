@@ -280,22 +280,9 @@
                     //Check exist
                     if( array_key_exists( 'duplicatescheck', $scrapperdata ) 
                     && $scrapperdata[ 'duplicatescheck' ] == TRUE
+                    && ( $title_ext = webscrap_check_duplicates( $title ) ) != FALSE
                     ){
-                        $basetitle = preg_replace('/[\W,\d]/', ' ', $basetitle);
-                        $basetitle = preg_replace('/\s\s+/', ' ', $basetitle);
-                        $basetitle = trim( $basetitle );
-                        $basetitle = str_ireplace( ' ', '%', $basetitle );
-                        if( strlen( str_ireplace( '%', '' , $basetitle ) ) == 0 ){
-                            $basetitle = $title;
-                        }
-                        if( ( $idexist = sqlite_media_check_exist_search( $basetitle ) ) != FALSE 
-                        && ( $idmediad = sqlite_media_getdata( $idexist ) ) != FALSE
-                        && array_key_exists( 0, $idmediad )
-                        && is_array( $idmediad[ 0 ] )
-                        && array_key_exists( 'file', $idmediad[ 0 ] )
-                        ){
-                            $title .= ' (EXIST:' . $idexist . '-' . basename( $idmediad[ 0 ][ 'file' ] ) . '-' . $basetitle . ')';
-                        }
+                        $title .= $title_ext;
                     }
                     //Add
                     if( !is_array( $result ) ) $result = array();
@@ -806,6 +793,117 @@
                 $result[ $title ] = $link;
             }
         }
+        return $result;
+    }
+    
+    //CHECK DUPLICATES
+    
+    function webscrap_check_duplicates( $title, $debug = PPATH_WEBSCRAP_DEBUG ){
+        $result = FALSE;
+        $basetitle = $title;
+        if( $debug ) echo "<br />CHECKDUPLYS START: " . $title;
+        $basetitle = clean_filename( $basetitle );
+        $basetitle = preg_replace('/[\W,\d]/', ' ', $basetitle);
+        $basetitle = preg_replace('/\s\s+/', ' ', $basetitle);
+        $basetitle = trim( $basetitle );
+        $basetitle = preg_replace( '/\b\w\b\s?/', '', $basetitle );
+        if( $debug ) echo "<br />CHECKDUPLYS CLEANTITLE: " . $basetitle;
+        
+        if( ( $season = get_media_chapter( $title ) ) != FALSE 
+        && is_array( $season )
+        && count( $season ) > 1
+        ){
+            $chapter = $season[ 1 ];
+            $season = $season[ 0 ];
+            if( $debug ) echo "<br />CHECKDUPLYS CHAPTERS: " . $season . 'x' . $chapter;
+            $basetitle = clean_media_chapter( $basetitle );
+        }else{
+            $chapter = FALSE;
+            $season = FALSE;
+            if( $debug ) echo "<br />CHECKDUPLYS NO CHAPTERS: " . $basetitle;
+        }
+        
+        $basetitle = str_ireplace( ' ', '%', $basetitle );
+        if( strlen( str_ireplace( '%', '' , $basetitle ) ) == 0 ){
+            $basetitle = $title;
+        }
+        
+        if( $season != FALSE ){
+            $ext_p2p_file = '*' . $season . '{?,??,???}' . $chapter . '*';
+        }else{
+            $ext_p2p_file = '*';
+        }
+        $filep2p = PPATH_WEBSCRAP_DOWNLOAD . DS . '*' . str_ireplace( '%', '*' , $basetitle ) . $ext_p2p_file . '.*';
+        if( $debug ) echo "<br />CHECKDUPLYS P2P FILE TO CHECK: " . basename( $filep2p );
+        if( ( $filesp2p = glob( $filep2p ) ) !== FALSE 
+        && is_array( $filesp2p )
+        && count( $filesp2p ) > 0
+        ){
+            if( $debug ) echo "<br />CHECKDUPLYS IS DUPLY P2P: " . basename( $filesp2p[ 0 ] );
+        }elseif( ( $idexist = sqlite_media_check_exist_search( $basetitle ) ) != FALSE 
+        && ( $idmediad = sqlite_media_getdata( $idexist ) ) != FALSE
+        && array_key_exists( 0, $idmediad )
+        && is_array( $idmediad[ 0 ] )
+        && array_key_exists( 'file', $idmediad[ 0 ] )
+        && (
+            ( $chapter == FALSE 
+            //remake to multiple coincidences
+            && array_key_exists( 'idmediainfo', $idmediad[ 0 ] )
+            && $idmediad[ 0 ][ 'idmediainfo' ] > 0
+            && ( $midata = sqlite_mediainfo_getdata( $idmediad[ 0 ][ 'idmediainfo' ] ) ) != FALSE
+            && is_array( $midata )
+            && array_key_exists( 0, $midata )
+            && is_array( $midata[ 0 ] )
+            && array_key_exists( 'season', $midata[ 0 ] )
+            && (int)$midata[ 0 ][ 'season' ] <= 0
+            )
+            ||
+            (  
+                array_key_exists( 'idmediainfo', $idmediad[ 0 ] )
+                && $idmediad[ 0 ][ 'idmediainfo' ] > 0
+                && ( $midata = sqlite_mediainfo_getdata( $idmediad[ 0 ][ 'idmediainfo' ] ) ) != FALSE
+                && is_array( $midata )
+                && array_key_exists( 0, $midata )
+                && is_array( $midata[ 0 ] )
+                && array_key_exists( 'title', $midata[ 0 ] )
+                && ( $findedmi = sqlite_mediainfo_check_exist( $midata[ 0 ][ 'title' ], $season, $chapter ) ) != FALSE
+                && ( $midata = sqlite_mediainfo_getdata( $findedmi ) ) != FALSE
+                && is_array( $midata )
+                && array_key_exists( 0, $midata )
+                && is_array( $midata[ 0 ] )
+                && array_key_exists( 'title', $midata[ 0 ] )
+                && ( $newfile = sqlite_media_getdata_mediainfo( $findedmi, 1 ) ) != FALSE
+                && is_array( $newfile )
+                && array_key_exists( 0, $newfile )
+                && array_key_exists( 'file', $newfile[ 0 ] )
+            )
+        )
+        ){
+            if( $debug ) echo "<br />CHECKDUPLYS IS DUPLY: " . $basetitle;
+            if( isset( $midata ) 
+            && is_array( $midata )
+            && array_key_exists( 0, $midata )
+            && is_array( $midata[ 0 ] )
+            && array_key_exists( 'season', $midata[ 0 ] )
+            && $midata[ 0 ][ 'season' ] > 0
+            ){
+                $ext_season = ' ' . $midata[ 0 ][ 'season' ] . 'x' . $midata[ 0 ][ 'episode' ] . ' ';
+            }else{
+                $ext_season = '';
+            }
+            if( isset( $newfile ) 
+            && is_array( $newfile )
+            && array_key_exists( 0, $newfile )
+            && array_key_exists( 'file', $newfile[ 0 ] )
+            ){
+                $result .= ' (EXIST:' . $idexist . '-' . basename( $newfile[ 0 ][ 'file' ] ) . $ext_season . ')';
+            }else{
+                $result .= ' (EXIST:' . $idexist . '-' . basename( $idmediad[ 0 ][ 'file' ] ) . $ext_season . ')';
+            }
+        }else{
+            if( $debug ) echo "<br />CHECKDUPLYS NOT DUPLY: " . $basetitle;
+        }
+        
         return $result;
     }
     

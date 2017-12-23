@@ -929,6 +929,51 @@
             $result = array();
             $result[] = (int)$d[ 0 ];
             $result[] = (int)$d[ 1 ];
+        }elseif( preg_match( "/[0-9]{1,2}×[0-9]{1,3}/", basename( $title ), $match ) 
+        && is_array( $match )
+        && count( $match ) > 0
+        && strlen( $match[ 0 ] ) > 3
+        && ( $t = str_ireplace( '×', 'e', $match[ 0 ] ) ) != FALSE
+        && ( $d = explode( 'e', $t ) ) != FALSE
+        && count( $d ) == 2
+        && (int)$d[ 0 ] > 0
+        && (int)$d[ 1 ] > 0
+        ){
+            $result = array();
+            $result[] = (int)$d[ 0 ];
+            $result[] = (int)$d[ 1 ];
+        }
+        
+        return $result;
+    }
+    
+    function clean_media_chapter( $title ){
+        $result = $title;
+        
+        if( ( $season = get_media_chapter( $title ) ) != FALSE
+        && is_array( $season )
+        && count( $season ) > 0
+        ){
+            if( preg_match( "/[0-9]{1,2}[x,X][0-9]{1,3}/", basename( $title ), $match ) 
+            && is_array( $match )
+            && count( $match ) > 0
+            && strlen( $match[ 0 ] ) > 3
+            ){
+                $title = str_ireplace( $match[ 0 ], '', $title );
+            }elseif( preg_match( "/[s,S]?[0-9]{1,2}[e,E][0-9]{1,3}/", basename( $title ), $match ) 
+            && is_array( $match )
+            && count( $match ) > 0
+            && strlen( $match[ 0 ] ) > 3
+            ){
+                $title = str_ireplace( $match[ 0 ], '', $title );
+            }elseif( preg_match( "/[0-9]{1,2}×[0-9]{1,3}/", basename( $title ), $match ) 
+            && is_array( $match )
+            && count( $match ) > 0
+            && strlen( $match[ 0 ] ) > 3
+            ){
+                $title = str_ireplace( $match[ 0 ], '', $title );
+            }
+            $result = $title;
         }
         
         return $result;
