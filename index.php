@@ -56,7 +56,7 @@
 	header('Expires: '.gmdate(DATE_RFC1123,time()+60*60*24*365));
 	
 	//cookie & session timeout
-	$SESS_MAX_TIME = 3600 * 24 * 7; //1 week
+	$SESS_MAX_TIME = 3600 * 24 * 365; //1 year
     ini_set( 'session.gc_maxlifetime', $SESS_MAX_TIME );
     session_set_cookie_params( $SESS_MAX_TIME );
     
