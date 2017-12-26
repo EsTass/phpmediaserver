@@ -118,6 +118,10 @@
                 $G_TIME = 0;
             }
             
+            //SET PLAYTIME
+            $time = ffmpeg_file_info_lenght_seconds( $dir );
+            sqlite_played_replace( $IDMEDIA, $G_TIME, $time );
+            
             //variable bitrate to max especified
             if( $G_QUALITY != 'hd' ){
                 $G_FFMPEGLVL = '3.0';
@@ -146,9 +150,11 @@
             ){
                 //TESTING
                 //$subtrack = ' -filter_complex "[0:v][0:s:' . $subtrack . ']overlay" ';
-                //$subtrack = ' -vf subtitles="' . $dir . '":si=' . $subtrack . ' ';
-                //$subtrack = ' -filter_complex "[0:v][0:s:' . $subtrack . ']overlay[v]" -map "[v]" ';
-                $subtrack = '';
+                //$subtrack = ' -vf subtitles="' . escapeshellarg( $dir ) . '":si=' . $subtrack . ' ';
+                //$subtrack = ' -filter_complex "[0:v][0:s:0]overlay[v]" -map [v] ';
+                //$subtrack = ' -vf subtitles=' . escapeshellarg( $dir ) . ' ';
+                //$subtrack = ' -vf "[0:0][0:' . $subtrack . ']overlay[0]" -map [0] ';
+                //$subtrack = ' -copyts -vf "subtitles=' . escapeshellarg( $dir ) . ',setpts=PTS-STARTPTS" -sn ';
             }else{
                 $subtrack = '';
             }
@@ -163,7 +169,7 @@
                     $AUDIOCODEC = 'aac';
                     //$AUDIOCODEC = 'mp3';
                     //$AUDIOCODEC = 'opus';
-                    $cmd = O_FFMPEG . " -nostdin -re " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -movflags +faststart -bufsize 500k -g 74 -strict experimental -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -level " . $G_FFMPEGLVL . " -profile:v baseline -level 3.0 -preset ultrafast -tune zerolatency -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 64k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+                    $cmd = O_FFMPEG . " -nostdin -re " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -movflags +faststart -bufsize 1000k -g 74 -strict experimental -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -level " . $G_FFMPEGLVL . " -profile:v baseline -level 3.0 -preset ultrafast -tune zerolatency -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 64k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
                     
                     header('Content-type: video/mp4');
                 break;
