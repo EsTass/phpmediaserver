@@ -137,4 +137,68 @@
         return $result;
 	}
 	
+	// KODI
+	
+	/*
+	'''
+    {
+        'Category': [
+            {
+                'name' => 'title',
+                'plot' => 'plot',
+                'year' => 'year',
+                'season' => 'season',
+                'episode' => 'episode',
+                'thumb' => 'url',
+                'landscape' => 'url',
+                'banner' =>  'banner',
+                'video' => 'video',
+                'genre' => 'genres',
+            },
+            ...
+        ],
+        ...
+    }
+    '''
+	*/
+	
+	function get_html_list_kodi( $data, $title ){
+        $result[ $title ] = array();
+        $session = '&PHPSESSION=' . session_id();
+        
+        foreach( $data AS $element ){
+            $genres = $element[ 'genre' ];
+            $ftitle = $element[ 'title' ];
+            $plot = $element[ 'plot' ];
+            $year = $element[ 'year' ];
+            $season = $element[ 'season' ];
+            $episode = $element[ 'episode' ];
+            $urlposter = getURLImg( FALSE, $element[ 'idmediainfo' ], 'poster' ) . $session;
+            $urllandscape = getURLImg( FALSE, $element[ 'idmediainfo' ], 'landscape' ) . $session;
+            $urlbanner =  getURLImg( FALSE, $element[ 'idmediainfo' ], 'banner' ) . $session;
+            $urlplay = getURLBase() . '?r=r&action=playtime&mode=webm&idmedia=' . $element[ 'idmedia' ] . $session;
+            if( $element[ 'season' ] > 0 ){
+                $ftitle .= ' ' . sprintf( '%02d', $element[ 'season' ] ) . 'x' . sprintf( '%02d', $element[ 'episode' ] );
+                if( strlen( $element[ 'titleepisode' ] ) > 0 ){
+                    $ftitle .= ' ' . $element[ 'titleepisode' ];
+                }
+            }
+            $e = array(
+                'name' => $ftitle,
+                'plot' => $plot,
+                'year' => $year,
+                'season' => $season,
+                'episode' => $episode,
+                'thumb' => $urlposter,
+                'landscape' => $urllandscape,
+                'banner' =>  $urlbanner,
+                'video' => $urlplay,
+                'genre' => $genres,
+            );
+            $result[ $title ][] = $e;
+        }
+        
+        return $result;
+	}
+	
 ?>

@@ -7,6 +7,13 @@
 	
 	//_SESSION
 	session_start();
+	//SESSION FROM GET DATA PHPSESSION
+	if( array_key_exists( 'PHPSESSION', $G_DATA ) 
+	&& strlen( $G_DATA[ 'PHPSESSION' ] ) > 12
+	){
+        session_id( $G_DATA[ 'PHPSESSION' ] );
+        session_commit();
+	}
 	$sessionid = session_id();
 	
 	if( ( $sessiondata = sqlite_session_getdata( '', $sessionid ) ) != FALSE 
