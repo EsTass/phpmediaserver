@@ -32,6 +32,9 @@
         ){
             $TIMETOTAL = (int)$G_DATA[ 'timetotal' ];
         }
+        if( $TIMETOTAL == 0 ){
+            $TIMETOTAL = ffmpeg_file_info_lenght_seconds( $mi[ 0 ][ 'file' ] );
+        }
         sqlite_played_update( $IDMEDIA, $TIME, $TIMETOTAL );
         echo get_msg( 'DEF_ELEMENTUPDATED' ) . $TIME;
 	}else{

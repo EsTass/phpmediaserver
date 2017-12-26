@@ -160,6 +160,22 @@
             }
             
             switch( $G_MODE ){
+                //TEST KODI
+                case 'direct':
+                    //slow
+                    $cmd = "cat " . escapeshellarg( $dir ) . "";
+                    
+                    header( 'Content-type: ' . getFileMimeType( $dir ) );
+                break;
+                //TEST KODI
+                case 'fast':
+                    //fast way to kodi
+                    $encoder_outformat = 'matroska';
+                    $encoder = 'libx264'; //webm 9
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -vcodec " . $encoder . " -crf 27 -preset veryfast -c:a copy -f " . $encoder_outformat . " - ";
+                    
+                    header('Content-type: video/matroska');
+                break;
                 case 'mp4':
                     //testing
                     //$encoder_outformat = 'mpegts';
@@ -204,7 +220,9 @@
             sqlite_db_close();
             
             //passthru
-            passthru( $cmd, $cmdok );
+            if( $_SERVER['REQUEST_METHOD'] != 'HEAD' ){
+                passthru( $cmd, $cmdok );
+            }
             
         }
     }
