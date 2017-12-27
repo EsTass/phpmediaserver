@@ -68,8 +68,14 @@
         $G_TIME = 0;
         if( array_key_exists( 'timeplayed', $G_DATA ) 
         && is_numeric( $G_DATA[ 'timeplayed' ] )
+        && (int)$G_DATA[ 'timeplayed' ] > -1
         ){
             $G_TIME = (int)$G_DATA[ 'timeplayed' ];
+        }elseif( array_key_exists( 'timeplayed', $G_DATA ) 
+        && is_numeric( $G_DATA[ 'timeplayed' ] )
+        && (int)$G_DATA[ 'timeplayed' ] == -1
+        ){
+            $G_TIME = sqlite_played_status( $IDMEDIA );
         }
         $G_QUALITY = 'sd';
         if( array_key_exists( 'quality', $G_DATA ) 
@@ -172,7 +178,8 @@
                     //fast way to kodi
                     $encoder_outformat = 'matroska';
                     $encoder = 'libx264'; //webm 9
-                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -vcodec " . $encoder . " -crf 27 -preset veryfast -c:a copy -f " . $encoder_outformat . " - ";
+                    //" . $subtrack . " " . $audiotrack . "
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " -vcodec " . $encoder . " -crf 23 -preset ultrafast -c:a copy -f " . $encoder_outformat . " - ";
                     
                     header('Content-type: video/matroska');
                 break;
