@@ -101,11 +101,13 @@
                 if( defined( 'O_LANG_AUDIO_TRACK' ) 
                 && is_array( O_LANG_AUDIO_TRACK )
                 ){
+                    $num = 1;
                     foreach( $audiolist AS $at ){
                         if( inString( $at, O_LANG_AUDIO_TRACK ) ){
-                            $AUDIOTRACK = (int)$at;
+                            $AUDIOTRACK = (int)$num;
                             break;
                         }
+                        $num++;
                     }
                 }
             }
@@ -633,17 +635,17 @@ html, body
 	
 		<?php
 			//first normaly video
+			$num = 1;
 			foreach( $audiolist AS $al ){
-                $l = (int)$al;
-                if( $AUDIOTRACK == $l ){
+                if( $AUDIOTRACK == $num ){
                     $atselected = '*';
                 }else{
                     $atselected = '';
                 }
 		?>
-			<div class='playerAudioTrack' onclick='setAudioTrack( <?php echo $l; ?> )'><?php echo $atselected . $al; ?></div>
+			<div class='playerAudioTrack' onclick='setAudioTrack( <?php echo $num; ?> )'><?php echo $atselected . $al; ?></div>
 		<?php
-                
+                $num++;
 			}
 			
 		?>
