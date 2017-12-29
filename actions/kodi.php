@@ -32,7 +32,11 @@
 	*/
 	
 	if( array_key_exists( 'search', $G_DATA ) ){
-        $G_SEARCH = $G_DATA[ 'search' ];       
+        if( mb_detect_encoding( $G_DATA[ 'search' ], 'UTF-8', TRUE ) ){
+            $G_SEARCH = $G_DATA[ 'search' ];
+        }else{
+            $G_SEARCH = utf8_encode( $G_DATA[ 'search' ] );
+        }
 	}else{
         $G_SEARCH = '';
 	}
@@ -44,7 +48,11 @@
 	}
 	
 	if( array_key_exists( 'cat', $G_DATA ) ){
-        $G_CAT = utf8_decode( $G_DATA[ 'cat' ] );
+        if( mb_detect_encoding( $G_DATA[ 'cat' ], 'UTF-8', TRUE ) ){
+            $G_CAT = $G_DATA[ 'cat' ];
+        }else{
+            $G_CAT = utf8_encode( $G_DATA[ 'cat' ] );
+        }
 	}else{
         $G_CAT = '';
 	}
@@ -68,10 +76,10 @@
         break;
         case 'categories':
             $RESULT = array( 
-                get_msg( 'LIST_TITLE_CONTINUE', FALSE ),
-                get_msg( 'LIST_TITLE_PREMIERE', FALSE ),
-                get_msg( 'LIST_TITLE_RECOMENDED', FALSE ),
-                get_msg( 'LIST_TITLE_LAST', FALSE ),
+                ' ' . get_msg( 'LIST_TITLE_CONTINUE', FALSE ),
+                ' ' . get_msg( 'LIST_TITLE_PREMIERE', FALSE ),
+                ' ' . get_msg( 'LIST_TITLE_RECOMENDED', FALSE ),
+                ' ' . get_msg( 'LIST_TITLE_LAST', FALSE ),
                 '+' . get_msg( 'MEDIA_TYPE_SERIE', FALSE ),
                 '-' . get_msg( 'MENU_SEARCH', FALSE ),
                 '*' . get_msg( 'MENU_UPDATE', FALSE ),
@@ -85,7 +93,103 @@
             }
         break;
         case 'category':
-            if( ( $edata = sqlite_media_getdata_filtered( utf8_encode( $G_CAT ), 1000 ) ) != FALSE 
+            if( $G_CAT == ' ' . get_msg( 'LIST_TITLE_LAST', FALSE ) ){
+                //Last Added
+                if( ( $edata = sqlite_media_getdata_filtered( $G_SEARCH, O_LIST_BIG_QUANTITY ) ) != FALSE 
+                && count( $edata ) > 0
+                ){
+                    $TITLE = get_msg( 'LIST_TITLE_LAST', FALSE );
+                    $RESULT = get_html_list_kodi( $edata, $TITLE );
+                    $RESULT = $RESULT[ $TITLE ];
+                }else{
+                    $e = array(
+                        'name' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'plot' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'year' => '',
+                        'season' => '',
+                        'episode' => '',
+                        'thumb' => '',
+                        'landscape' => '',
+                        'banner' =>  '',
+                        'video' => '',
+                        'genre' => '',
+                    );
+                    $RESULT = array( $e );
+                }
+            
+            }elseif( $G_CAT == ' ' . get_msg( 'LIST_TITLE_CONTINUE', FALSE ) ){
+                //Continue
+                if( ( $edata = sqlite_played_getdata_ext( FALSE, '', TRUE, O_LIST_BIG_QUANTITY, TRUE ) ) != FALSE 
+                && count( $edata ) > 0
+                ){
+                    $TITLE = get_msg( 'LIST_TITLE_CONTINUE', FALSE );
+                    $RESULT = get_html_list_kodi( $edata, $TITLE );
+                    $RESULT = $RESULT[ $TITLE ];
+                }else{
+                    $e = array(
+                        'name' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'plot' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'year' => '',
+                        'season' => '',
+                        'episode' => '',
+                        'thumb' => '',
+                        'landscape' => '',
+                        'banner' =>  '',
+                        'video' => '',
+                        'genre' => '',
+                    );
+                    $RESULT = array( $e );
+                }
+            
+            }elseif( $G_CAT == ' ' . get_msg( 'LIST_TITLE_PREMIERE', FALSE ) ){
+                //Premiere
+                if( ( $edata = sqlite_media_getdata_premiere_ex( O_LIST_BIG_QUANTITY ) ) != FALSE 
+                && count( $edata ) > 0
+                ){
+                    $TITLE = get_msg( 'LIST_TITLE_PREMIERE', FALSE );
+                    $RESULT = get_html_list_kodi( $edata, $TITLE );
+                    $RESULT = $RESULT[ $TITLE ];
+                }else{
+                    $e = array(
+                        'name' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'plot' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'year' => '',
+                        'season' => '',
+                        'episode' => '',
+                        'thumb' => '',
+                        'landscape' => '',
+                        'banner' =>  '',
+                        'video' => '',
+                        'genre' => '',
+                    );
+                    $RESULT = array( $e );
+                }
+            
+            }elseif( $G_CAT == ' ' . get_msg( 'LIST_TITLE_RECOMENDED', FALSE ) ){
+                //Recommended
+                if( ( $edata = media_get_recomended( O_LIST_BIG_QUANTITY ) ) != FALSE 
+                && count( $edata ) > 0
+                ){
+                    $TITLE = get_msg( 'LIST_TITLE_RECOMENDED', FALSE );
+                    $RESULT = get_html_list_kodi( $edata, $TITLE );
+                    $RESULT = $RESULT[ $TITLE ];
+                }else{
+                    $e = array(
+                        'name' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'plot' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'year' => '',
+                        'season' => '',
+                        'episode' => '',
+                        'thumb' => '',
+                        'landscape' => '',
+                        'banner' =>  '',
+                        'video' => '',
+                        'genre' => '',
+                    );
+                    $RESULT = array( $e );
+                }
+            
+            }elseif( ( $edata = sqlite_media_getdata_filtered( $G_CAT, 1000 ) ) != FALSE 
             && is_array( $edata )
             && count( $edata ) > 0
             ){
@@ -109,7 +213,7 @@
             }
         break;
         case 'search':
-            if( ( $edata = sqlite_media_getdata_filtered( utf8_encode( $G_SEARCH ), 1000 ) ) != FALSE 
+            if( ( $edata = sqlite_media_getdata_filtered( $G_SEARCH, 1000 ) ) != FALSE 
             && is_array( $edata )
             && count( $edata ) > 0
             ){
@@ -133,7 +237,7 @@
             }
         break;
         case 'series':
-            if( ( $edata = sqlite_media_getdata_filtered_grouped( utf8_encode( $G_SEARCH ), 10000, FALSE, TRUE ) ) != FALSE 
+            if( ( $edata = sqlite_media_getdata_filtered_grouped( $G_SEARCH, 10000, FALSE, TRUE ) ) != FALSE 
             && is_array( $edata )
             && count( $edata ) > 0
             ){
