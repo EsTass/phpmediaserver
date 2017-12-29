@@ -6,6 +6,29 @@
 	//search
 	//page
 	
+	/*
+	'''
+    {
+        'Category': [
+            {
+                'name' => 'title',
+                'plot' => 'plot',
+                'year' => 'year',
+                'season' => 'season',
+                'episode' => 'episode',
+                'thumb' => 'url',
+                'landscape' => 'url',
+                'banner' =>  'banner',
+                'video' => 'video',
+                'genre' => 'genres',
+            },
+            ...
+        ],
+        ...
+    }
+    '''
+	*/
+	
 	if( array_key_exists( 'search', $G_DATA ) ){
         $G_SEARCH = $G_DATA[ 'search' ];       
 	}else{
@@ -73,17 +96,32 @@
             }
         }
         
+        //ADD SEARCH & UPDATE
+        $e = array(
+            'name' => get_msg( 'MENU_SEARCH', FALSE ),
+            'plot' => get_msg( 'MENU_SEARCH', FALSE ),
+            'year' => '',
+            'season' => '',
+            'episode' => '',
+            'thumb' => '',
+            'landscape' => '',
+            'banner' =>  '',
+            'video' => '',
+            'genre' => '',
+        );
+        $e[ 'search' ] = TRUE;
+        $ELIST[ get_msg( 'MENU_SEARCH', FALSE ) ] = array( $e );
+        unset( $e[ 'search' ] );
+        $e[ 'update' ] = TRUE; 
+        $ELIST[ get_msg( 'MENU_UPDATE', FALSE ) ] = array( $e );
+        
     }else{
-        if( $G_PAGE === FALSE ){
-            $G_PAGE = 0;
-        }
         $TITLE = get_msg( 'LIST_SEARCH_RESULT', FALSE );
-        if( ( $edata_pages = sqlite_media_getdata_filtered_grouped_pages_total( $G_SEARCH, O_LIST_BIG_QUANTITY ) ) != FALSE 
-        && ( $edata = sqlite_media_getdata_filtered( $G_SEARCH, O_LIST_BIG_QUANTITY, $G_PAGE, $edata_pages ) ) != FALSE 
+        if( ( $edata = sqlite_media_getdata_filtered( $G_SEARCH, 1000 ) ) != FALSE 
         ){
             $TITLE = get_msg( 'LIST_TITLE_LAST', FALSE );
-            $edata_pages = (int)( $edata_pages / O_LIST_BIG_QUANTITY );
-            $ELIST = get_html_list_kodi( $edata, $TITLE, $G_PAGE, $edata_pages );
+            $ELIST = get_html_list_kodi( $edata, $TITLE );
+            $ELIST = $ELIST[ $TITLE ];
         }else{
             die( get_msg( 'DEF_EMPTYLIST', FALSE ) );
         }
