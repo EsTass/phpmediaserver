@@ -394,8 +394,16 @@
 					&& strlen( $d[ 'language' ] ) > 0
 					){
                         $lang = $d[ 'language' ];
+					}elseif( is_array( $d )
+					&& array_key_exists( 'language', $d )
+					&& is_array( $d[ 'language' ] )
+					&& count( $d[ 'language' ] ) > 0
+					){
+                        foreach( $d[ 'language' ] AS $k => $v ){
+                            $lang .= $v . ', ';
+                        }
 					}else{
-                        $lang = get_msg( 'DEF_NOTSPECIFIED' );
+                        $lang = get_msg( 'DEF_NOTSPECIFIED', FALSE );
 					}
 					if( strlen( $rtesult[ $f ] ) > 0 ){
                         $rtesult[ $f ] .= ',';
@@ -414,12 +422,21 @@
 				$data = $xml[ 'fileinfo' ][ 'streamdetails' ][ 'subtitle' ];
 				foreach( $data AS $d ){
 					if( is_array( $d )
-					&& array_key_exists( 'language', $d ) 
+					&& array_key_exists( 'language', $d )
+					&& is_string( $d[ 'language' ] )
 					&& strlen( $d[ 'language' ] ) > 0
 					){
                         $lang = $d[ 'language' ];
+					}elseif( is_array( $d )
+					&& array_key_exists( 'language', $d )
+					&& is_array( $d[ 'language' ] )
+					&& count( $d[ 'language' ] ) > 0
+					){
+                        foreach( $d[ 'language' ] AS $k => $v ){
+                            $lang .= $v . ', ';
+                        }
 					}else{
-                        $lang = get_msg( 'DEF_NOTSPECIFIED' );
+                        $lang = get_msg( 'DEF_NOTSPECIFIED', FALSE );
 					}
 					if( strlen( $rtesult[ $f ] ) > 0 ){
                         $rtesult[ $f ] .= ',';
