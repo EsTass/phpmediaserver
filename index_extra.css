@@ -223,9 +223,10 @@
 .menuBox{
 	display: table;
 	width: 100%;
+    min-width: 100%;
+    max-width: 100%;
 	height: auto;
 	text-align: center;
-	
 	position: fixed;
 	top: 0px;
 	left: 0px;
@@ -241,7 +242,12 @@
 	/* text-shadow: 2px 2px black; */
 	font-weight: bold;
 	background-color: transparent;
-    border-right: 1px solid dimgray;
+    width: auto;
+    margin: auto;
+}
+
+.listMenuElement:hover{
+	background-color: dimgray;
 }
 
 .listMenuElementAdmin{
@@ -251,9 +257,15 @@
 	font-weight: bold;
 	background-color: indigo;
     border-right: 1px solid dimgray;
+    width: auto;
+    margin: auto;
 }
 
-.listMenuElement a{
+.listMenuElementAdmin:hover{
+	background-color: dimgray;
+}
+
+.listMenuElement a, .listMenuElementAdmin a{
 	padding: 0px 10px;
 	text-decoration: none;
 }
@@ -725,4 +737,217 @@
     background: rgba(50,50,50,.5);
     -webkit-align-items: center;
     align-items: center;
+}
+
+.dRow{
+    display: table-row;
+}
+
+
+/* PLAYER BOX 2 */
+
+.playerBoxControls{
+    background: rgba(0,0,0,0.5);
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: auto;
+    min-height: 5%;
+    text-align: center;
+    margin: 0px;
+    vertical-align: middle;
+    /* border: 1px solid gray; */
+    z-index: 9999;
+    left: 0px;
+    bottom: 0px;
+    display: table;
+}
+
+.playerBoxControls div{
+    box-sizing:border-box;
+}
+
+.playerBoxBarInfo{
+    width: 20vh;
+    max-width: 20vh;
+    display: table-cell;
+    text-align: center;
+}
+.playerBoxBarInfo img{
+    max-width: 100%;
+    max-height: 40vh;
+}
+
+.playerBoxBarControls{
+    width: 80vh;
+    max-width: 80vh;
+    display: table-cell;
+    vertical-align: top;
+}
+.playerBoxBarControlsTitle{
+    font-size: 160%;
+    display:block;
+    text-align: center;
+}
+.tRow{
+    display: table-row;
+}
+.tbSlider{
+    padding: 1%;
+    margin: auto;
+    width: 100%;
+    display: table-cell;
+}
+.tbTimer{
+    width: auto;
+    display: table-cell;
+    padding: 10px;
+    vertical-align: middle;
+}
+.playerBoxBarControlsTimeBarSlide{
+    width: 96%;
+}
+.playerBoxBarControlsButton{
+    width: auto;
+    height: auto;
+    display: table-cell;
+    font-size: 160%;
+    padding: 0.2em 0.5em;
+    margin: 0.2em;
+    cursor: pointer;
+}
+.playerBoxBarControlsButton:hover{
+    background-color: #595959;
+}
+.playerBoxBarControlsButtonSelected{
+    background-color: #797979 !important;
+}
+.text120{
+    font-size: 120% !important;
+}
+.playerBoxControls hr{
+    border: 0; 
+    height: 1px;
+    background: transparent;
+    margin: 0px;
+    border: 0px;
+    padding: 2px;
+}
+.videoinfo{
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 90%;
+    color: #c3c3c3;
+}
+
+/* RANGE */
+input[type=range].slider {
+  -webkit-appearance: none;
+  width: 100%;
+  margin: 0.7px 0;
+  background-color: transparent;
+}
+input[type=range].slider:focus {
+  outline: none;
+}
+input[type=range].slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 25.6px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #484d4d;
+  border-radius: 0px;
+  border: 0px solid #010101;
+}
+input[type=range].slider::-webkit-slider-thumb {
+  box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
+  border: 0px solid #ff1e00;
+  height: 27px;
+  width: 18px;
+  border-radius: 0px;
+  background: rgba(202, 200, 202, 0.81);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -0.7px;
+}
+input[type=range].slider:focus::-webkit-slider-runnable-track {
+  background: #545a5a;
+}
+input[type=range].slider::-moz-range-track {
+  width: 100%;
+  height: 25.6px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #484d4d;
+  border-radius: 0px;
+  border: 0px solid #010101;
+}
+input[type=range].slider::-moz-range-thumb {
+  box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
+  border: 0px solid #ff1e00;
+  height: 27px;
+  width: 18px;
+  border-radius: 0px;
+  background: rgba(202, 200, 202, 0.81);
+  cursor: pointer;
+}
+input[type=range].slider::-ms-track {
+  width: 100%;
+  height: 25.6px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range].slider::-ms-fill-lower {
+  background: #3c4040;
+  border: 0px solid #010101;
+  border-radius: 0px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range].slider::-ms-fill-upper {
+  background: #484d4d;
+  border: 0px solid #010101;
+  border-radius: 0px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range].slider::-ms-thumb {
+  box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
+  border: 0px solid #ff1e00;
+  height: 27px;
+  width: 18px;
+  border-radius: 0px;
+  background: rgba(202, 200, 202, 0.81);
+  cursor: pointer;
+  height: 25.6px;
+}
+input[type=range].slider:focus::-ms-fill-lower {
+  background: #484d4d;
+}
+input[type=range].slider:focus::-ms-fill-upper {
+  background: #545a5a;
+}
+
+/* dSlider */
+
+.dSlider{
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    cursor: pointer;
+    -webkit-box-shadow: 0 0 4px white; 
+    -moz-box-shadow: 0 0 4px white; 
+    box-shadow: 0 0 4px white;
+}
+.dSliderInner{
+    width: 0%;
+    height: 100%;
+    background-color: CornflowerBlue;
+    overflow: hidden;
+    text-align: right;
+    -webkit-box-shadow: 0 0 4px CornflowerBlue;
+    -moz-box-shadow: 0 0 4px CornflowerBlue;
+    box-shadow: 0 0 4px CornflowerBlue;
+    font-size: 80%;
+    border-right: 2px solid white;
 }
