@@ -55,6 +55,10 @@
         || !is_int( $playedtimebefore )
         ){
             $playedtimebefore = 0;
+        }else{
+            if( $playedtimebefore > ( $time - ( $time / 10 ) ) ){
+                $playedtimebefore = 0;
+            }
         }
         sqlite_played_replace( $IDMEDIA, $playedtimebefore, $time );
         $PLAYERSKIPTIME = 10;
@@ -63,6 +67,7 @@
         $urllandscape = getURLImg( FALSE, $IDMEDIAINFO, 'landscape' );
         $inforul = getURLInfo( FALSE, $IDMEDIAINFO );
         $nextfileinfo = getURLNextInfo( FALSE, $IDMEDIAINFO );
+        $backfileinfo = getURLBackInfo( FALSE, $IDMEDIAINFO );
         
         if( $IDMEDIAINFO > 0
         && ( $mi = sqlite_mediainfo_getdata( $IDMEDIAINFO, 1 ) ) != FALSE 
@@ -84,13 +89,23 @@
             ){
                 $title .= ' ' . $mi[ 0 ][ 'titleepisode' ];
             }
+            $year = $mi[ 0 ][ 'year' ];
+            $rating = $mi[ 0 ][ 'rating' ];
         }else{
             $title = 'No Title';
+            $year = '';
+            $rating = '';
         }
         
         $audiolist = array();
         $subslist = array();
         $AUDIOTRACK = 1;
+        $CODECORDER = array(
+            //url ident = header type
+            'webm' => 'webm',
+            'mp4' => 'mp4',
+            'webm2' => 'webm',
+        );
         
         if( ( $videoinfo = ffprobe_get_data( $FMEDIA ) ) != FALSE 
         && is_array( $videoinfo )
@@ -116,6 +131,25 @@
             ){
                 $subslist = $videoinfo[ 'subtracks' ];
             }
+            
+            if( array_key_exists( 'codec', $videoinfo )
+            && strlen( $videoinfo[ 'codec' ] ) > 0 
+            ){
+                //ORDER BY CODEC
+                /*
+                if( stripos( $videoinfo[ 'codec' ], 'mpeg' ) !== FALSE
+                || stripos( $videoinfo[ 'codec' ], '264' ) !== FALSE
+                ){
+                    $CODECORDER = array(
+                        //url ident = header type
+                        'mp4' => 'mp4',
+                        'webm' => 'webm',
+                        'webm2' => 'webm',
+                    );
+                }
+                */
+            }
+            
         }
 ?>
 
@@ -123,7 +157,7 @@
 $(function () {
 	$( window ).on( 'beforeunload', function(){
 		$.ajax({
-			url : '?action=playstop&timeplayed=' + playedtotaltime + '&timetotal=<?php echo $time; ?>&idmedia=<?php echo $IDMEDIA; ?>',
+			url : '?action=playstop&timeplayed=' + parseInt( $( '#slideTime' ).val() ) + '&timetotal=<?php echo $time; ?>&idmedia=<?php echo $IDMEDIA; ?>',
 			type : 'GET',
 			dataType : 'json',
 			success : function (result) {
@@ -131,11 +165,13 @@ $(function () {
 			}
 		});
 		var videoElement = document.getElementById( 'my-player' );
-		videoElement.pause();
-		$( '#my-player' ).off();
-		$( '#my-player source' ).off();
-		videoElement.src =""; // empty source
-		videoElement.load();
+		if( videoElement ){
+            videoElement.pause();
+            $( '#my-player' ).off();
+            $( '#my-player source' ).off();
+            videoElement.src =""; // empty source
+            videoElement.load();
+        }
 	});
 	
 	//player
@@ -157,6 +193,58 @@ $(function () {
 			$( '#my-player' ).addClass( 'cursorTransparent' ); 
 			$( '#my-player' ).css( 'cursor', 'none' ); 
 		}, 2000);
+	});
+	//buttons
+	$( '#playerControlStop' ).click( function(){
+        goToURL( '<?php echo $inforul; ?>' );
+	});
+	//playerControlPlayBack
+	$( '#playerControlPlayBack' ).click( function(){
+        var seconds = parseInt( $( '#slideTime' ).val() ) - parseInt( playerskiptime );
+        if( seconds < 0 ){
+            seconds = 0;
+        }
+        playerTimeChanged( seconds );
+	});
+	//dSlider
+	$( '.dSlider' ).click( function(e) {
+        var posX = e.pageX - parseInt( $(this).position().left );
+        var posY = e.pageY - parseInt( $(this).position().top );
+        var size = parseInt( $(this).width() );
+        var pos = parseInt( ( ( 100 * posX ) / size ) );
+        var nowtime = parseInt( ( totaltime / 100 ) * pos );
+        $( '.dSliderInner' ).css( 'width', pos + '%');
+        if( DEBUG ) console.log( 'CHANGED TIME: ' + nowtime );
+        playerTimeChanged( nowtime );
+        //alert( posX + ' , ' + posY + ' - ' + size + ' - ' + pos + '%' + ' - ' + nowtime + '%' );
+    });
+    $( ".dSlider" ).mousemove( function(e){
+        var posX = e.pageX - parseInt( $(this).position().left );
+        var posY = e.pageY - parseInt( $(this).position().top );
+        var size = parseInt( $(this).width() );
+        var pos = parseInt( ( ( 100 * posX ) / size ) );
+        var nowtime = parseInt( ( totaltime / 100 ) * pos );
+        $( '.dSlider' ).prop( 'title', secondsTimeSpanToHMS( nowtime ) + ' (' + pos + '%)');
+        if( DEBUG ) console.log( 'MOUSE CHANGED TIME: ' + nowtime );
+    });
+	//playerControlPause
+	$( '#playerControlPause' ).click( function(){
+        document.getElementById( 'my-player' ).pause();
+	});
+	//playerControlPlay
+	$( '#playerControlPlay' ).click( function(){
+        document.getElementById( 'my-player' ).play();
+	});
+	//playerControlPlayFor
+	$( '#playerControlPlayFor' ).click( function(){
+        var seconds = parseInt( $( '#slideTime' ).val() ) + parseInt( playerskiptime );
+        playerTimeChanged( seconds );
+	});
+	
+	//playerBoxBarControlsButton
+	$( '.basecontrols .playerBoxBarControlsButton' ).click( function(){
+        $( '.basecontrols .playerBoxBarControlsButton' ).removeClass( 'playerBoxBarControlsButtonSelected' );
+		$( this ).addClass( 'playerBoxBarControlsButtonSelected' );
 	});
 	
 	//video events SOURCES
@@ -209,7 +297,8 @@ $(function () {
 	//play
 	$( '#my-player' ).on( "play", function( event ) {
 		if( DEBUG ) console.log( 'VIDEO play: ' + parseInt( playedtotaltime ) + ' - ' + this.duration + ' - ' + this.networkState );
-		$( '#playerControlPlay' ).html( '&#x25B7;' );
+		$( '.basecontrols .playerBoxBarControlsButton' ).removeClass( 'playerBoxBarControlsButtonSelected' );
+		$( '#playerControlPlay' ).addClass( 'playerBoxBarControlsButtonSelected' );
 	});
 	//playing
 	$( '#my-player source' ).on( "playing", function( event ) {
@@ -245,17 +334,17 @@ $(function () {
 	//pause
 	$( '#my-player' ).on( "pause", function( event ) {
 		if( DEBUG ) console.log( 'VIDEO pause: ' + parseInt( playedtotaltime ) + ' - ' + this.duration + ' - ' + this.networkState );
-		$( '#playerControlPlay' ).html( '&#x02502;&#x02502;' );
+		$( '.basecontrols .playerBoxBarControlsButton' ).removeClass( 'playerBoxBarControlsButtonSelected' );
+		$( '.playerControlPause' ).addClass( 'playerBoxBarControlsButtonSelected' );
 	});
 	//timeupdate
 	$( '#my-player' ).on( "timeupdate", function( event ) {
-        if( DEBUG ) console.log( 'VIDEO timeupdate: ' + parseInt( playedtotaltime ) + ' - ' + this.duration + ' - ' + this.networkState );
-        var total = parseInt( this.currentTime ) + startplayedtotaltime;
-        if( total != playedtotaltime ){
-            playedtotaltime = total;
-		}
-		playerTimeBarSelectPlayed( playedtotaltime );
-		$( '#playerControlTimeNowData' ).html( secondsTimeSpanToHMS( playedtotaltime ) );
+        var total = parseInt( this.currentTime ) + parseInt( playedtotaltime );
+        if( DEBUG ) console.log( 'VIDEO timeupdate: ' + parseInt( total ) + ' - ' + this.duration + ' - ' + this.currentTime );
+		$( '#slideTime' ).val( total );
+		$( '#slideTime' ).attr( 'title', secondsTimeSpanToHMS( total ) );
+		slideUpdate( total );
+		$( '.playerControlTimeNowData' ).html( secondsTimeSpanToHMS( total ) );
 	});
 	//error video
 	$( '#my-player' ).on( "error", function( event ) {
@@ -325,14 +414,16 @@ $(function () {
 	//sound init
 	if( localStorage
 	&& ( 'soundValue' in localStorage )
+	&& parseInt( localStorage.getItem( "soundValue" ) ) >= 1
+	&& parseInt( localStorage.getItem( "soundValue" ) ) <= 100
 	){
-		var soundvalue = localStorage.getItem( "soundValue" );
+        var soundvalue = localStorage.getItem( "soundValue" );
 	}else{
-		var soundvalue = 0.5;
+		var soundvalue = 50;
 		localStorage.setItem( "soundValue" , soundvalue );
 	}
-	$( "#my-player" ).prop( 'volume', soundvalue );
-	playerSoundBarSelectPlayed( ( $( "#my-player" ).prop( 'volume' ) ) );
+    $( "#my-player" ).prop( 'volume', ( soundvalue / 100 ) );
+	$( "#slideVolume" ).val( soundvalue );
 	
 	//loading
 	loading_show();
@@ -345,28 +436,15 @@ var mousemovetimeout = null;
 var DEBUG = false;
 var retrytimer = false;
 var playedtotaltime = <?php echo $playedtimebefore; ?>;
-var startplayedtotaltime = <?php echo $playedtimebefore; ?>;
-var playerskiptime = <?php echo $PLAYERSKIPTIME; ?>;
 var playererrors = 0;
 var playererrors_max = 3;
+var playerskiptime = <?php echo $PLAYERSKIPTIME; ?>;
+var totaltime = parseInt( '<?php echo $time; ?>' );
 
-function checkVideoUsable(){
-	if( DEBUG ) console.log( 'video usable: ' + $( "#my-player" ).prop( 'readyState' ) );
-	var next = ( parseInt( playedtotaltime ) + playerskiptime );
-	if( $( "#my-player" ).prop( 'readyState' ) == 0 ){
-		if( DEBUG ) console.log( 'played add time: ' + parseInt( playedtotaltime ) + ' - ' + next );
-		playedtotaltime = next;
-		playerTimeChanged( next );
-	}else if( $( "#my-player" ).prop( 'readyState' ) == 1 ){
-		if( DEBUG ) console.log( 'played only meta : ' + parseInt( playedtotaltime ) + ' - ' + next );
-		if( retrytimer ){
-			playedtotaltime = next;
-			playerTimeChanged( next );
-		}else{
-			retrytimer = true;
-		}
-	}
-	return true;
+//SLIDE UPDATE
+function slideUpdate( nowtime ){
+    var pos = parseInt( ( 100 * nowtime ) / totaltime );
+    $( '.dSliderInner' ).css( 'width', pos + '%');
 }
 
 //TIME CHANGE
@@ -376,31 +454,13 @@ function playerTimeChanged( seconds, audiotrack, subtrack, quality ){
 	subtrack = typeof subtrack !== 'undefined' ? subtrack : subtracknow;
 	quality = typeof quality !== 'undefined' ? quality : qualitynow;
 	if( DEBUG ) console.log('changeTime ' + $( '#my-player' ).currentTime );
+	playedtotaltime = seconds;
 	var url = $( "#my-player source" ).attr( 'src' );
 	if( typeof url != 'undefined' ){
 		url = url.substring( 0, url.indexOf( '&timeplayed=' ) );
 		url += '&timeplayed=' + seconds + '&audiotrack=' + audiotrack + '&subtrack=' + subtrack + '&quality=' + quality;
-		playerTimeBarSelectPlayed( seconds );
+		//playerTimeBarSelectPlayed( seconds );
 		if( DEBUG ) console.log( 'attr: ' + $( "#my-player source" ).attr( 'src') );
-		playedtotaltime = seconds;
-		document.getElementById( 'my-player' ).load();
-		$( "#my-player source" ).attr( 'src', url );
-		document.getElementById( 'my-player' ).load();
-		startplayedtotaltime = seconds;
-	}
-}
-
-function playerTimeChangedSafe( seconds, audiotrack, subtrack ){
-	audiotrack = typeof audiotrack !== 'undefined' ? audiotrack :audiotracknow;
-	subtrack = typeof subtrack !== 'undefined' ? subtrack :subtracknow;
-	quality = typeof quality !== 'undefined' ? quality :qualitynow;
-	var url = $( "#my-player source" ).attr( 'src' );
-	if( typeof url != 'undefined' ){
-		url = url.substring( 0, url.indexOf( '&timeplayed=' ) );
-		url += '&timeplayed=' + seconds + '&audiotrack=' + audiotrack + '&subtrack=' + subtrack + '&quality=' + quality;
-		playerTimeBarSelectPlayed( seconds );
-		if( DEBUG ) console.log( 'attr: ' + $( "#my-player source" ).attr( 'src') );
-		playedtotaltime = seconds;
 		document.getElementById( 'my-player' ).load();
 		$( "#my-player source" ).attr( 'src', url );
 		document.getElementById( 'my-player' ).load();
@@ -408,21 +468,6 @@ function playerTimeChangedSafe( seconds, audiotrack, subtrack ){
 }
 
 //PLAYER BARS
-
-var lasttimeclassedpayed = 0;
-function playerTimeBarSelectPlayed( seconds ){
-	if( seconds < lasttimeclassedpayed ){
-		$( '.playerControlTimeInfo' ).removeClass( 'playerControlTimeInfoPlayed' );
-		for( var x = 0; x <= seconds; x++ ){
-			$( '.playerControlTimeInfo' + x ).addClass( 'playerControlTimeInfoPlayed' );
-		}
-	}else if( seconds > lasttimeclassedpayed ){
-		for( var x = lasttimeclassedpayed; x <= seconds; x++ ){
-			$( '.playerControlTimeInfo' + x ).addClass( 'playerControlTimeInfoPlayed' );
-		}
-	}
-	lasttimeclassedpayed = seconds;
-}
 
 function secondsTimeSpanToHMS(seconds) {
 
@@ -448,29 +493,19 @@ function secondsTimeSpanToHMS(seconds) {
 //SOUND
 
 function playerSoundChanged( value ){
-	$( "#my-player" ).prop( 'volume', value );
+    var value2 = value / 100;
+	$( "#my-player" ).prop( 'volume', value2 );
 	if( localStorage ){
 		localStorage.setItem( "soundValue" , value );
-	}
-	playerSoundBarSelectPlayed( value );
-}
-
-function playerSoundBarSelectPlayed( value ){
-	value = value * 10;
-	$( '.playerControlSoundInfo' ).removeClass( 'playerControlSoundInfoSel' );
-	for( var x = 0; x <= value; x++ ){
-		$( '.playerControlSoundInfo' + x ).addClass( 'playerControlSoundInfoSel' );
 	}
 }
 
 //AUDIO TRACKS
 
 var audiotracknow = <?php echo $AUDIOTRACK; ?>;
-function show_audio_tracks(){
-	msgbox( $( '#playerControlAudioTrackList' ).html(), 10000 );
-}
-
-function setAudioTrack( track ){
+function setAudioTrack( e, track ){
+    $( '.playerControlAudioList .playerBoxBarControlsButton' ).removeClass( 'playerBoxBarControlsButtonSelected' );
+    $( e ).addClass( 'playerBoxBarControlsButtonSelected' );
 	audiotracknow = track;
 	playerTimeChanged( playedtotaltime, audiotracknow, subtracknow, qualitynow );
 }
@@ -478,11 +513,9 @@ function setAudioTrack( track ){
 //SUBS TRACKS
 
 var subtracknow = -1;
-function show_sub_tracks(){
-	msgbox( $( '#playerControlSubTrackList' ).html(), 10000 );
-}
-
-function setSubTrack( track ){
+function setSubTrack( e, track ){
+	$( '.playerControlSubsList .playerBoxBarControlsButton' ).removeClass( 'playerBoxBarControlsButtonSelected' );
+    $( e ).addClass( 'playerBoxBarControlsButtonSelected' );
 	subtracknow = track;
 	playerTimeChanged( playedtotaltime, audiotracknow, subtracknow, qualitynow );
 }
@@ -536,6 +569,7 @@ function send_video_error(){
     var url = '?action=playervideoerror&idmedia=<?php echo $IDMEDIA; ?>';
     var data = [];
     show_msgbox( url, data );
+    loading_hide();
 }
 
 </script>
@@ -558,15 +592,216 @@ html, body
     border: 0px !important;
     background-color: black !important;
 }
+
+/* PLAYER BOX */
+
+.playerBoxControls{
+    background: rgba(0,0,0,0.5);
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: auto;
+    min-height: 5%;
+    text-align: center;
+    margin: 0px;
+    vertical-align: middle;
+    /* border: 1px solid gray; */
+    z-index: 9999;
+    left: 0px;
+    bottom: 0px;
+    display: table;
+}
+
+.playerBoxControls div{
+    box-sizing:border-box;
+}
+
+.playerBoxBarInfo{
+    width: 20vh;
+    max-width: 20vh;
+    display: table-cell;
+    text-align: center;
+}
+.playerBoxBarInfo img{
+    max-width: 100%;
+    max-height: 40vh;
+}
+
+.playerBoxBarControls{
+    width: 80vh;
+    max-width: 80vh;
+    display: table-cell;
+    vertical-align: top;
+}
+.playerBoxBarControlsTitle{
+    font-size: 160%;
+    display:block;
+    text-align: center;
+}
+.tRow{
+    display: table-row;
+}
+.tbSlider{
+    padding: 1%;
+    margin: auto;
+    width: 100%;
+    display: table-cell;
+}
+.tbTimer{
+    width: auto;
+    display: table-cell;
+    padding: 10px;
+    vertical-align: middle;
+}
+.playerBoxBarControlsTimeBarSlide{
+    width: 96%;
+}
+.playerBoxBarControlsButton{
+    width: auto;
+    height: auto;
+    display: table-cell;
+    font-size: 160%;
+    padding: 0.2em 0.5em;
+    margin: 0.2em;
+    cursor: pointer;
+}
+.playerBoxBarControlsButton:hover{
+    background-color: #595959;
+}
+.playerBoxBarControlsButtonSelected{
+    background-color: #797979 !important;
+}
+.text120{
+    font-size: 120% !important;
+}
+.playerBoxControls hr{
+    border: 0; 
+    height: 1px;
+    background: transparent;
+    margin: 0px;
+    border: 0px;
+    padding: 2px;
+}
+.videoinfo{
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 90%;
+    color: #c3c3c3;
+}
+
+/* RANGE */
+input[type=range].slider {
+  -webkit-appearance: none;
+  width: 100%;
+  margin: 0.7px 0;
+  background-color: transparent;
+}
+input[type=range].slider:focus {
+  outline: none;
+}
+input[type=range].slider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 25.6px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #484d4d;
+  border-radius: 0px;
+  border: 0px solid #010101;
+}
+input[type=range].slider::-webkit-slider-thumb {
+  box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
+  border: 0px solid #ff1e00;
+  height: 27px;
+  width: 18px;
+  border-radius: 0px;
+  background: rgba(202, 200, 202, 0.81);
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -0.7px;
+}
+input[type=range].slider:focus::-webkit-slider-runnable-track {
+  background: #545a5a;
+}
+input[type=range].slider::-moz-range-track {
+  width: 100%;
+  height: 25.6px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #484d4d;
+  border-radius: 0px;
+  border: 0px solid #010101;
+}
+input[type=range].slider::-moz-range-thumb {
+  box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
+  border: 0px solid #ff1e00;
+  height: 27px;
+  width: 18px;
+  border-radius: 0px;
+  background: rgba(202, 200, 202, 0.81);
+  cursor: pointer;
+}
+input[type=range].slider::-ms-track {
+  width: 100%;
+  height: 25.6px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range].slider::-ms-fill-lower {
+  background: #3c4040;
+  border: 0px solid #010101;
+  border-radius: 0px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range].slider::-ms-fill-upper {
+  background: #484d4d;
+  border: 0px solid #010101;
+  border-radius: 0px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range].slider::-ms-thumb {
+  box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
+  border: 0px solid #ff1e00;
+  height: 27px;
+  width: 18px;
+  border-radius: 0px;
+  background: rgba(202, 200, 202, 0.81);
+  cursor: pointer;
+  height: 25.6px;
+}
+input[type=range].slider:focus::-ms-fill-lower {
+  background: #484d4d;
+}
+input[type=range].slider:focus::-ms-fill-upper {
+  background: #545a5a;
+}
+
+/* dSlider */
+
+.dSlider{
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    cursor: pointer;
+    -webkit-box-shadow: 0 0 4px white; 
+    -moz-box-shadow: 0 0 4px white; 
+    box-shadow: 0 0 4px white;
+}
+.dSliderInner{
+    width: 0%;
+    height: 100%;
+    background-color: CornflowerBlue;
+    overflow: hidden;
+    text-align: right;
+    -webkit-box-shadow: 0 0 4px CornflowerBlue;
+    -moz-box-shadow: 0 0 4px CornflowerBlue;
+    box-shadow: 0 0 4px CornflowerBlue;
+    font-size: 80%;
+    border-right: 2px solid white;
+}
+
 </style>
-	
-	<div id='playerBoxI' class='playerBoxI'>
-		<div id='playerInfo' class='playerInfo'>
-			<img class='playerInfoImg' style='max-height: 100px; max-width: 100px;' src='<?php echo $urllogo; ?>' title='<?php echo $title; ?>' />
-			<div class='playerInfoTitle'><?php echo $title; ?></div>
-			
-		</div>
-	</div>
 	
 	<video id="my-player" class="videoplayer"
 	width="100%" height="100%"
@@ -574,110 +809,129 @@ html, body
 	poster="<?php echo $urllandscape; ?>"
 	autoplay
 	>
-        <source id='my-player-source' src="?r=r&action=playtime&mode=webm&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/webm">
-        <source id='my-player-source' src="?r=r&action=playtime&mode=mp4&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/mp4">
-        <source id='my-player-source' src="?r=r&action=playtime&mode=webm2&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/webm" data-last='1'>
+        <?php
+            $num = 1;
+            $vtotal = count( $CODECORDER );
+            foreach( $CODECORDER AS $urlident => $videoheader ){
+                if( $num == $vtotal ){
+                    $extra_vdata = " data-last='1'";
+                }else{
+                    $extra_vdata = "";
+                }
+        ?>
+        <source id='my-player-source' src="?r=r&action=playtime&mode=<?php echo $urlident; ?>&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/<?php echo $videoheader; ?>" <?php echo $extra_vdata; ?>>
+        <?php
+                $num++;
+            }
+        ?>
         Your browser does not support the video tag.
 	</video>
-	<div id='playerBoxC' class='playerBoxC'>
-		<div id='playerControls' class='playerControls'>
-			<div id='playerControlPlay' class='playerControlPlay playerControlsOv'>&#x25B7;</div>
-			<div id="playerControlTime" class='playerControlTime'>
-				<div id="playerBoxControlTime" class='playerBoxControlTime'>
-			<?php 
-				$MAXPOSITIONELEMENTS = 300;
-				for( $x = 0; $x < $MAXPOSITIONELEMENTS; $x++ ){
-					$posnow = (int)( ( $x * (int)$time ) / $MAXPOSITIONELEMENTS );
-			?>
-					<div id="playerControlTimeInfo" class="playerControlTimeInfo playerControlTimeInfo<?php echo $posnow; ?>" 
-					title='<?php echo secondsToTimeFormat( $posnow, TRUE ); ?>'
-					onclick='javascript:playerTimeChanged( <?php echo $posnow; ?> );return false;'
-					>
-					</div>
-			<?php 
-				}
-			?>
-				</div>
-			</div>
-			<div id='playerControlSoundIco' class='playerControlSoundIco'>&#x266A;</div>
-			<div id="playerControlSound" class='playerControlSound'>
-				<div id="playerBoxControlSound" class='playerBoxControlSound'>
-			<?php 
-				$MAXPOSITIONELEMENTS = 10;
-				for( $x = 0; $x <= $MAXPOSITIONELEMENTS; $x++ ){
-			?>
-					<div id="playerControlSoundInfo" class="playerControlSoundInfo playerControlSoundInfo<?php echo $x; ?>" 
-					title='<?php echo( ( $x * 10 ) . '%' ); ?>'
-					onclick='javascript:playerSoundChanged( <?php if( $x < 10 ){ echo '0.' . $x; }else{ echo '1'; } ?> );return false;'
-					>
-					</div>
-			<?php 
-				}
-			?>
-				</div>
-			</div>
-			<div id='playerControlTimeNow' class='playerControlTimeNow'><span id='playerControlTimeNowData'>00:00</span>/<?php echo secondsToTimeFormat( $time, TRUE ); ?></div>
-			<div id='playerControlQuality' class='playerControlQuality' title='Quality' onclick='return setQuality();'>SD</div>
-			<div id='playerControlAudioTrackIco' class='playerControlAudioTrackIco' title='Audio' onclick='return show_audio_tracks();'>&#x266B;</div>
-			<div id='playerControlSubTrackIco' class='playerControlSubTrackIco' title='Subs' onclick='return show_sub_tracks();' ><span>cc</span></div>
-			<div id='playerControlFullScreenIco' class='playerControlFullScreenIco' title='Full Screen' onclick="toggleFullScreen();">&#9633;</div>
-			<?php if( strlen( $nextfileinfo ) > 0 ){ ?>
-			<div class='playerControlNewFile'><a href='<?php echo $nextfileinfo; ?>' title='Next' id='aNextFile'>&rsaquo;</a></div>
-			<?php } ?>
-			<div class='playerControlHome'><a href='<?php echo $inforul; ?>' title='Back' id='aFileInfo'>H</a></div>
-		</div>
+	
+	<div id='playerBoxC' class='playerBoxControls'>
+        <div class='playerBoxBarInfo'>
+            <img class='playerInfoImg' src='<?php echo $urllogo; ?>' title='<?php echo $title; ?>' />
+        </div>
+        <div class='playerBoxBarControls'>
+            <div class='playerBoxBarControlsTitle'>
+                <span><?php echo $title; ?> <?php echo $year; ?> &#x2605;<?php echo $rating; ?></span>
+            </div>
+            <div class='playerBoxBarControlsTimeBar'>
+                <div class='tRow'>
+                    <div class='tbTimer'>
+                        <span class='playerControlTimeNowData'>00:00</span>/<?php echo secondsToTimeFormat( $time, TRUE ); ?>
+                    </div>
+                    <div class='tbSlider'>
+                        <input class='hidden playerBoxBarControlsTimeBarSlide slider' id="slideTime" type="range" min="0" max="<?php echo $time; ?>" step="1" value="<?php echo $playedtimebefore; ?>" onchange="playerTimeChanged( this.value ); return false;" />
+                        <div class='dSlider'>
+                            <div class='dSliderInner'>
+                                <span class='playerControlTimeNowData'>00:00</span>&nbsp;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class='playerBoxBarControlsActions basecontrols'>
+                <div class='tRow'>
+                    <?php if( strlen( $backfileinfo ) > 0 ){ ?>
+                    <div class='playerBoxBarControlsButton'><a href='<?php echo $backfileinfo; ?>' title='Next' id='aBackFile'>&#x23ee;</a></div>
+                    <?php } ?>
+                    <div id='playerControlPlayBack' class='playerBoxBarControlsButton'>&#9194;</div>
+                    <div id='playerControlPause' class='playerBoxBarControlsButton'>&#10073;&#10073;</div>
+                    <div id='playerControlPlay' class='playerBoxBarControlsButton'>&#x25B7;</div>
+                    <div id='playerControlStop' class='playerBoxBarControlsButton'>&#9724;</div>
+                    <div id='playerControlPlayFor' class='playerBoxBarControlsButton'>&#9193;</div>
+                    <?php if( strlen( $nextfileinfo ) > 0 ){ ?>
+                    <div class='playerBoxBarControlsButton'><a href='<?php echo $nextfileinfo; ?>' title='Next' id='aNextFile'>&#x23ed;</a></div>
+                    <?php } ?>
+                    <div id='playerControlQuality' class='playerBoxBarControlsButton' title='Quality' onclick='return setQuality();'>SD</div>
+                    <div id='playerControlFullScreenIco' class='playerBoxBarControlsButton' title='Full Screen' onclick="toggleFullScreen();">&#9633;</div>
+                    <div id='playerControlVolume' class='playerBoxBarControlsButton' title='Volume'>
+                        &#x266A;
+                    </div>
+                    <div id='playerControlVolume' class='playerBoxBarControlsButton' title='Volume'>
+                        <input class='playerBoxBarControlsVolumeSlide slider' id="slideVolume" type="range" min="0" max="100" step="5" value="50" 
+                            onchange="playerSoundChanged( this.value ); return false;" />
+                    </div>
+                    <div class='playerBoxBarControlsButton videoinfo'><?php echo $videoinfo[ 'width' ]; ?>x<?php echo $videoinfo[ 'height' ]; ?> <?php echo $videoinfo[ 'codec' ]; ?> <?php echo $videoinfo[ 'acodec' ]; ?></div>
+                </div>
+            </div>
+            <hr />
+                <?php
+                    if( is_array( $audiolist ) 
+                    && count( $audiolist ) > 1
+                    ){
+                ?>
+            <div class='playerBoxBarControlsActions playerControlAudioList'>
+                <div class='tRow'>
+                    <div class='playerBoxBarControlsButton text120'>
+                        &#x266B; Audio: 
+                    </div>
+                            <?php
+                                //first normaly video
+                                $num = 1;
+                                foreach( $audiolist AS $al ){
+                                    if( $AUDIOTRACK == $num ){
+                                        $atselected = 'playerBoxBarControlsButtonSelected';
+                                    }else{
+                                        $atselected = '';
+                                    }
+                            ?>
+                    <div class='playerBoxBarControlsButton text120 <?php echo $atselected; ?>' onclick='setAudioTrack( this, <?php echo $num; ?> );'><?php echo $al; ?></div>
+                            <?php
+                                    $num++;
+                                }
+                                
+                            ?>
+                    <?php
+                        }
+                    ?>
+                    <!--
+                    <?php
+                        if( is_array( $subslist ) 
+                        && count( $audiolist ) > 0
+                        ){
+                    ?>
+                    <div id='playerControlSubsList' class='playerBoxBarControlsButton text120'>
+                        &#x225F; Subs: 
+                    </div>
+                            <?php
+                                foreach( $subslist AS $al ){
+                                    $l = (int)$al;
+                            ?>
+                    <div class='playerBoxBarControlsButton text120' onclick='setSubTrack( this, <?php echo $l; ?> );'><?php echo $al; ?></div>
+                            <?php   
+                                }
+                            ?>
+                    </div>
+                        <?php
+                            }
+                        ?>
+                    -->
+            </div>
+        </div>
 	</div>
 	
-	<div id='playerControlAudioTrackList' class='playerControlAudioTrackList hidden' title='Audio List' >
-	<?php
-		if( is_array( $audiolist ) ){
-	?>
-	
-		<?php
-			//first normaly video
-			$num = 1;
-			foreach( $audiolist AS $al ){
-                if( $AUDIOTRACK == $num ){
-                    $atselected = '*';
-                }else{
-                    $atselected = '';
-                }
-		?>
-			<div class='playerAudioTrack' onclick='setAudioTrack( <?php echo $num; ?> )'><?php echo $atselected . $al; ?></div>
-		<?php
-                $num++;
-			}
-			
-		?>
-	<?php
-		}else{
-			echo "1 - *" . 'Default';
-		}
-	?>
-	</div>
-	
-	<div id='playerControlSubTrackList' class='playerControlSubTrackList hidden' title='Subs List' >
-	<?php
-		if( is_array( $subslist ) ){
-	?>
-	
-		<?php
-			
-			foreach( $subslist AS $al ){
-                $l = (int)$al;
-		?>
-			<div class='playerSubTrack' onclick='setSubTrack( <?php echo $l; ?> )'><?php echo $al; ?></div>
-		<?php
-                
-			}
-			
-		?>
-	<?php
-		}else{
-			echo "No Subs";
-		}
-	?>
-	</div>
 <?php 
     }
 ?>

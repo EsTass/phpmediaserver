@@ -76,6 +76,12 @@
         && (int)$G_DATA[ 'timeplayed' ] == -1
         ){
             $G_TIME = sqlite_played_status( $IDMEDIA );
+            $time = ffmpeg_file_info_lenght_seconds( $FMEDIA );
+            if( $time > 0 
+            && $G_TIME > ( $time - ( $time / 10 ) ) 
+            ){
+                $G_TIME = 0;
+            }
         }
         $G_QUALITY = 'sd';
         if( array_key_exists( 'quality', $G_DATA ) 
@@ -125,7 +131,9 @@
             }
             
             //SET PLAYTIME
-            $time = ffmpeg_file_info_lenght_seconds( $dir );
+            if( !isset( $time ) ){
+                $time = ffmpeg_file_info_lenght_seconds( $dir );
+            }
             sqlite_played_replace( $IDMEDIA, $G_TIME, $time );
             
             //variable bitrate to max especified
@@ -177,7 +185,7 @@
                 case 'fast':
                     //fast way to kodi
                     $encoder_outformat = 'matroska';
-                    $encoder = 'libx264'; //webm 9
+                    $encoder = 'libx264'; //fastest ???
                     //" . $subtrack . " " . $audiotrack . "
                     $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " -vcodec " . $encoder . " -crf 23 -preset ultrafast -c:a copy -f " . $encoder_outformat . " - ";
                     
@@ -192,7 +200,7 @@
                     $AUDIOCODEC = 'aac';
                     //$AUDIOCODEC = 'mp3';
                     //$AUDIOCODEC = 'opus';
-                    $cmd = O_FFMPEG . " -nostdin -re " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -movflags +faststart -bufsize 1000k -g 74 -strict experimental -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -level " . $G_FFMPEGLVL . " -profile:v baseline -level 3.0 -preset ultrafast -tune zerolatency -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 64k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+                    $cmd = O_FFMPEG . " -nostdin -re " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -movflags +faststart -bufsize 1000k -g 74 -strict experimental -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -aspect 16:9 -level " . $G_FFMPEGLVL . " -profile:v baseline -level 3.0 -preset ultrafast -tune zerolatency -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 64k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
                     
                     header('Content-type: video/mp4');
                 break;
@@ -201,7 +209,9 @@
                     $AUDIOCODEC = 'libvorbis';
                     $encoder_outformat = 'webm';
                     $encoder = 'libvpx-vp9'; //webm 9
-                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -threads 4 -speed 8 -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -bufsize 1000k -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -preset baseline " . $QUALITY . " -level " . $G_FFMPEGLVL . " -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -f " . $encoder_outformat . " - ";
+                    //better compatible
+                    $G_FFMPEGLVL = '4.0';
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -threads 4 -speed 8 -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -bufsize 1000k -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -aspect 16:9 -preset baseline " . $QUALITY . " -level " . $G_FFMPEGLVL . " -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -f " . $encoder_outformat . " - ";
                     
                     header('Content-type: video/webm');
                 break;
@@ -211,7 +221,7 @@
                     $AUDIOCODEC = 'libvorbis';
                     $encoder_outformat = 'webm';
                     $encoder = 'libvpx';
-                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -bufsize 1000k -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -preset baseline " . $QUALITY . " -level " . $G_FFMPEGLVL . " -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -f " . $encoder_outformat . " - ";
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -bufsize 1000k -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -aspect 16:9 -preset baseline " . $QUALITY . " -level " . $G_FFMPEGLVL . " -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -f " . $encoder_outformat . " - ";
                     
                     header('Content-type: video/webm');
             }

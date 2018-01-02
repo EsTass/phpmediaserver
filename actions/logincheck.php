@@ -16,6 +16,10 @@
 	}
 	$sessionid = session_id();
 	
+	if( array_key_exists( 'user', $G_DATA ) ){
+        $G_DATA[ 'user' ] = strtolower( $G_DATA[ 'user' ] );
+	}
+	
 	if( ( $sessiondata = sqlite_session_getdata( '', $sessionid ) ) != FALSE 
 	&& count( $sessiondata ) > 0
 	&& array_key_exists( 0, $sessiondata ) > 0
@@ -52,7 +56,7 @@
 	&& strlen( $G_DATA[ 'pass' ] ) > 0 
 	){
 		//test user
-		if( sqlite_users_checkuser( $G_DATA[ 'user' ], $G_DATA[ 'pass' ] )
+		if( sqlite_users_checkuser( $G_DATA[ 'user' ] , $G_DATA[ 'pass' ] )
 		){
 			
 			sqlite_session_replace( $sessionid, $G_DATA[ 'user' ] );

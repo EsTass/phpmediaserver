@@ -31,6 +31,7 @@
 	}
 	
 	$FMEDIA = PPATH_MEDIAINFO . DS . $IDMEDIAINFO . '.' . $TYPE;
+	$FMEDIA_BASE = PPATH_MEDIAINFO . DS . $IDMEDIAINFO . '.poster';
 	$FMEDIA_B = PPATH_IMGS . DS . $TYPE . '.jpg';
 	if( ( $IDMEDIAINFO == 1 || $IDMEDIA == 1 )
 	&& ( $TYPE == 'next' || $TYPE == 'back' )
@@ -54,6 +55,26 @@
 	&& array_key_exists( 'idmediainfo', $m[ 0 ] )
 	&& $m[ 0 ][ 'idmediainfo' ] > 0
 	&& ( $FMEDIA = PPATH_MEDIAINFO . DS . $m[ 0 ][ 'idmediainfo' ] . '.' . $TYPE ) !== FALSE
+	&& file_exists( $FMEDIA )
+	&& getFileMimeTypeImg( $FMEDIA )
+	){
+        
+	}elseif( $IDMEDIAINFO > 0
+	&& ( $mi = sqlite_mediainfo_getdata( $IDMEDIAINFO ) ) != FALSE 
+	&& is_array( $mi )
+	&& count( $mi ) > 0
+	&& file_exists( $FMEDIA_BASE )
+	&& getFileMimeTypeImg( $FMEDIA_BASE )
+	){
+        $FMEDIA = $FMEDIA_BASE;
+	}elseif( $IDMEDIA > 0
+	&& ( $m = sqlite_media_getdata( $IDMEDIA ) ) != FALSE 
+	&& is_array( $m )
+	&& count( $m ) > 0
+	&& array_key_exists( 0, $m )
+	&& array_key_exists( 'idmediainfo', $m[ 0 ] )
+	&& $m[ 0 ][ 'idmediainfo' ] > 0
+	&& ( $FMEDIA = PPATH_MEDIAINFO . DS . $m[ 0 ][ 'idmediainfo' ] . '.poster' ) !== FALSE
 	&& file_exists( $FMEDIA )
 	&& getFileMimeTypeImg( $FMEDIA )
 	){

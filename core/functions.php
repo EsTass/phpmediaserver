@@ -311,6 +311,21 @@
         return $result;
 	}
 	
+	function getURLBackInfo( $idmedia = FALSE, $idmediainfo = FALSE ){
+        global $G_MEDIADATA;
+        $result = getURLBase() . '?action=mediaback';
+        
+        if( $idmedia ){
+            $result .= '&idmedia=' . $idmedia;
+        }
+        
+        if( $idmediainfo ){
+            $result .= '&idmediainfo=' . $idmediainfo;
+        }
+        
+        return $result;
+	}
+	
 	function getURLPlayer( $idmedia = FALSE, $idmediainfo = FALSE ){
         global $G_MEDIADATA;
         $result = getURLBase() . '?action=player';
