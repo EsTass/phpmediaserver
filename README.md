@@ -1,4 +1,13 @@
 # phpmediaserver
+
+## Screenshots
+
+[Galery](https://postimg.org/gallery/k0qi1t9y/)
+
+![example1](https://s18.postimg.org/dbta95ek5/Screenshot_20171211_193317.png)
+![example2](https://s18.postimg.org/ahq4vowyd/Screenshot_20171211_193532.png)
+
+## Description
 A bunch of utilities for:
  - Easy html5 web player with php7 + sqlite + jquery + ffmpeg.
  - Easy config.php and config.ws.php
@@ -93,7 +102,3 @@ Restart apache, and login with default user/pass.
 ## Admin SQLite DB
 
 Adding https://www.phpliteadmin.org/ file to base folder add a menu entry to access sqlite DB file (need to configure db file and user).
-
-## Screenshots
-
-[Galery](https://postimg.org/gallery/k0qi1t9y/)
