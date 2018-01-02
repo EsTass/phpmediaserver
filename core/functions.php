@@ -88,8 +88,14 @@
 	function check_ip_country( $IP ){
         $result = FALSE;
         $COUNTRY = O_COUNTRYALLOWED;
+        $VALID_IPs = array( 
+            '192.168.',
+            '10.0.',
+        );
         
-        if( checkWhitedIP( $IP ) ){
+        if( inString( $IP, $VALID_IPs ) ){
+            $result = TRUE;
+        }elseif( checkWhitedIP( $IP ) ){
             $result = TRUE;
         }elseif( ( $ipcountry = ip_info( $IP, 'country' ) ) != FALSE 
         && in_array( $ipcountry, $COUNTRY )
