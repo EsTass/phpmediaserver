@@ -20,7 +20,7 @@
 	define( 'DS', DIRECTORY_SEPARATOR );
 	define( 'PPATH_ACTIONS', PPATH_BASE . DS . 'actions'  );
 	define( 'PPATH_CORE', PPATH_BASE . DS . 'core'  );
-	define( 'PPATH_CACHE', PPATH_BASE . DS . '.cache'  );
+	define( 'PPATH_CACHE', PPATH_BASE . DS . 'cache'  );
 	define( 'PPATH_TEMP', PPATH_CACHE . DS . 'temp'  );
 	define( 'PPATH_LANG', PPATH_BASE . DS . 'lang'  );
 	define( 'PPATH_MEDIAINFO', PPATH_CACHE . DS . 'mediadata' );//file: idmedia.type (poster, landscape, nfo, etc)
