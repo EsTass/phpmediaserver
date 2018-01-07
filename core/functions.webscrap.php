@@ -641,8 +641,11 @@
         if( ( $links = webscrapp_search( $wscrapper, '', $debug ) ) != FALSE 
         && count( $links ) > 0
         ){
+            if( $echo ) echo "<br />";
+            if( $echo ) echo "Links: " . count( $links );
+                    
             foreach( $links AS $title => $href ){
-                if( stripos( $title, 'EXIST:' ) !== FALSE ){
+                if( strpos( $title, 'EXIST:' ) === FALSE ){
                     if( $echo ) echo "<br />";
                     if( $echo ) echo get_msg( 'WEBSCRAP_ADD_URL', FALSE ) . ': ' . $wscrapper . ' => ' . $title . ' => ' . $href;
                     
@@ -653,8 +656,14 @@
                         if( $echo ) echo "<br />";
                         if( $echo ) echo get_msg( 'WEBSCRAP_ADDKO', FALSE ) . ': ' . $wscrapper . ' => ' . $title . ' => ' . $href;
                     }
+                }else{
+                    if( $echo ) echo "<br />";
+                    if( $echo ) echo "Exist: " . $title;
                 }
             }
+		}else{
+            if( $echo ) echo "<br />";
+            if( $echo ) echo get_msg( 'DEF_EMPTYLIST', FALSE ) . ': ' . $wscrapper . ' => ' . $title . ' => ' . $href;
 		}
 		
 		return $result;
