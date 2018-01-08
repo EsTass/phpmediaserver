@@ -13,6 +13,7 @@
 	$FIELDS = array(
         'idmedia' => 'idmedia',
         'file' => 'file',
+        'title' => 'Title',
         'langs' => 'Languajes',
         'subs' => 'Subs',
         'idmediainfo' => 'idmediainfo',
@@ -93,8 +94,9 @@ function ident_identify_media( idmedia ){
                 <img class='listElementImg listElementImgMini lazy' src='' data-src='<?php echo getURLImg( FALSE, $lrow[ 'idmediainfo' ], 'poster' ); ?>' class='listElementPosterTiny' />
             </td>
                 <?php
-                        foreach( $lrow AS $field => $data ){
-                            if( array_key_exists( $field, $FIELDS ) ){
+                        foreach( $FIELDS AS $field => $title ){
+                            if( array_key_exists( $field, $lrow ) ){
+                                $data = $lrow[ $field ];
                 ?>
             <td class='<?php echo $css_extra; ?>' title='<?php echo $data; ?>'><?php echo substr( $data, 0, 100 ); ?></td>
                 <?php
