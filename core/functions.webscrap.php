@@ -663,7 +663,7 @@
             }
 		}else{
             if( $echo ) echo "<br />";
-            if( $echo ) echo get_msg( 'DEF_EMPTYLIST', FALSE ) . ': ' . $wscrapper . ' => ' . $title . ' => ' . $href;
+            if( $echo ) echo get_msg( 'DEF_EMPTYLIST', FALSE ) . ': ' . $wscrapper;
 		}
 		
 		return $result;
