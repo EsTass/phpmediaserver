@@ -228,27 +228,95 @@
 	
 	function searchImages( $search, $max = 5, $getthumb = TRUE ) {
 		$result = array();
+		$debug = FALSE;
 		
 		if( ( $links = searchImagesBing( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
 		}
-		
+		if( $debug ) echo "<br />Bing: " . count( $result );
 		if( count( $result ) < $max
 		&& ( $links = searchImagesIXQick( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
 		}
+		if( $debug ) echo "<br />IXQick: " . count( $result );
 		
+		if( count( $result ) < $max
+		&& ( $links = searchImagesWebcrawler( $search, $max, $getthumb ) ) != FALSE ){
+            $result = array_merge( $result, $links );
+		}
+		if( $debug ) echo "<br />WebCrawler: " . count( $result );
+		/*
+		//fail, recheck
 		if( count( $result ) < $max
 		&& ( $links = searchImagesDuckDuckGo( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
 		}
-		
+		if( $debug ) echo "<br />DuckDuckGo: " . count( $result );
+		//captchas and only thumb
 		if( count( $result ) < $max
 		&& ( $links = searchImagesYandex( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
 		}
-		
+		if( $debug ) echo "<br />Yandex: " . count( $result );
+		*/
 		$result = array_slice( $result, 0, $max );
+		
+		return $result;
+	}
+	
+	function searchImagesWebcrawler( $search, $max = 5, $getthumb = TRUE ){
+		$result = array();
+		
+		$url = "https://www.webcrawler.com/info.wbcrwl.udog/search/images?q=" . urlencode( $search ) . "";
+		if( ( $html = @file_get_contents_timed( $url ) ) != FALSE ){
+			$result = array();
+
+			$doc = new DOMDocument();
+			@$doc->loadHTML($html);
+            
+            if( $getthumb ){
+                $divs = $doc->getElementsByTagName( 'img' );
+                $n = 0;
+                foreach( $divs AS $div ){
+                    if( $div->getAttribute('class') == 'resultThumbnail' ){
+                        $turl = $div->getAttribute('src');
+                        //var_dump( $turl );
+                        if( startsWith( $turl, '//' ) ){
+                            $turl = 'https:' . $turl;
+                        }
+                        if( filter_var( $turl, FILTER_VALIDATE_URL )
+                        ){
+                            $result[] = $turl;
+                            $n++;
+                            if( $n > $max ) break;
+                        }
+                    }
+                    if( $n > $max ) break;
+                }
+            }else{
+                //TARGET IMG
+                $divs = $doc->getElementsByTagName('a');
+                $n = 0;
+                foreach( $divs AS $div ){
+                    if( $div->getAttribute('class') == 'resultThumbnailLink' ){
+                        $turl = $div->getAttribute('href');
+                        //var_dump( $turl );
+                        if( startsWith( $turl, '//' ) ){
+                            $turl = 'https:' . $turl;
+                        }
+                        if( filter_var( $turl, FILTER_VALIDATE_URL )
+                        ){
+                            $result[] = $turl;
+                            $n++;
+                            if( $n > $max ) break;
+                        }
+                    }
+                    if( $n > $max ) break;
+                }
+                //echo htmlspecialchars( $html );
+                //var_dump( $result );die();
+            }
+		}
 		
 		return $result;
 	}
@@ -292,6 +360,54 @@
                 }
             }else{
                 //TARGET IMG
+                //$pattern = '/\"murl\"\:\"(.*?)\"\,/';
+                $pattern = '/cgi\-bin\/serveimage\?url\=(.*?)\\\'\>/';
+                if( preg_match_all( $pattern, $html, $match)
+                && array_key_exists( 1, $match )
+                && count( $match[ 1 ] ) > 0
+                ){
+                    $n = 0;
+                    foreach( $match[ 1 ] AS $turl ){
+                        $turl = urldecode( $turl );
+                        if( $turl 
+                        && filter_var( $turl, FILTER_VALIDATE_URL )
+                        ){
+                            $result[] = $turl;
+                        }
+                        if( $n > $max ) break;
+                        $n++;
+                    }
+                }else{
+                    //THUMB IMG
+                    $divs = $doc->getElementsByTagName('div');
+                    $n = 0;
+                    foreach( $divs AS $div ){
+                        if( $div->getAttribute('class') == 'img_box' ){
+                            //THUMB IMG
+                            $tags = $div->getElementsByTagName('img');
+                            $n = 0;
+                            
+                            foreach ($tags as $tag) {
+                                //url thumb
+                                $turl = $tag->getAttribute('src');
+                                //var_dump( $turl );
+                                //duckduckgoim
+                                if( startsWith( $turl, '//' ) ){
+                                    $turl = 'https:' . $turl;
+                                }
+                                if( filter_var( $turl, FILTER_VALIDATE_URL )
+                                ){
+                                    $result[] = $turl;
+                                    $n++;
+                                    if( $n > $max ) break;
+                                }
+                            }
+                        }
+                        if( $n > $max ) break;
+                    }
+                }
+                //echo htmlspecialchars( $html );
+                //var_dump( $result );die();
             }
 		}
 		
@@ -333,6 +449,28 @@
                 }
             }else{
                 //TARGET IMG
+                //not direct link, get thumb
+                //THUMB IMG
+                $tags = $doc->getElementsByTagName('img');
+                $n = 0;
+                
+                foreach ($tags as $tag) {
+                    //url thumb
+                    $turl = $tag->getAttribute('src');
+                    //var_dump( $turl );
+                    //duckduckgoim
+                    if( startsWith( $turl, '//' ) ){
+                        $turl = 'https:' . $turl;
+                    }
+                    if( filter_var( $turl, FILTER_VALIDATE_URL )
+                    ){
+                        if( stripos( $turl, 'captcha' ) === FALSE ){
+                            $result[] = $turl;
+                        }
+                    }
+                    if( $n > $max ) break;
+                    $n++;
+                }
             }
 		}
 		
@@ -373,6 +511,46 @@
                 }
             }else{
                 //TARGET IMG
+                //$pattern = '/\"murl\"\:\"(.*?)\"\,/';
+                $pattern = '/\<a\ class\=\"thumb\"\ target\=\"\_blank\"\ href\=\"(.*?)\"/';
+                if( preg_match_all( $pattern, $html, $match)
+                && array_key_exists( 1, $match )
+                && count( $match[ 1 ] ) > 0
+                ){
+                    $n = 0;
+                    foreach( $match[ 1 ] AS $turl ){
+                        if( $turl ){
+                            if( filter_var( $turl, FILTER_VALIDATE_URL )
+                            ){
+                                $result[] = $turl;
+                            }
+                        }
+                        if( $n > $max ) break;
+                        $n++;
+                    }
+                }else{
+                    //THUMB IMG
+                    $tags = $doc->getElementsByTagName('img');
+                    $n = 0;
+                    
+                    foreach ($tags as $tag) {
+                        //url thumb
+                        $turl = $tag->getAttribute('src');
+                        //var_dump( $turl );
+                        //duckduckgoim
+                        if( startsWith( $turl, '//' ) ){
+                            $turl = 'https:' . $turl;
+                        }
+                        if( filter_var( $turl, FILTER_VALIDATE_URL )
+                        ){
+                            $result[] = $turl;
+                        }
+                        if( $n > $max ) break;
+                        $n++;
+                    }
+                }
+                //echo htmlspecialchars( $html );
+                //var_dump( $result );die();
             }
 		}
 		
@@ -414,6 +592,28 @@
                 }
             }else{
                 //TARGET IMG
+                $pattern = '/\<a\ class\=\"thumb\"\ target\=\"\_blank\"\ href\=\"(.*?)\"/';
+                if( preg_match_all( $pattern, $html, $match)
+                && array_key_exists( 1, $match )
+                && count( $match[ 1 ] ) > 0
+                ){
+                    $n = 0;
+                    foreach( $match[ 1 ] AS $turl ){
+                        if( $turl ){
+                            if( filter_var( $turl, FILTER_VALIDATE_URL )
+                            ){
+                                $result[] = $turl;
+                            }
+                        }
+                        if( $n > $max ) break;
+                        $n++;
+                    }
+                }else{
+                    //THUMB IMG
+                    
+                }
+                //echo htmlspecialchars( $html );
+                //var_dump( $result );die();
             }
 		}
 		
@@ -505,7 +705,7 @@
         curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, $time );
         curl_setopt( $curl, CURLOPT_COOKIESESSION, TRUE );
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, TRUE );
-        curl_setopt( $curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; pl; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7 (.NET CLR 3.5.30729)');
+        curl_setopt( $curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41');
         curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, TRUE );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, FALSE );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, FALSE );
@@ -557,7 +757,7 @@
         curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, $time );
         curl_setopt( $curl, CURLOPT_COOKIESESSION, TRUE );
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, TRUE );
-        curl_setopt( $curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; pl; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7 (.NET CLR 3.5.30729)');
+        curl_setopt( $curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41');
         curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, TRUE );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, FALSE );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, FALSE );
@@ -618,7 +818,7 @@
         curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, $time );
         curl_setopt( $curl, CURLOPT_COOKIESESSION, TRUE );
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, TRUE );
-        curl_setopt( $curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; pl; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7 (.NET CLR 3.5.30729)');
+        curl_setopt( $curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41');
         curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, TRUE );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, FALSE );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, FALSE );
@@ -679,7 +879,7 @@
         curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, $time );
         curl_setopt( $curl, CURLOPT_COOKIESESSION, TRUE );
         curl_setopt( $curl, CURLOPT_RETURNTRANSFER, TRUE );
-        curl_setopt( $curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; pl; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7 (.NET CLR 3.5.30729)');
+        curl_setopt( $curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41');
         curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, TRUE );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, FALSE );
         curl_setopt( $curl, CURLOPT_SSL_VERIFYHOST, FALSE );
