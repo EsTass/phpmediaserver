@@ -428,6 +428,7 @@
                 //set to auto-updated: idmediainfo = -1
                 @sqlite_media_update_mediainfo( $media[ 'idmedia' ], -1 );
                 $title = basename( $media[ 'file' ] );
+                $title = clean_filename( $title );
                 $IDMEDIA = $media[ 'idmedia' ];
                 $type = TRUE;//Movies
                 $season = FALSE;
@@ -437,7 +438,7 @@
                 ){
                     if( $echo ) echo get_msg( 'IDENT_FILETODETECTED' ) . 'TV';
                     $type = FALSE;//Series
-                    if( is_array( $season ) ){
+                    if( is_array( $season_e ) ){
                         $season = $season_e[ 0 ];
                         $episode = $season_e[ 1 ];
                     }
@@ -451,12 +452,26 @@
                     $imdbid = scrap_all_nearest_title( $title, $type );
                 }
                 if( $echo ) echo get_msg( 'IDENT_FILETODETECTED' ) . ' ' . basename( $media[ 'file' ] ) . ' ' . $season . 'x' . $episode . ' - ' . $imdbid;
-                if( ( $info_data = $G_SCRAPPERS[ O_SCRAP_CRON ][ 1 ]( $media[ 'file' ], $title, $type, $imdbid, $season, $episode ) ) != FALSE 
-                && array_key_exists( 'data', $info_data )
-                && is_array( $info_data[ 'data' ] )
-                && array_key_exists( 'title', $info_data[ 'data' ] )
-                && array_key_exists( 'year', $info_data[ 'data' ] )
-                && strlen( $info_data[ 'data' ][ 'title' ] ) > 0
+                //Check DB Scrap
+                //next config cron autodetect
+                if( 
+                    (
+                        ( $info_data = ident_detect_file_db( $media[ 'file' ], $title, $type, $imdbid, $season, $episode ) ) != FALSE 
+                        && array_key_exists( 'data', $info_data )
+                        && is_array( $info_data[ 'data' ] )
+                        && array_key_exists( 'title', $info_data[ 'data' ] )
+                        && array_key_exists( 'year', $info_data[ 'data' ] )
+                        && strlen( $info_data[ 'data' ][ 'title' ] ) > 0
+                    )
+                
+                || ( 
+                        ( $info_data = $G_SCRAPPERS[ O_SCRAP_CRON ][ 1 ]( $media[ 'file' ], $title, $type, $imdbid, $season, $episode ) ) != FALSE 
+                        && array_key_exists( 'data', $info_data )
+                        && is_array( $info_data[ 'data' ] )
+                        && array_key_exists( 'title', $info_data[ 'data' ] )
+                        && array_key_exists( 'year', $info_data[ 'data' ] )
+                        && strlen( $info_data[ 'data' ][ 'title' ] ) > 0
+                    )
                 ){
                     if( $echo ) echo get_msg( 'IDENT_DETECTED' ) . $info_data[ 'data' ][ 'title' ] . ' ' . $info_data[ 'data' ][ 'year' ];
                     //check duplicates in idmediainfo
@@ -560,12 +575,24 @@
                     $imdbid = scrap_all_nearest_title( $title, $type );
                 }
                 if( $echo ) echo get_msg( 'IDENT_FILETODETECTED' ) . ' ' . basename( $media[ 'file' ] ) . ' ' . $season . 'x' . $episode . ' - ' . $imdbid;
-                if( ( $info_data = $G_SCRAPPERS[ O_SCRAP_CRON ][ 1 ]( $media[ 'file' ], $title, $type, $imdbid, $season, $episode ) ) != FALSE 
-                && array_key_exists( 'data', $info_data )
-                && is_array( $info_data[ 'data' ] )
-                && array_key_exists( 'title', $info_data[ 'data' ] )
-                && array_key_exists( 'year', $info_data[ 'data' ] )
-                && strlen( $info_data[ 'data' ][ 'title' ] ) > 0
+                if( 
+                    (
+                        ( $info_data = ident_detect_file_db( $media[ 'file' ], $title, $type, $imdbid, $season, $episode ) ) != FALSE 
+                        && array_key_exists( 'data', $info_data )
+                        && is_array( $info_data[ 'data' ] )
+                        && array_key_exists( 'title', $info_data[ 'data' ] )
+                        && array_key_exists( 'year', $info_data[ 'data' ] )
+                        && strlen( $info_data[ 'data' ][ 'title' ] ) > 0
+                    )
+                
+                || ( 
+                        ( $info_data = $G_SCRAPPERS[ O_SCRAP_CRON ][ 1 ]( $media[ 'file' ], $title, $type, $imdbid, $season, $episode ) ) != FALSE 
+                        && array_key_exists( 'data', $info_data )
+                        && is_array( $info_data[ 'data' ] )
+                        && array_key_exists( 'title', $info_data[ 'data' ] )
+                        && array_key_exists( 'year', $info_data[ 'data' ] )
+                        && strlen( $info_data[ 'data' ][ 'title' ] ) > 0
+                    )
                 ){
                     if( $echo ) echo get_msg( 'IDENT_DETECTED' ) . $info_data[ 'data' ][ 'title' ] . ' ' . $info_data[ 'data' ][ 'year' ];
                     //check duplicates in idmediainfo
@@ -813,11 +840,14 @@
         global $G_CLEAN_FILENAME;
         $filename = basename( $file );
         $CLEAN_NAME = $G_CLEAN_FILENAME;
+        $DEBUG = FALSE;
         
         //extract year, not clean
         $YEAR = '';
         preg_match_all('!\d+!', $filename, $years );
-        //var_dump( $years );
+        
+        if( $DEBUG ) var_dump( $years );
+        
         if( is_array( $years ) 
         && count( $years ) > 0
         && array_key_exists( 0, $years )
@@ -837,14 +867,17 @@
         $CLEANNAME = $filename;
         $CLEANNAME = preg_replace('/\[[\s\S]+?\]/', '', $CLEANNAME);
         $CLEANNAME = preg_replace('/\([\s\S]+?\)/', '', $CLEANNAME);
+        if( $DEBUG ) var_dump( $CLEANNAME );
         
         //Clean domains
         $CLEANNAME = clean_string_domains( $CLEANNAME );
+        if( $DEBUG ) var_dump( $CLEANNAME );
         
         //Exclude strings
         foreach( $CLEAN_NAME AS $clean ){
             $CLEANNAME = str_ireplace( $clean, '', $CLEANNAME );
         }
+        if( $DEBUG ) var_dump( $CLEANNAME );
         
         //CLEAN EXTRAS
         $CLEANNAME = str_ireplace( '  ', ' ', $CLEANNAME );
@@ -852,9 +885,18 @@
         $CLEANNAME = str_ireplace( '.', ' ', $CLEANNAME );
         $CLEANNAME = str_ireplace( '_', ' ', $CLEANNAME );
         $CLEANNAME = trim( $CLEANNAME );
+        if( $DEBUG ) var_dump( $CLEANNAME );
+        
+        //Put space before uppercases
+        $CLEANNAME = preg_replace('/(?<!\ )[A-Z]/', ' $0', $CLEANNAME );
+        if( $DEBUG ) var_dump( $CLEANNAME );
+        
         if( $clean_year == FALSE ){
             $CLEANNAME .= ' ' . $YEAR;
         }
+        
+        $CLEANNAME = str_ireplace( '  ', ' ', $CLEANNAME );
+        $CLEANNAME = trim( $CLEANNAME );
         
         return $CLEANNAME;
 	}
@@ -883,11 +925,11 @@
                 }
                 $replace = substr( $string, $pos_b, ( $pos_a - $pos_b ) + strlen( $d ) );
                 if( $debug ) echo PHP_EOL . "++Clean: " . $string . ' -> ' . $replace;
-                $string = str_ireplace( $replace, '', $string );
+                $string = str_ireplace( $replace, ' ', $string );
             }
         }
         
-        $string = str_ireplace( 'www', '', $string );
+        $string = str_ireplace( 'www', ' ', $string );
         
         if( strlen( $string ) < 5 ){
             $string = $ostring;
@@ -900,6 +942,7 @@
     
     function get_media_chapter( $title ){
         $result = FALSE;
+        
         if( preg_match( "/[0-9]{1,2}[x,X][0-9]{1,3}/", basename( $title ), $match ) 
         && is_array( $match )
         && count( $match ) > 0
@@ -942,6 +985,32 @@
             $result = array();
             $result[] = (int)$d[ 0 ];
             $result[] = (int)$d[ 1 ];
+        }elseif( preg_match_all( "/([0-9]{3,5})/", basename( $title ), $match ) 
+        && is_array( $match )
+        && count( $match ) > 1
+        && is_array( $match[ 1 ] )
+        && count( $match[ 1 ] ) > 0
+        && strlen( $match[ 1 ][ 0 ] ) > 2
+        ){
+            //Exclude Years
+            if( (int)$match[ 1 ][ 0 ] < 1920
+            || (int)$match[ 1 ][ 0 ] > ( (int)date( 'Y' ) + 1 )
+            ){
+                $season = (int)( (int)$match[ 1 ][ 0 ] / 100 );
+                $episode = (int)( (int)$match[ 1 ][ 0 ] - ( $season * 100 ) );
+                if( $season != 10
+                && $episode != 80
+                && $season != 7
+                && $episode != 20
+                && $season > 0 
+                && $season < 40
+                && $episode > 0
+                ){
+                    $result = array();
+                    $result[] = $season;
+                    $result[] = $episode;
+                }
+            }
         }
         
         return $result;
@@ -972,8 +1041,17 @@
             && strlen( $match[ 0 ] ) > 3
             ){
                 $title = str_ireplace( $match[ 0 ], '', $title );
+            }elseif( preg_match_all( "/([0-9]{3,5})/", basename( $title ), $match ) 
+            && is_array( $match )
+            && count( $match ) > 1
+            && is_array( $match[ 1 ] )
+            && count( $match[ 1 ] ) > 0
+            && strlen( $match[ 1 ][ 0 ] ) > 2
+            ){
+                $title = str_ireplace( $match[ 1 ][ 0 ], '', $title );
             }
             $result = $title;
+            $result = trim( $result );
         }
         
         return $result;

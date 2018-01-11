@@ -34,10 +34,12 @@
             //echo reloadJS();
             //header("Refresh: 2");
         }else{
-            if( ( $d = get_media_chapter( $TITLE ) ) != FALSE
+            if( ( $d = get_media_chapter( $FILENAME ) ) != FALSE
             ){
                 $SEASON = (int)$d[ 0 ];
                 $EPISODE = (int)$d[ 1 ];
+                $TITLE = clean_media_chapter( $TITLE );
+                $TITLE .= ' ' . $SEASON . 'x' . sprintf( '%02d', $EPISODE );
             }
 ?>
 <script type="text/javascript">

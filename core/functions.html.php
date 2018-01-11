@@ -81,7 +81,7 @@
             }else{
                 $onclick = "list_show_info( this, " . $element[ 'idmediainfo' ] . " );";
             }
-            $result .= "<div class='listElement " . $css_extra . "' onclick='" . $onclick .  "'><a href='#' title='" . htmlspecialchars( $plot, ENT_QUOTES ) . "'><img title='" . htmlspecialchars( $ftitle, ENT_QUOTES ) . ": " . htmlspecialchars( $plot, ENT_QUOTES ) . "' class='listElementImg lazy' data-src='" . $urlposter . "' src='' /><span class='" . $css_played . "'>" . $ftitle . "" . $played . "</span></a></div>";
+            $result .= "<div class='listElement " . $css_extra . "' onclick='" . $onclick .  "'><a href='#' title='" . htmlspecialchars( $ftitle, ENT_QUOTES ) . "'><img title='" . htmlspecialchars( $ftitle, ENT_QUOTES ) . ": " . htmlspecialchars( $plot, ENT_QUOTES ) . "' class='listElementImg lazy' data-src='" . $urlposter . "' src='' /><span class='" . $css_played . "'>" . $ftitle . "" . $played . "</span></a></div>";
         }
         
         //Next

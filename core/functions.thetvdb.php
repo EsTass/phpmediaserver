@@ -45,11 +45,11 @@
         && mkdir( $TMP_FOLDER )
         && ( 
             is_string( $THETVDB_TOKEN )
-            || ident_thetvdb_login( TRUE ) != FALSE
+            || ident_thetvdb_login( $debug ) != FALSE
             )
         ){
             if( $imdb != FALSE 
-            && ( $result = ident_detect_thetvdb( $imdb, $title, TRUE ) ) != FALSE
+            && ( $result = ident_detect_thetvdb( $imdb, $title, $debug ) ) != FALSE
             ){
                 //Convert URLs IMGs to Files On TMP Folder
                 foreach( $result AS $k => $v ){
@@ -127,7 +127,7 @@
         //$postdata[ 'id' ] = $thetvbd_id;
         $postdata[ 'token' ] = $THETVDB_TOKEN;
         
-        if( ( $data = ident_thetvdb_get_data( $url, $THETVDB_TOKEN, TRUE ) ) != FALSE
+        if( ( $data = ident_thetvdb_get_data( $url, $THETVDB_TOKEN, $debug ) ) != FALSE
         && is_array( $data )
         && array_key_exists( 'data', $data )
         && is_array( $data[ 'data' ] )
@@ -138,7 +138,7 @@
             
             //ACTORS
             $result[ 'actors' ] = '';
-            if( ( $data = ident_thetvdb_get_data( $url . '/actors', $THETVDB_TOKEN, TRUE ) ) != FALSE
+            if( ( $data = ident_thetvdb_get_data( $url . '/actors', $THETVDB_TOKEN, $debug ) ) != FALSE
             && is_array( $data )
             && array_key_exists( 'data', $data )
             && is_array( $data[ 'data' ] )

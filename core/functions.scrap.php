@@ -905,4 +905,78 @@
 
         return $response;
 	}
+	
+	//OWN DB SCRAPPER
+	
+	$G_SCRAPPERS[ 'my_db' ] = array( '', 'ident_detect_file_db' );
+	
+	function ident_detect_file_db( $file, $title, $movies = TRUE, $imdb = FALSE, $season = FALSE, $episode = FALSE ){
+        //Check same title in db
+        //recolect NEEDED DATA
+        // array( poster, fanart, logo, poster, banner, landscape, data => $G_MEDIAINFO )
+        global $G_MEDIADATA;
+        $result = $G_MEDIADATA;
+        $bfile = basename( $file );
+        $debug = FALSE;
+        
+        if( $debug ){
+            if( $debug ) echo "<br />File: ";
+            var_dump( $file );
+            if( $debug ) echo "<br />Title: ";
+            var_dump( $title );
+            if( $debug ) echo "<br />Movies: ";
+            var_dump( $movies );
+            if( $debug ) echo "<br />IMDB: ";
+            var_dump( $imdb );
+            if( $debug ) echo "<br />SEASON: ";
+            var_dump( $season );
+            if( $debug ) echo "<br />EPISODE: ";
+            var_dump( $episode );
+        }
+        
+        $title = clean_media_chapter( $title );
+        $title = clean_filename( $title, TRUE );
+        $title = trim( $title );
+        
+        if( ( $mediainfo = sqlite_mediainfo_search( $title ) ) ){
+            if( $debug ) echo "<br />MEDIAINFO FINDED: " . count( $mediainfo );
+            $similars = array();
+            $midata = array();
+            foreach( $mediainfo AS $mi ){
+                if( $debug ) echo "<br />MEDIAINFO FINDED TITLE: " . $mi[ 'title' ];
+                $modifs = similar_text( $title, $mi[ 'title' ], $pc );
+                if( $debug ) echo "<br />MEDIAINFO SIMILARITY: " . $pc;
+                $similars[ $pc ] = $mi;
+            }
+            krsort( $similars );
+            foreach( $similars AS $pc => $mi ){
+                if( $pc > 80 ){
+                    if( $debug ) echo "<br />MEDIAINFO FINDED: " . $mi[ 'title' ];
+                    $midata = $mi;
+                }
+                break;
+            }
+            if( array_key_exists( 'idmediainfo', $midata ) ){
+                foreach( $result AS $rkey => $rvalue ){
+                    if( is_string( $rvalue ) ){
+                        $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
+                    }
+                }
+                $midata[ 'idmediainfo' ] = 'NULL';
+                $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
+                $midata[ 'season' ] = $season;
+                $midata[ 'episode' ] = $episode;
+                $midata[ 'titleepisode' ] = '';
+                $result[ 'data' ] = $midata;
+            }
+        }
+        
+        if( $debug ){
+            echo "<br />RESULT: ";
+            var_dump( $result );
+            //die();
+        }
+        return $result;
+	}
+	
 ?>

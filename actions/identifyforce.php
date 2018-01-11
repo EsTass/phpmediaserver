@@ -70,6 +70,10 @@
         $IMDB = FALSE;
 	}
 	
+	$TITLE = clean_filename( $TITLE, TRUE );
+	$TITLE = clean_media_chapter( $TITLE );
+	$TITLE = trim( $TITLE );
+	
 	//SEARCH EXISTENT AND FORCE
 	if( ( $mediainfo = sqlite_mediainfo_check_exist( $TITLE, $SEASON, $EPISODE ) ) != FALSE  ){
         if( is_numeric( $SEASON ) ){

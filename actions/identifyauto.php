@@ -24,6 +24,7 @@
 	&& array_key_exists( 0, $info_data )
 	&& is_array( $info_data[ 0 ] )
 	&& array_key_exists( 'title', $info_data[ 0 ] )
+	&& strlen( $info_data[ 0 ][ 'title' ] ) > 0
 	){
         if( $SHOW_IDENTIFY_DATA == FALSE ){
             echo get_msg( 'IDENT_DETECTEDOK' ) . ' ' . $info_data[ 0 ][ 'title' ] . ' => ' . $info_data[ 0 ][ 'file' ];

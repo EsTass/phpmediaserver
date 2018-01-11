@@ -66,6 +66,9 @@
         $G_PAGE = FALSE;
 	}
 	
+	//Log
+	sqlite_log_insert( $G_DATA[ 'action' ], 'as: ' . $G_SUBACTION . ' - cat: ' . $G_CAT );
+	
 	$RESULT = array();
 	
 	//SUBACTIONS
