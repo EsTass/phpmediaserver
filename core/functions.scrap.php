@@ -229,23 +229,35 @@
 	function searchImages( $search, $max = 5, $getthumb = TRUE ) {
 		$result = array();
 		$debug = FALSE;
+		$in_list = array();
+		$list = array( 'searchImagesBing', 'searchImagesIXQick', 'searchImagesWebcrawler' );
+		$rnd = mt_rand( 0, ( count( $list ) - 1 ) );
+		if( array_key_exists( $rnd, $list ) 
+		&& function_exists( $list[ $rnd ] )
+		&& !in_array( $list[ $rnd ], $in_list )
+		){
+            $in_list[] = $list[ $rnd ];
+            if( ( $links = $list[ $rnd ]( $search, $max, $getthumb ) ) != FALSE ){
+                $result = array_merge( $result, $links );
+            }
+		}
 		
+		/*
 		if( ( $links = searchImagesBing( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
-		}
-		if( $debug ) echo "<br />Bing: " . count( $result );
-		if( count( $result ) < $max
-		&& ( $links = searchImagesIXQick( $search, $max, $getthumb ) ) != FALSE ){
+        }
+        if( $debug ) echo "<br />Bing: " . count( $result );
+        if( count( $result ) < $max
+        && ( $links = searchImagesIXQick( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
-		}
-		if( $debug ) echo "<br />IXQick: " . count( $result );
-		
-		if( count( $result ) < $max
-		&& ( $links = searchImagesWebcrawler( $search, $max, $getthumb ) ) != FALSE ){
+        }
+        if( $debug ) echo "<br />IXQick: " . count( $result );
+        
+        if( count( $result ) < $max
+        && ( $links = searchImagesWebcrawler( $search, $max, $getthumb ) ) != FALSE ){
             $result = array_merge( $result, $links );
-		}
-		if( $debug ) echo "<br />WebCrawler: " . count( $result );
-		/*
+        }
+        if( $debug ) echo "<br />WebCrawler: " . count( $result );
 		//fail, recheck
 		if( count( $result ) < $max
 		&& ( $links = searchImagesDuckDuckGo( $search, $max, $getthumb ) ) != FALSE ){
@@ -934,11 +946,29 @@
             var_dump( $episode );
         }
         
+        if( $debug ) echo "<br />TITLE CLEAN 1: " . $title;
+        
         $title = clean_media_chapter( $title );
         $title = clean_filename( $title, TRUE );
         $title = trim( $title );
         
-        if( ( $mediainfo = sqlite_mediainfo_search( $title ) ) ){
+        if( $debug ) echo "<br />TITLE CLEAN 2: " . $title;
+        
+        //Clean non standar chars
+        $title = preg_replace( '/[^\x20-\x7E]/','_', $title );
+        $title = str_ireplace( '__', '_', $title );
+        $title = str_ireplace( ' ', '%', $title );
+        $title = trim( $title, '_' );
+        $title = trim( $title, '%' );
+        $title = trim( $title, '_' );
+        $title = trim( $title, '%' );
+        if( $debug ) echo "<br />TITLE CLEAN 3: " . $title;
+        
+        //BASE MODE: string similarity by search
+        if( ( $mediainfo = sqlite_mediainfo_search( $title ) ) != FALSE
+        && is_array( $mediainfo )
+        && count( $mediainfo ) > 0
+        ){
             if( $debug ) echo "<br />MEDIAINFO FINDED: " . count( $mediainfo );
             $similars = array();
             $midata = array();
@@ -969,6 +999,107 @@
                 $midata[ 'titleepisode' ] = '';
                 $result[ 'data' ] = $midata;
             }
+        }elseif( $season !== FALSE ){
+            //SERIES MODE SIMILARITY
+            $FINDED = FALSE;
+            //Check by title similarity ONLY SERIES
+            if( ( $mediadata = sqlite_media_getdata_file_search( $title ) ) != FALSE
+            && is_array( $mediadata )
+            && count( $mediadata ) > 0
+            ){
+                if( $debug ) echo "<br />MEDIA FINDED (TITLE): " . count( $mediadata );
+                $similars = array();
+                $midata = array();
+                foreach( $mediadata AS $mi ){
+                    if( $debug ) echo "<br />MEDIA FINDED FILE: " . $mi[ 'title' ];
+                    $modifs = similar_text( $title, $mi[ 'title' ], $pc );
+                    if( $debug ) echo "<br />MEDIA SIMILARITY: " . $pc;
+                    $similars[ $pc ] = $mi;
+                }
+                krsort( $similars );
+                $pcmin = ( 10 * ( ( strlen( $title ) ) + 1 ) );
+                if( $pcmin > 80 ) $pcmin = 80;
+                if( $debug ) echo "<br />MEDIA PC NEEDED: " . $pcmin;
+                foreach( $similars AS $pc => $mi ){
+                    if( $pc > $pcmin 
+                    && $pc < 100
+                    ){
+                        if( $debug ) echo "<br />MEDIA FINDED: " . $mi[ 'title' ];
+                        $midata = $mi;
+                        break;
+                    }
+                }
+                if( array_key_exists( 'idmediainfo', $midata ) 
+                ){
+                    foreach( $result AS $rkey => $rvalue ){
+                        if( is_string( $rvalue ) ){
+                            $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
+                        }
+                    }
+                    $midata[ 'idmediainfo' ] = 'NULL';
+                    $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
+                    $midata[ 'season' ] = $season;
+                    $midata[ 'episode' ] = $episode;
+                    $midata[ 'titleepisode' ] = '';
+                    $result[ 'data' ] = $midata;
+                    $FINDED = TRUE;
+                }
+            }
+            
+            //Check by file similarity SERIES MODE
+            if( $FINDED == FALSE
+            && ( $betterword = get_word_better( basename( $file ) ) ) != FALSE
+            && ( $mediadata = sqlite_media_getdata_file_search( $betterword ) ) != FALSE
+            && is_array( $mediadata )
+            && count( $mediadata ) > 0
+            ){
+                if( $debug ) echo "<br />MEDIA BETTERWORD (FILE2): " . $betterword;
+                if( $debug ) echo "<br />MEDIA FINDED (FILE2): " . count( $mediadata );
+                $similars = array();
+                $midata = array();
+                foreach( $mediadata AS $mi ){
+                    $f1 = clean_filename( basename( $file ) );
+                    $f2 = clean_filename( basename( $mi[ 'file' ] ) );
+                    $modifs = similar_text( $f1, $f2, $pc );
+                    if( $pc > 50 ){
+                        if( $debug ) echo "<br />MEDIA FINDED FILE: " . basename( $mi[ 'file' ] );
+                        if( $debug ) echo "<br />MEDIA SIMILARITY STRINGA: " . $f1;
+                        if( $debug ) echo "<br />MEDIA SIMILARITY STRINGB: " . $f2;
+                        if( $debug ) echo "<br />MEDIA SIMILARITY: " . $pc;
+                    }
+                    $similars[ $pc ] = $mi;
+                }
+                krsort( $similars );
+                $pcmin = 75;
+                if( $debug ) echo "<br />MEDIA PC NEEDED: " . $pcmin;
+                foreach( $similars AS $pc => $mi ){
+                    if( $pc > $pcmin 
+                    && $pc < 100
+                    ){
+                        if( $debug ) echo "<br />MEDIA FINDED: " . $mi[ 'title' ];
+                        $midata = $mi;
+                        break;
+                    }
+                }
+                if( array_key_exists( 'idmediainfo', $midata ) 
+                && ( $midata = sqlite_mediainfo_getdata( $midata[ 'idmediainfo' ] )) != FALSE
+                && is_array( $midata )
+                && count( $midata ) > 0
+                ){
+                    $midata = $midata[ 0 ];
+                    foreach( $result AS $rkey => $rvalue ){
+                        if( is_string( $rvalue ) ){
+                            $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
+                        }
+                    }
+                    $midata[ 'idmediainfo' ] = 'NULL';
+                    $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
+                    $midata[ 'season' ] = $season;
+                    $midata[ 'episode' ] = $episode;
+                    $midata[ 'titleepisode' ] = '';
+                    $result[ 'data' ] = $midata;
+                }
+            }
         }
         
         if( $debug ){
@@ -976,6 +1107,112 @@
             var_dump( $result );
             //die();
         }
+        return $result;
+	}
+	
+	//SEARCH POSTERS IMAGES
+	
+	function get_medinfo_images( $limit = 10, $type = 'poster', $print = TRUE, $debug = FALSE ){
+        $result = FALSE;
+        
+        if( $debug ) echo "<br />GETTING IMGS AUTO: " . $limit;
+        if( ( $MEDIAINFO = sqlite_mediainfo_search( '', 1000 ) ) != FALSE
+        && is_array( $MEDIAINFO )
+        && count( $MEDIAINFO ) > 0
+        ){
+            if( $debug ) echo "<br />MEDIAINFOS: " . count( $MEDIAINFO );
+            foreach( $MEDIAINFO AS $row ){
+                $FTARGET = PPATH_MEDIAINFO . DS . $row[ 'idmediainfo' ] . '.' . $type;
+                if( $debug ) echo "<br />CHECKING: " . $row[ 'idmediainfo' ] . ' - ' . $row[ 'title' ];
+                if( !file_exists( $FTARGET )
+                && ( $images = get_image_auto( $row[ 'idmediainfo' ], $type ) ) != FALSE
+                ){
+                    if( $debug ) echo "<br />TITLE: " . $row[ 'title' ];
+                    if( $debug ) echo "<br />IMAGES: " . count( $images );
+                    foreach( $images AS $img ){
+                        if( getFileMimeTypeImg( $img )
+                        && link( $img, $FTARGET )
+                        ){
+                            $limit--;
+                            if( $print ) echo "<br />IMAGE ADD: " . $row[ 'title' ] . ' - ' . $row[ 'idmediainfo' ];
+                            if( array_key_exists( 'title', $row )
+                            && ( $MIDATA2 = sqlite_mediainfo_search_title( $row[ 'title' ] ) ) != FALSE 
+                            && count( $MIDATA2 ) > 0
+                            ){
+                                $q = 0;
+                                foreach( $MIDATA2 AS $row ){
+                                    $FTARGET2 = PPATH_MEDIAINFO . DS . $row[ 'idmediainfo' ] . '.' . $type;
+                                    if( !file_exists( $FTARGET2 )
+                                    && link( $img, $FTARGET2 ) 
+                                    ){
+                                        if( $print ) echo "<br />IMAGE ADD CHAPTER: " . $row[ 'title' ] . ' - ' . $row[ 'idmediainfo' ];
+                                        $q++;
+                                    }
+                                }   
+                            }else{
+                                $result = TRUE;
+                            }
+                        }else{
+                            $result = FALSE;
+                        }
+                    }
+                }
+                if( $limit <= 0 ){
+                    break;
+                }
+            }
+        }
+        
+        return $result;
+	}
+	
+	function get_image_auto( $idmediainfo, $type = 'poster', $quantity = 1 ){
+        $result = FALSE; //FALSE|array( fileimage, ... )
+        global $G_MEDIADATA;
+        
+        if( ( $MEDIAINFO = sqlite_mediainfo_getdata( $idmediainfo ) ) != FALSE
+        && is_array( $MEDIAINFO )
+        && array_key_exists( 0, $MEDIAINFO )
+        ){
+            $MEDIAINFO = $MEDIAINFO[ 0 ];
+            $fileimgpathrnd = getRandomString( 8 );
+            $fileimgpath = PPATH_TEMP . DS . $fileimgpathrnd;
+            @mkdir( $fileimgpath );
+            $in_list = array();
+            $filenum = 1;
+            if( array_key_exists( $type, $G_MEDIADATA ) ){
+                $search = $type . ' ' . $MEDIAINFO[ 'title' ] . ' ' . $MEDIAINFO[ 'year' ];
+                if( is_numeric( $MEDIAINFO[ 'season' ] ) ){
+                    $search .= ' serie';
+                }else{
+                    $search .= ' movie';
+                }
+                //var_dump( $search );
+                $images_own = array();
+                if( ( $images = searchImages( $search, $quantity, FALSE ) ) != FALSE
+                && is_array( $images ) 
+                && count( $images ) > 0
+                ){
+                    foreach( $images AS $key => $img ){
+                        $fileimg = $fileimgpath . DS . $filenum;
+                        if( array_key_exists( $img, $in_list ) ){
+                            $images_own[] = $in_list[ $img ];
+                        }elseif( downloadPosterToFile( $img, $fileimg ) 
+                        && file_exists( $fileimg )
+                        && getFileMimeTypeImg( $fileimg )
+                        ){
+                            $in_list[ $img ] = $fileimg;
+                            $images_own[] = $fileimg;
+                            $filenum++;
+                        }
+                    }
+                    if( !is_array( $result ) ) $result = array();
+                    $result = $images_own;
+                }
+            }
+        }
+        
+        
         return $result;
 	}
 	

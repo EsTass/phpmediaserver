@@ -86,6 +86,12 @@
 	echo "<br />";
 	media_fill_imgs( 1000, TRUE, TRUE );
 	
+	//DOWNLOAD NEW IMGS (TESTING)
+	echo "<br />" . date( 'Y-m-d H:i:s' );
+	echo "<br />Download MediaInfo IMGs: ";
+	echo "<br />";
+	get_medinfo_images( 10, 'poster', TRUE, FALSE );
+	
 	//HARDLINK DUPLI CACHE IMGs
 	echo "<br />" . date( 'Y-m-d H:i:s' );
 	echo "<br />Clean Duply IMGs: ";

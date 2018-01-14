@@ -37,7 +37,7 @@
                 }
                 //var_dump( $search );
                 $images_own = array();
-                if( ( $images = searchImages( $search, 8, FALSE ) ) != FALSE
+                if( ( $images = searchImages( $search, 8, TRUE ) ) != FALSE
                 && is_array( $images ) 
                 && count( $images ) > 0
                 ){

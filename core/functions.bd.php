@@ -775,6 +775,27 @@
 		return $result;
 	}
 	
+	function sqlite_media_getdata_file_search( $search, $limit = 1000 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM media ';
+			$sql .= ' INNER JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
+			if( strlen( $search ) > 0
+			){
+				$sql .= ' WHERE file LIKE \'%' . $search . '%\' ';
+			}
+			$sql .= ' ORDER BY file DESC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
 	function sqlite_media_getdata_order_mediainfo( $idmedia = FALSE, $limit = 1000 ){
 		//Vars
 		$result = FALSE;

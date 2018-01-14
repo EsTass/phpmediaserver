@@ -646,4 +646,25 @@
 		return @json_decode(@json_encode($object),1); 
 	} 
 	
+	//Get biggest word
+	
+	function get_word_better( $str ){
+        $result = '';
+        $first = 5;
+        
+        if( ( $words = str_word_count( $str, 2 ) ) != FALSE ){
+            foreach( $words AS $p => $w ){
+                if( $p <= $first ){
+                    if( strlen( $result ) < strlen( $w ) ){
+                        $result = $w;
+                    }
+                }else{
+                    break;
+                }
+            }
+        }
+        
+        return $result;
+	}
+	
 ?>

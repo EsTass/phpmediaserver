@@ -10,6 +10,6 @@
         $G_SEARCH = '';
 	}
 	
-	//$a =  media_fill_imgs( 10, TRUE );
-	//var_dump( $a );
+	//get_medinfo_images( 1, 'poster', TRUE, TRUE );
+	
 ?>
