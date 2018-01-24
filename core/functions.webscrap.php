@@ -946,7 +946,8 @@
         $result = array();
         
         //$pattern = '/^.*\bmagnet\b.*$/m';
-        $pattern = '/magnet:\?xt=urn:tree:tiger:(?P<tth>\w+)/';
+        //$pattern = '/magnet:\?xt=urn:tree:tiger:(?P<tth>\w+)/';
+        $pattern = '/(magnet:[^"\'\s]*)/';
         preg_match_all( $pattern, $data, $match);
         
         return $match[0];
