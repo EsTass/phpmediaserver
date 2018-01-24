@@ -210,8 +210,8 @@
                         $scrapped[] = $link;
                         echo "<br />" . $deepstr . "LINKS P2P DOWNLOAD: " . $title . ' - ' . $link;
                         //PPATH_WEBSCRAP_DOWNLOAD  PPATH_TEMP
-                        if( torrentAdd( $link, PPATH_TEMP . DS . $title ) ){
-                            echo "<br />" . $deepstr . "LINKS P2P DOWNLOADED: " . PPATH_TEMP . DS . $title;
+                        if( torrentAdd( $link, PPATH_WEBSCRAP_DOWNLOAD . DS . $title ) ){
+                            echo "<br />" . $deepstr . "LINKS P2P DOWNLOADED: " . PPATH_WEBSCRAP_DOWNLOAD . DS . $title;
                         }
                     }
                 }
