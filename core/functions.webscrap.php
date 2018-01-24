@@ -945,7 +945,8 @@
 	function extract_magnets( $data ){
         $result = array();
         
-        $pattern = '/^.*\bmagnet\b.*$/m';
+        //$pattern = '/^.*\bmagnet\b.*$/m';
+        $pattern = '/magnet:\?xt=urn:tree:tiger:(?P<tth>\w+)/';
         preg_match_all( $pattern, $data, $match);
         
         return $match[0];
@@ -954,7 +955,8 @@
 	function extract_elinks( $data ){
         $result = array();
         
-        $pattern = '/^.*\bed2k\b.*$/m';
+        //$pattern = '/^.*\bed2k\b.*$/m';
+        $pattern = '/ed2k\:\/\/\|file\|.{1,250}\|[0-9]{8,12}\|[0-9A-F]{32}\|\//m';
         preg_match_all( $pattern, $data, $match);
         
         return $match[0];
@@ -977,6 +979,24 @@
         preg_match('/(?<=file\|)\S*?\|/', $magnet, $magnet_link);
         if( array_key_exists( 0, $magnet_link ) ){
             $result = $magnet_link[ 0 ];
+        }
+        
+        return $result;
+    }
+    
+    function mime_check_torrent( $file ){
+        $result = FALSE;
+        $mimes = array(
+            'application/x-bittorrent', 
+            'application/force-download', 
+            'application/torrent', 
+            'torrent'
+        );
+        
+        if( ( $mime = getFileMimeType( $file ) ) != FALSE 
+        && in_array( $mime, $mimes )
+        ){
+            $result = TRUE;
         }
         
         return $result;

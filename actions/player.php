@@ -611,7 +611,7 @@ html, body
                     $extra_vdata = "";
                 }
         ?>
-        <source id='my-player-source' src="?r=r&action=playtime&mode=<?php echo $urlident; ?>&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/<?php echo $videoheader; ?>" <?php echo $extra_vdata; ?>>
+        <source id='my-player-source' src="?r=r&action=playtime&mode=<?php echo $urlident; ?>&idmedia=<?php echo $IDMEDIA; ?>&timeplayed=<?php echo $playedtimebefore; ?>&audiotrack=<?php echo $AUDIOTRACK; ?>" type="video/<?php echo $videoheader; ?>" <?php echo $extra_vdata; ?> preload="auto" >
         <?php
                 $num++;
             }

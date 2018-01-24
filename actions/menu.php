@@ -50,6 +50,9 @@
         <div class='listMenuElementAdmin'>
             <a href='?action=config'><?php echo get_msg( 'MENU_CONFIG', FALSE ) ?></a>
         </div>
+        <div class='listMenuElementAdmin'>
+            <a href='?action=webspider'>WebSpider</a>
+        </div>
         <?php
                 }
                 if( count( $G_WEBSCRAPPER ) > 0 ){
@@ -62,10 +65,28 @@
         </div>
         <?php
                 }
+                
+                $LOGLIST = array(
+                    'log' => get_msg( 'MENU_LOG', FALSE ),
+                    'medialog' => get_msg( 'MENU_LOGMEDIA', FALSE ),
+                    'mediainfolog' => get_msg( 'MENU_LOGMEDIAINFO', FALSE ),
+                    'playedlog' => get_msg( 'MENU_LOGPLAYED', FALSE ),
+                    'cronlog' => get_msg( 'MENU_CRON', FALSE ),
+                );
+                
+                foreach( $LOGLIST AS $a => $title ){
         ?>
+        <div class='listMenuElementAdmin'>
+            <a href='?action=<?php echo $a; ?>'><?php echo $title; ?></a>
+        </div>
+        <?php
+                }
+        ?>
+        <!--
         <div class='listMenuElementAdmin'>
             <a href='?action=loglist'><?php echo get_msg( 'MENU_LOG', FALSE ) ?></a>
         </div>
+        -->
         <div class='listMenuElementAdmin'>
             <a href='?action=mediainfojoin'><?php echo get_msg( 'MENU_JOINMEDIA', FALSE ) ?></a>
         </div>
