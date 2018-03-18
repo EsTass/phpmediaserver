@@ -37,6 +37,11 @@
 	if( ( $links = webscrapp_search( $SCRAPPER, $SEARCH ) ) != FALSE 
 	&& count( $links ) > 0
 	){
+	
+	//CLEAN VALUES
+	$SCRAPPER = str_replace( "\t", '', $SCRAPPER );
+    $SCRAPPER = str_replace( "\n", '', $SCRAPPER );
+    $SCRAPPER = str_replace( "\r", '', $SCRAPPER );
         
 ?>
     <table class='tList'>
@@ -45,6 +50,9 @@
         </tr>
         <?php  
             foreach( $links AS $t => $href ){
+                $t = str_replace( "\t", '', $t );
+                $t = str_replace( "\n", '', $t );
+                $t = str_replace( "\r", '', $t );
         ?>
         <tr>
             <td class='tCenter'>
