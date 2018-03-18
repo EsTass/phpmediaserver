@@ -1256,6 +1256,10 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'SELECT * FROM media ';
 			$sql .= ' WHERE file LIKE \'%' . $search . '%\'';
+			//Add Exlude VOSE
+			$sql .= ' AND file NOT LIKE \'%VOSE%\' ';
+			$sql .= ' AND file NOT LIKE \'%V.O.S.E%\'';
+			$sql .= ' AND file NOT LIKE \'%Subt%\'';
 			$sql .= ' ORDER BY idmedia ASC';
 			//var_dump( $sql );
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
