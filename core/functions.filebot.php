@@ -168,7 +168,9 @@
                     }
                 }
                 if( !$added ){
-                    if( array_key_exists( 'year', $xml ) ){
+                    if( array_key_exists( 'year', $xml ) 
+                    && is_string( $xml[ 'year' ] )
+                    ){
                         $rtesult[ $fi ] = $xml[ 'year' ] . '00-00';
                     }else{
                         $rtesult[ $fi ] = '0000-00-00';
