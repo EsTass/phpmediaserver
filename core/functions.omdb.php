@@ -24,7 +24,7 @@
             $title .= ' ' . $season . 'x' . $episode;
         }
         
-        $TMP_FOLDER = PPATH_TEMP . DS . genRandomString( 8 );
+        $TMP_FOLDER = PPATH_TEMP . DS . getRandomString( 8 );
         //echo "<br />" . $file . ' => ' . $title;die();
         if( file_exists( $file )
         && mkdir( $TMP_FOLDER )
@@ -43,7 +43,7 @@
                 foreach( $result AS $k => $v ){
                     if( is_string( $v )
                     ){
-                        $FILENAME = $TMP_FOLDER . DS . genRandomString( 8 );
+                        $FILENAME = $TMP_FOLDER . DS . getRandomString( 8 );
                         if( filter_var( $v, FILTER_VALIDATE_URL )
                         && downloadPosterToFile( $v, $FILENAME ) 
                         ){

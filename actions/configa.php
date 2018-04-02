@@ -13,7 +13,7 @@
         die( 'No config data.' );
 	}
 	
-	$tempfile = PPATH_TEMP . DS . genRandomString( 10 ) . '.php';
+	$tempfile = PPATH_TEMP . DS . getRandomString( 10 ) . '.php';
 	$configfile = PPATH_BASE . DS . 'config.php';
 	$configfilebackup = PPATH_BASE . DS . 'config.php.backup';
 	if( !is_writable( $configfile ) ){
