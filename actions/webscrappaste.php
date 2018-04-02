@@ -20,11 +20,11 @@ $(function () {
     
 });
 function webscrapper_paste(){
-    var url = '<?php echo getURLBase(); ?>?r=r&';
+    var url = '<?php echo getURLBase(); ?>?r=r&' + $( '#fElementWebScrapp' ).serialize();
     loading_show();
     $( '#dResultWebScrapp' ).html( '' );
     $( '#dResultWebScrappAdd' ).html( '' );
-    $.post( url, $( '#fElementWebScrapp' ).serialize() )
+    $.get( url )
     .done( function( data ){
         scrollbottom();
         $( '#dResultWebScrapp' ).html( data );

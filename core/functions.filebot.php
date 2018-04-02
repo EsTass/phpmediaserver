@@ -33,7 +33,7 @@
         //echo "<br />" . $file . ' => ' . $filet;die();
         if( file_exists( $file )
         && mkdir( $TMP_FOLDER )
-        && link( $file, $filet )
+        && ( @link( $file, $filet ) || @symlink( $file, $filet ) )
         ){
             if( ( $fb_r = ident_detect_filebot( $filet, $movies ) ) != FALSE ){
                 $folder = $TMP_FOLDER;

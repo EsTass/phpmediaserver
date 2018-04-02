@@ -143,7 +143,9 @@
                             if( file_exists( $imgfile ) ){
                                 @unlink( $imgfile );
                             }
-                            if( link( $vif, $imgfile ) ){
+                            if( @link( $vif, $imgfile ) 
+                            || @copy( $vif, $imgfile )
+                            ){
                                 echo get_msg( 'DEF_COPYOK' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
                             }else{
                                 echo get_msg( 'DEF_COPYKO' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;

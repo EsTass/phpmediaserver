@@ -56,7 +56,7 @@
 	$FTARGET = PPATH_MEDIAINFO . DS . $IDMEDIAINFO . '.' . $TYPE;
 	if( file_exists( $FTARGET ) ) @unlink( $FTARGET );
 	if( getFileMimeTypeImg( $FMEDIA )
-	&& link( $FMEDIA, $FTARGET )
+	&& ( @link( $FMEDIA, $FTARGET ) || @copy( $FMEDIA, $FTARGET ) )
 	){
         if( array_key_exists( 'title', $MIDATA )
         && ( $MIDATA2 = sqlite_mediainfo_search_title( $MIDATA[ 'title' ] ) ) != FALSE 
@@ -66,7 +66,7 @@
             foreach( $MIDATA2 AS $row ){
                 $FTARGET2 = PPATH_MEDIAINFO . DS . $row[ 'idmediainfo' ] . '.' . $TYPE;
                 if( file_exists( $FTARGET2 ) ) @unlink( $FTARGET2 );
-                if( link( $FMEDIA, $FTARGET2 ) ){
+                if( ( @link( $FMEDIA, $FTARGET2 ) || @copy( $FMEDIA, $FTARGET2 ) ) ){
                     if( $q < 6 ){
                         echo "<br />" . get_msg( 'DEF_ELEMENTUPDATED' , FALSE ) . $row[ 'title' ] . ' ' . $row[ 'season' ] . 'x' . $row[ 'episode' ];
                     }else{

@@ -44,7 +44,7 @@ function join_mediainfo(){
     <table class='tList'>
         <tr>
             <td class='tCenter' colspan=100>
-                Join 2 series/movies splited by diferent language 'Title'.
+                Join 2 series/movies splited by diferent languaje 'Title'.
             </td>
         </tr>
         <tr>

@@ -1131,7 +1131,10 @@
                     if( $debug ) echo "<br />IMAGES: " . count( $images );
                     foreach( $images AS $img ){
                         if( getFileMimeTypeImg( $img )
-                        && link( $img, $FTARGET )
+                        && (
+                            @link( $img, $FTARGET )
+                            || @copy( $img, $FTARGET )
+                            )
                         ){
                             $limit--;
                             if( $print ) echo "<br />IMAGE ADD: " . $row[ 'title' ] . ' - ' . $row[ 'idmediainfo' ];
@@ -1143,7 +1146,10 @@
                                 foreach( $MIDATA2 AS $row ){
                                     $FTARGET2 = PPATH_MEDIAINFO . DS . $row[ 'idmediainfo' ] . '.' . $type;
                                     if( !file_exists( $FTARGET2 )
-                                    && link( $img, $FTARGET2 ) 
+                                    && (
+                                        @link( $img, $FTARGET2 )
+                                        || @copy( $img, $FTARGET2 )
+                                    )
                                     ){
                                         if( $print ) echo "<br />IMAGE ADD CHAPTER: " . $row[ 'title' ] . ' - ' . $row[ 'idmediainfo' ];
                                         $q++;

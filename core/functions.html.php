@@ -176,7 +176,7 @@
             $urlposter = getURLImg( FALSE, $element[ 'idmediainfo' ], 'poster' ) . $session;
             $urllandscape = getURLImg( FALSE, $element[ 'idmediainfo' ], 'landscape' ) . $session;
             $urlbanner =  getURLImg( FALSE, $element[ 'idmediainfo' ], 'banner' ) . $session;
-            $urlplay = getURLBase() . '?r=r&action=playtime&mode=fast&timeplayed=-1&idmedia=' . $element[ 'idmedia' ] . $session;
+            $urlplay = getURLBase() . '?r=r&action=playtime&mode=direct&timeplayed=-1&idmedia=' . $element[ 'idmedia' ] . $session;
             if( $element[ 'season' ] > 0 ){
                 $ftitle .= ' ' . sprintf( '%02d', $element[ 'season' ] ) . 'x' . sprintf( '%02d', $element[ 'episode' ] );
                 if( strlen( $element[ 'titleepisode' ] ) > 0 ){

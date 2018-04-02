@@ -548,7 +548,9 @@
                                     if( file_exists( $imgfile ) ){
                                         @unlink( $imgfile );
                                     }
-                                    if( link( $vif, $imgfile ) ){
+                                    if( @link( $vif, $imgfile ) 
+                                    || @copy( $vif, $imgfile ) 
+                                    ){
                                         if( $echo ) echo get_msg( 'DEF_COPYOK' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
                                     }else{
                                         if( $echo ) echo get_msg( 'DEF_COPYKO' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
@@ -849,7 +851,9 @@
                             if( $file != $filebase 
                             && !file_exists( $file )
                             ){
-                                link( $filebase, $file );
+                                if( !@link( $filebase, $file ) ){
+                                    @copy( $filebase, $file );
+                                }
                                 if( $echo ) echo "+";
                                 $quantity--;
                                 if( $quantity <= 0 ) break;
