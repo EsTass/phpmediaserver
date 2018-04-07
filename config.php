@@ -83,7 +83,7 @@
 	//FILE SCRAPPERS
 	
 	//function.[scrapper].php to include
-	define( 'O_SCRAPPERS_INCLUDES', array( 'filebot', 'omdb', 'thetvdb' ) );
+	define( 'O_SCRAPPERS_INCLUDES', array( 'filebot', 'pymi', 'omdb', 'thetvdb' ) );
 	//Scrapper List ( title => array( function_search, function_add ) ) filled in each scrapper
 	$G_SCRAPPERS = array();
 	//SCRAPPERS API KEY ( title => function ) filled in each scrapper
@@ -104,6 +104,10 @@
 	define( 'O_FILEBOT', 'export HOME="' . PPATH_CACHE . '" && filebot' );
 	//PATH PHP (run cron jobs)
 	define( 'O_PHP', 'php' );
+	//WGET (run cron jobs)
+	define( 'O_WGET', 'wget' );
+	//pymediaident
+	define( 'O_PYMEDIAIDENT', 'pymediaident.py' );
 	
 	//FOLDERS
 	
