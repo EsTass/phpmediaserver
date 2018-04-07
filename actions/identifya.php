@@ -110,6 +110,38 @@
                 if( sqlite_mediainfo_update( $info_data[ 'data' ] ) 
                 && sqlite_media_update_mediainfo( $IDMEDIA, $idmediainfo )
                 ){
+                    //Copy needed files
+                    foreach( $info_data AS $kif => $vif ){
+                        if( $kif != 'data' 
+                        && file_exists( $vif )
+                        && getFileMimeTypeImg( $vif )
+                        ){
+                            $numtimes = 3;
+                            if( O_MAX_IMG_FILES > 0 )
+                            while( filesize( $vif ) > O_MAX_IMG_FILES 
+                            && filesize( $vif ) > 0
+                            && $numtimes > 0
+                            ){
+                                if( !resize_img_div2( $vif ) 
+                                ){
+                                    break;
+                                }
+                                $numtimes--;
+                            }
+                            //copy file to format idmediainfo.poster|landscape|...
+                            $imgfile = PPATH_MEDIAINFO . DS . $idmediainfo . '.' . $kif;
+                            if( file_exists( $imgfile ) ){
+                                @unlink( $imgfile );
+                            }
+                            if( @link( $vif, $imgfile ) 
+                            || @copy( $vif, $imgfile )
+                            ){
+                                echo get_msg( 'DEF_COPYOK' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
+                            }else{
+                                echo get_msg( 'DEF_COPYKO' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
+                            }
+                        }
+                    }
                     echo get_msg( 'IDENT_DETECTEDOK' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $media[ 0 ][ 'file' ];
                 }else{
                     echo get_msg( 'IDENT_DETECTEDKO' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $media[ 0 ][ 'file' ];
