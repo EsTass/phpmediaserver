@@ -98,6 +98,7 @@ Restart apache, and login with default user/pass.
  - [wget](https://www.gnu.org/software/wget/)
  - [omdbapi APIKEY](https://www.omdbapi.com)
  - [www.thetvdb.com APIKEY](https://www.thetvdb.com)
+ - [pymediaident](https://github.com/EsTass/pymediaident)
 
 ## Admin SQLite DB
 
