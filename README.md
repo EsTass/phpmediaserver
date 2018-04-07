@@ -91,10 +91,10 @@ extension=zip.so
 Restart apache, and login with default user/pass.
 
 ## Needed
- - [Filebot](https://www.filebot.net)
  - [ffmpeg and ffprobe](https://ffmpeg.org/)
  
 ## Recomended
+ - [Filebot](https://www.filebot.net)
  - [wget](https://www.gnu.org/software/wget/)
  - [omdbapi APIKEY](https://www.omdbapi.com)
  - [www.thetvdb.com APIKEY](https://www.thetvdb.com)
