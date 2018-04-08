@@ -2,8 +2,8 @@
 	
 	defined( 'ACCESS' ) or die( 'HTTP/1.0 401 Unauthorized.<br />' );
 	//ADD SCRAPPER
-	$G_SCRAPPERS[ 'pymediaident' ] = array( '', 'ident_detect_file_pymi' );
-	$G_SCRAPPERS_KEY[ 'pymediaident' ] = '';
+	$G_SCRAPPERS[ 'pymi' ] = array( '', 'ident_detect_file_pymi' );
+	$G_SCRAPPERS_KEY[ 'pymi' ] = '';
 	
 	//BASE
 	function ident_detect_file_pymi( $file, $title, $movies = TRUE, $imdb = FALSE, $season = FALSE, $episode = FALSE ){
