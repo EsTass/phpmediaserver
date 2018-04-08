@@ -456,7 +456,9 @@
                     if( $echo ) echo get_msg( 'IDENT_FILETODETECTED' ) . 'Movie';
                 }
                 //exclude filebot, not use of imdbid
-                if( O_SCRAP_CRON == 'filebot' ){
+                if( O_SCRAP_CRON == 'filebot' 
+                || O_SCRAP_CRON == 'pymi'
+                ){
                     $imdbid = FALSE;
                 }else{
                     $imdbid = scrap_all_nearest_title( $title, $type );
