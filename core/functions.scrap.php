@@ -230,7 +230,7 @@
 		$result = array();
 		$debug = FALSE;
 		$in_list = array();
-		$list = array( 'searchImagesBing', 'searchImagesIXQick', 'searchImagesWebcrawler' );
+		$list = array( 'searchImagesPyMI', 'searchImagesBing', 'searchImagesIXQick', 'searchImagesWebcrawler' );
 		$rnd = mt_rand( 0, ( count( $list ) - 1 ) );
 		if( array_key_exists( $rnd, $list ) 
 		&& function_exists( $list[ $rnd ] )
@@ -1125,7 +1125,11 @@
                 $FTARGET = PPATH_MEDIAINFO . DS . $row[ 'idmediainfo' ] . '.' . $type;
                 if( $debug ) echo "<br />CHECKING: " . $row[ 'idmediainfo' ] . ' - ' . $row[ 'title' ];
                 if( !file_exists( $FTARGET )
-                && ( $images = get_image_auto( $row[ 'idmediainfo' ], $type ) ) != FALSE
+                && 
+                    ( 
+                        ( $images = get_image_pymediaident( $row[ 'idmediainfo' ], $type ) ) != FALSE
+                        || ( $images = get_image_auto( $row[ 'idmediainfo' ], $type ) ) != FALSE
+                    )
                 ){
                     if( $debug ) echo "<br />TITLE: " . $row[ 'title' ];
                     if( $debug ) echo "<br />IMAGES: " . count( $images );
@@ -1222,4 +1226,93 @@
         return $result;
 	}
 	
+	function get_image_pymediaident( $idmediainfo, $type = 'poster', $quantity = 1 ){
+        $result = FALSE; //FALSE|array( fileimage, ... )
+        global $G_MEDIADATA;
+        
+        //ONLY POSTERS
+        if( $type == 'poster'
+        && ( $MEDIAINFO = sqlite_mediainfo_getdata( $idmediainfo ) ) != FALSE
+        && is_array( $MEDIAINFO )
+        && array_key_exists( 0, $MEDIAINFO )
+        ){
+            $MEDIAINFO = $MEDIAINFO[ 0 ];
+            $fileimgpathrnd = getRandomString( 8 );
+            $fileimgpath = PPATH_TEMP . DS . $fileimgpathrnd;
+            @mkdir( $fileimgpath );
+            $in_list = array();
+            $filenum = 1;
+            if( array_key_exists( $type, $G_MEDIADATA ) ){
+                $search = $type . ' ' . $MEDIAINFO[ 'title' ] . ' ' . $MEDIAINFO[ 'year' ];
+                if( is_numeric( $MEDIAINFO[ 'season' ] ) ){
+                    $season = (int)$MEDIAINFO[ 'season' ];
+                    $episode = (int)$MEDIAINFO[ 'episode' ];
+                    $search .= ' ' . $MEDIAINFO[ 'season' ] . 'x' . $MEDIAINFO[ 'episode' ];
+                    $movies = FALSE;
+                }else{
+                    //$search .= ' movie';
+                    $movies = TRUE;
+                    $season = FALSE;
+                    $episode = FALSE;
+                }
+                //var_dump( $search );
+                $images_own = array();
+                $imdb = FALSE;
+                
+                if( ( $md = ident_detect_file_pymi( $file, $title, $movies, $imdb, $season, $episode ) ) != FALSE 
+                && array_key_exists( $type, $md )
+                ){
+                    $fileimg = $fileimgpath . DS . $filenum;
+                    if( ident_download_pymi( $md[ 'url' . $type ], $fileimg ) 
+                    && file_exists( $fileimg )
+                    && getFileMimeTypeImg( $fileimg )
+                    ){
+                        $in_list[ $img ] = $fileimg;
+                        $images_own[] = $fileimg;
+                        $filenum++;
+                    }
+                    $result = $images_own;
+                    if( !is_array( $result ) ) $result = array();
+                }
+            }
+        }
+        
+        
+        return $result;
+	}
+	
+	function searchImagesPyMI( $search, $max = 5, $getthumb = TRUE ){
+        $result = FALSE;
+        
+        if( stripos( $search, 'serie' ) !== FALSE ){
+            $movies = FALSE;
+            $season = 1;
+            $episode = 1;
+        }else{
+            $movies = TRUE;
+            $season = FALSE;
+            $episode = FALSE;
+        }
+        $imdb = FALSE;
+        
+        //ONLY POSTER
+        if(  stripos( $search, 'poster' ) !== FALSE
+        && ( $md = ident_detect_file_pymi( FALSE, $search, $movies, $imdb, $season, $episode ) ) != FALSE 
+        && array_key_exists( $type, $md )
+        ){
+            $fileimg = $fileimgpath . DS . $filenum;
+            if( ident_download_pymi( $md[ 'url' . $type ], $fileimg ) 
+            && file_exists( $fileimg )
+            && getFileMimeTypeImg( $fileimg )
+            ){
+                $in_list[ $img ] = $fileimg;
+                $images_own[] = $fileimg;
+                $filenum++;
+            }
+            $result = $images_own;
+            if( !is_array( $result ) ) $result = array();
+        }
+        
+        return $result;
+	}
 ?>

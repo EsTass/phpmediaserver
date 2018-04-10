@@ -451,6 +451,22 @@
                     if( is_array( $season_e ) ){
                         $season = $season_e[ 0 ];
                         $episode = $season_e[ 1 ];
+                        $se = $season . 'x' . sprintf( '%02d', $episode );
+                        $title = clean_media_chapter( $title, $se );
+                        $title2 = clean_media_chapter( $title2, $se );
+                        //cut on seasonXchapter string
+                        if( ( $d = explode( $se, $title ) ) != FALSE 
+                        && count( $d ) > 1
+                        && strlen( $d[ 0 ] ) > 5
+                        ){
+                            $title=$d[ 0 ];
+                        }
+                        if( ( $d = explode( $se, $title2 ) ) != FALSE 
+                        && count( $d ) > 1
+                        && strlen( $d[ 0 ] ) > 5
+                        ){
+                            $title2=$d[ 0 ];
+                        }
                     }
                 }else{
                     if( $echo ) echo get_msg( 'IDENT_FILETODETECTED' ) . 'Movie';
@@ -706,7 +722,9 @@
                                     if( file_exists( $imgfile ) ){
                                         @unlink( $imgfile );
                                     }
-                                    if( link( $vif, $imgfile ) ){
+                                    if( @link( $vif, $imgfile ) 
+                                    || @copy( $vif, $imgfile )
+                                    ){
                                         if( $echo ) echo get_msg( 'DEF_COPYOK' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
                                     }else{
                                         if( $echo ) echo get_msg( 'DEF_COPYKO' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
@@ -1072,19 +1090,24 @@
             if( (int)$match[ 1 ][ 0 ] < 1920
             || (int)$match[ 1 ][ 0 ] > ( (int)date( 'Y' ) + 1 )
             ){
-                $season = (int)( (int)$match[ 1 ][ 0 ] / 100 );
-                $episode = (int)( (int)$match[ 1 ][ 0 ] - ( $season * 100 ) );
-                if( 
-                ( $season != 10 && $episode != 80 )
-                && ( $season != 7 && $episode != 20 )
-                && ( $season != 2 && $episode != 64 )
-                && ( $season != 2 && $episode != 65 )
-                && (  $season > 0 && $season < 40 )
-                && $episode > 0
-                ){
-                    $result = array();
-                    $result[] = $season;
-                    $result[] = $episode;
+                foreach( $match[ 1 ] AS $row ) {
+                    $season = (int)( (int)$row / 100 );
+                    $episode = (int)( (int)$row - ( $season * 100 ) );
+                    if( 
+                    ( $season == 10 && $episode == 80 )
+                    || ( $season == 7 && $episode == 20 )
+                    || ( $season == 2 && $episode == 64 )
+                    || ( $season == 2 && $episode == 65 )
+                    ||  $season < 0 
+                    || $season > 40
+                    ){
+                
+                    }else{
+                        $result = array();
+                        $result[] = $season;
+                        $result[] = $episode;
+                        break;
+                    }
                 }
             }
         }
@@ -1092,7 +1115,7 @@
         return $result;
     }
     
-    function clean_media_chapter( $title ){
+    function clean_media_chapter( $title, $replace = '' ){
         $result = $title;
         
         if( ( $season = get_media_chapter( $title ) ) != FALSE
@@ -1104,19 +1127,19 @@
             && count( $match ) > 0
             && strlen( $match[ 0 ] ) > 3
             ){
-                $title = str_ireplace( $match[ 0 ], '', $title );
+                $title = str_ireplace( $match[ 0 ], $replace, $title );
             }elseif( preg_match( "/[s,S]?[0-9]{1,2}[e,E][0-9]{1,3}/", basename( $title ), $match ) 
             && is_array( $match )
             && count( $match ) > 0
             && strlen( $match[ 0 ] ) > 3
             ){
-                $title = str_ireplace( $match[ 0 ], '', $title );
+                $title = str_ireplace( $match[ 0 ], $replace, $title );
             }elseif( preg_match( "/[0-9]{1,2}×[0-9]{1,3}/", basename( $title ), $match ) 
             && is_array( $match )
             && count( $match ) > 0
             && strlen( $match[ 0 ] ) > 3
             ){
-                $title = str_ireplace( $match[ 0 ], '', $title );
+                $title = str_ireplace( $match[ 0 ], $replace, $title );
             }elseif( preg_match_all( "/([0-9]{3,5})/", basename( $title ), $match ) 
             && is_array( $match )
             && count( $match ) > 1
@@ -1124,7 +1147,7 @@
             && count( $match[ 1 ] ) > 0
             && strlen( $match[ 1 ][ 0 ] ) > 2
             ){
-                $title = str_ireplace( $match[ 1 ][ 0 ], '', $title );
+                $title = str_ireplace( $match[ 1 ][ 0 ], $replace, $title );
             }
             $result = $title;
             $result = trim( $result );

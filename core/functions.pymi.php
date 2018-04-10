@@ -315,9 +315,9 @@
             }
             $result[ 'data' ] = $rtesult;
             
-		return $result;
-	} 
-}
+            return $result;
+        } 
+    }
 
 	function ident_download_pymi( $url, $file ){
         $result = FALSE;
