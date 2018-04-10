@@ -38,8 +38,8 @@
             ){
                 $SEASON = (int)$d[ 0 ];
                 $EPISODE = (int)$d[ 1 ];
-                $TITLE = clean_media_chapter( $TITLE );
-                $TITLE .= ' ' . $SEASON . 'x' . sprintf( '%02d', $EPISODE );
+                $TITLE = clean_media_chapter( $TITLE, $SEASON . 'x' . sprintf( '%02d', $EPISODE ) );
+                //$TITLE .= ' ' . $SEASON . 'x' . sprintf( '%02d', $EPISODE );
             }
 ?>
 <script type="text/javascript">
