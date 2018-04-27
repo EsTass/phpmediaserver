@@ -92,27 +92,22 @@
                 $rtesult[ $fi ] = $xml[ $f ];
             }
             //sorttitle
-            $f = 'sorttitle';
-            $fi = $f;
+            $f = 'releasedate';
+            $fi = 'sorttitle';
             if( array_key_exists( $f, $xml ) 
             && is_string( $xml[ $f ] ) 
             ){
                 $added = FALSE;
-                if( ( $d = explode( '::', $xml[ $f ] ) ) != FALSE
-                ){
-                    foreach( $d AS $dat ){
-                        $dat = trim( $dat );
-                        if( strtotime( $dat ) != FALSE ){
-                            $rtesult[ $fi ] = $dat;
-                            $added = TRUE;
-                        }
-                    }
+                $dat = trim( $xml[ $f ] );
+                if( strtotime( $dat ) != FALSE ){
+                    $rtesult[ $fi ] = $dat;
+                    $added = TRUE;
                 }
                 if( !$added ){
                     if( array_key_exists( 'year', $xml ) 
                     && is_string( $xml[ 'year' ] )
                     ){
-                        $rtesult[ $fi ] = $xml[ 'year' ] . '00-00';
+                        $rtesult[ $fi ] = $xml[ 'year' ] . '-01-01';
                     }else{
                         $rtesult[ $fi ] = '0000-00-00';
                     }
