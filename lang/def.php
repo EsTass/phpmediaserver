@@ -67,6 +67,7 @@
         'MENU_DELETE_IMGS' => 'Delete Images',
         'MENU_IMGS_SEARCH' => 'Search Images',
         'MENU_MEDIAINFO_NEW' => 'New MediaInfo',
+        'MENU_HDDCLEAN' => 'HDD Clean',
         
         'MEDIA_TYPE_SERIE' => 'Series',
         'MEDIA_TYPE_MOVIES' => 'Movies',

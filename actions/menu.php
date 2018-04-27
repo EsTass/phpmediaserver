@@ -24,7 +24,7 @@
         </div>
         <div class='listMenuElement'>
             <form methog='get'>
-            <input type='text' id='search' name='search' placeholder='<?php echo get_msg( 'MENU_SEARCH', FALSE ) ?>'
+            <input type='text' id='search' name='search' placeholder='<?php echo get_msg( 'MENU_SEARCH', FALSE ); ?>'
             value='<?php echo $G_DATA[ 'search' ]; ?>'
             />
             <input type='hidden' id='action' name='action' value='<?php echo $G_DATA[ 'action' ]; ?>'>
@@ -95,6 +95,9 @@
         </div>
         <div class='listMenuElementAdmin'>
             <a href='?action=users'><?php echo get_msg( 'MENU_USERS', FALSE ) ?></a>
+        </div>
+        <div class='listMenuElementAdmin'>
+            <a href='?action=mediaspacerecover'><?php echo get_msg( 'MENU_HDDCLEAN', FALSE ) ?></a>
         </div>
         <?php
             }
