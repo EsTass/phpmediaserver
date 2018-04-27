@@ -54,9 +54,9 @@
         //EXTRA VARS
         $urlposter = getURLImg( $IDMEDIA, $IDMEDIAINFO, 'poster' );
         $urlplayer = getURLPlayer( $IDMEDIA, $IDMEDIAINFO );
+        $urlplayersafe = getURLPlayerSafe( $IDMEDIA, $IDMEDIAINFO );
         $urldowload = getURLDownload( $IDMEDIA, $IDMEDIAINFO );
         $urlchapters = getURLChapterList( $IDMEDIA, $IDMEDIAINFO );;
-        $urlplayersafe = '';
         $urllandscape = getURLImg( $IDMEDIA, $IDMEDIAINFO, 'landscape' );
         $duration = $MEDIAINFO[ 'runtime' ];
         if( (int)$MEDIAINFO[ 'season' ] > 0 ){
@@ -157,7 +157,7 @@ function infovideo_playlater( idmedia, idmediainfo ){
                     if( strlen( $urlplayersafe ) > 0 ){
 				?>
 				&nbsp;
-				<span style='background-color: lightgreen !important;'>
+				<span style='background-color: DarkSalmon !important;'>
 					<a href='<?php echo $urlplayersafe; ?>'>&#x25B7;&nbsp;<?php echo get_msg( 'INFO_PLAY_SAFE', FALSE ); ?></a>
 				</span>
 				<?php
