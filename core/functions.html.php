@@ -5,6 +5,7 @@
 	function get_html_list( $data, $title, $page = FALSE, $totalpages = FALSE, $toplayer = FALSE, $urltitle = FALSE ){
         $result = '';
         global $G_DATA;
+        global $G_FILENAME_INFO;
         
         $result .= "<div class='boxList'>";
         $result .= "<h2>";
@@ -81,7 +82,30 @@
             }else{
                 $onclick = "list_show_info( this, " . $element[ 'idmediainfo' ] . " );";
             }
-            $result .= "<div class='listElement " . $css_extra . "' onclick='" . $onclick .  "'><a href='#' title='" . htmlspecialchars( $ftitle, ENT_QUOTES ) . "'><img title='" . htmlspecialchars( $ftitle, ENT_QUOTES ) . ": " . htmlspecialchars( $plot, ENT_QUOTES ) . "' class='listElementImg lazy' data-src='" . $urlposter . "' src='' /><span class='" . $css_played . "'>" . $ftitle . "" . $played . "</span></a></div>";
+            
+            $extrainfo = "";
+            if( //check_user_admin() &&
+            isset( $G_FILENAME_INFO )
+            && is_array( $G_FILENAME_INFO )
+            && count( $G_FILENAME_INFO ) > 0
+            && ( $edata = sqlite_media_getdata( $element[ 'idmedia' ] ) ) != FALSE
+            && is_array( $edata )
+            && array_key_exists( 0, $edata ) > 0
+            && is_array( $edata[ 0 ] )
+            && array_key_exists( 'file', $edata[ 0 ] )
+            ){
+                $extrai = '';
+                foreach( $G_FILENAME_INFO AS $ititle => $grep ){
+                    if( preg_match("/" . $grep . "/i", $edata[ 0 ][ 'file' ] ) ){
+                        $extrai .= '' . $ititle . ' ';
+                    }
+                }
+                $extrai .= '';
+                if( strlen( $extrai ) > 0 ){
+                    $extrainfo = "<div style='position:absolute;top:1;right:0;background-color: blue !important;'>" . $extrai . "</div>";
+                }
+            }
+            $result .= "<div class='listElement " . $css_extra . "' onclick='" . $onclick .  "'><a href='#' title='" . htmlspecialchars( $ftitle, ENT_QUOTES ) . "'>" . $extrainfo . "<img title='" . htmlspecialchars( $ftitle, ENT_QUOTES ) . ": " . htmlspecialchars( $plot, ENT_QUOTES ) . "' class='listElementImg lazy' data-src='" . $urlposter . "' src='' /><span class='" . $css_played . "'>" . $ftitle . "" . $played . "</span></a></div>";
         }
         
         //Next
@@ -176,6 +200,7 @@
             $urlposter = getURLImg( FALSE, $element[ 'idmediainfo' ], 'poster' ) . $session;
             $urllandscape = getURLImg( FALSE, $element[ 'idmediainfo' ], 'landscape' ) . $session;
             $urlbanner =  getURLImg( FALSE, $element[ 'idmediainfo' ], 'banner' ) . $session;
+            //direct, fast, mp4, 
             $urlplay = getURLBase() . '?r=r&action=playtime&mode=direct&timeplayed=-1&idmedia=' . $element[ 'idmedia' ] . $session;
             if( $element[ 'season' ] > 0 ){
                 $ftitle .= ' ' . sprintf( '%02d', $element[ 'season' ] ) . 'x' . sprintf( '%02d', $element[ 'episode' ] );
