@@ -183,6 +183,33 @@
 	@setlocale( LC_ALL, 'es_ES.utf8' );
 	//setlocale( LC_ALL, 'en_US.utf8' );
 	
+	//Info added to lists from filename: htmlappend => grep
+	$G_FILENAME_INFO = array(
+        //Video Size
+        '480p' => '(480(p)?)',
+        '720p' => '(720(p)?)',
+        '1080p' => '(1080(p)?)',
+        //Video Type
+        'HDCam' => '(hd(\W){1}cam)',
+        'Screener' => '(screen(er)?|(\Wts\W))',
+        'HDScreener' => '(hd(\W)?screen(er)?)',
+        'DVDScreener' => '(dvd(\W)?screen(er)?)',
+        'BRScreener' => '(br(\W)?screen(er)?)',
+        'DVD' => '(dvd)',
+        'BDRip' => '(blueray|bluray|bdrip)',
+        'MicroHD' => '(micro(\W)?hd)',
+        'HDRip' => '(hd(\W)?rip)',
+        'HDTV' => '(hd(\W)?tv)',
+        'TVRip' => '(tv(\W)?rip)',
+        'WEBDL' => '(web(\W)?dl)',
+        'SATRip' => '(sat(\W)?rip)',
+        //lang
+        'LATINO' => '(latino)',
+        'ESP' => '((^sub(\W)?)?castellano|(^sub(\W)?)?español|(^sub(\W)?)?esp|(^sub(\W)?)?spanish|(^sub(\W)?)?spa(\W)?)',
+        'ENG' => '(eng(lish)?)',
+        'SUB' => '(v\.o\.s\.e|v\.o(\.)?|sub(\W)?(esp|eng|lat|bed|b|ti)?)',
+	);
+	
 	//CLEAN DOWNLOADED FILENAMES
 	$G_CLEAN_FILENAME = array(
         //Languaje
