@@ -56,6 +56,10 @@ function action_spacerecover(){
                 <input type="number" name='size' id='size' value='4.0' step="0.1" />
             </td>
             <td>
+                Min. Timelength (Minutes)
+                <input type="number" name='minutes' id='minutes' value='60' step="10" />
+            </td>
+            <td>
                 <?php echo get_msg( 'MENU_YEAR', FALSE ) ?>: 
                 <select id='year1' name='year1'>
                     <option value='1900'>1900</option>

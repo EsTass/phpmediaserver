@@ -12,6 +12,7 @@
 	//year1
 	//year2
 	//rating
+	//minutes
 	
 	if( array_key_exists( 'search', $G_DATA ) ){
         $G_SEARCH = $G_DATA[ 'search' ];
@@ -65,12 +66,21 @@
         $G_YEAR2 = 3000;
 	}
 	
+	if( array_key_exists( 'minutes', $G_DATA ) 
+	&& (int)$G_DATA[ 'minutes' ] > 0
+	){
+        $G_MAXTIME = (int)$G_DATA[ 'minutes' ];
+	}else{
+        $G_MAXTIME = 0;
+	}
+	
 	//Clean Top size for file search
 	echo "<br />MAX FILESIZE: " . formatSizeUnits( $CUTSIZE );
 	echo "<br />QUANTITY: " . $MAXFILES;
     echo "<br />MIN RATING: " . $G_RATING;
     echo "<br />MIN YEAR1: " . $G_YEAR1;
     echo "<br />MAX YEAR2: " . $G_YEAR2;
+    echo "<br />MIN DURATION: " . $G_MAXTIME;
 	if( $G_REMOVE ){
         echo "<br />!!!!!!!REMOVE!!!!!!!!!!!: " . $MAXFILES;
     }
@@ -87,8 +97,16 @@
             && (int)$mediainfodata[ 0 ][ 'year' ] > $G_YEAR1
             && (int)$mediainfodata[ 0 ][ 'year' ] < $G_YEAR2
             && ( 
-                (int)$mediainfodata[ 0 ][ 'rating' ] == 0
-                || (int)$mediainfodata[ 0 ][ 'rating' ] < $G_RATING
+                $G_RATING == 0
+                || (
+                    (int)$mediainfodata[ 0 ][ 'rating' ] > 0
+                    && (int)$mediainfodata[ 0 ][ 'rating' ] < $G_RATING
+                    )
+                )
+            && ( $duration = ffmpeg_file_info_lenght_minutes( $lrow[ 'file' ] ) ) != FALSE
+            && (
+                $G_MAXTIME > 0
+                || $G_MAXTIME > $duration
                 )
             ){
                 $file = $lrow[ 'file' ];
@@ -96,7 +114,10 @@
                     $filesize = filesize( $file );
                     if( $filesize > $CUTSIZE ){
                         echo "<br />FILE: " . $file;
-                        echo "<br />FILESIZE: " . formatSizeUnits( $filesize ) . "<br />";
+                        echo "<br />FILESIZE: " . formatSizeUnits( $filesize ) . "";
+                        echo "<br />YEAR: " . $mediainfodata[ 0 ][ 'year' ];
+                        echo "<br />RATING: " . $mediainfodata[ 0 ][ 'rating' ];
+                        echo "<br />DURATION: " . $duration;
                         if( $G_REMOVE ){
                             if( @unlink( $file )
                             ){
@@ -105,6 +126,7 @@
                                 echo "<br />!!!!! ERROR FILE REMOVED: " . $file . "<br />";
                             }
                         }
+                        echo "<br />";
                         $MAXFILES--;
                     }else{
                         echo ".";
