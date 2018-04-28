@@ -100,8 +100,25 @@
         && array_key_exists( 'file', $mediadata1 )
         && is_array( $mediadata2 )
         && array_key_exists( 'file', $mediadata2 )
+        && file_exists( $mediadata1[ 'file' ] )
+        && file_exists( $mediadata2[ 'file' ] )
         ){
-            if( ( $lowq = ffmpeg_video_compare( $mediadata1[ 'file' ], $mediadata2[ 'file' ] ) ) != FALSE
+            $maxsize = O_CRON_CLEAN_DUPLICATES_MEDIAINFO_MAXSIZE * 1024 * 1024;
+            $fs1 = filesize( $mediadata1[ 'file' ] );
+            $fs2 = filesize( $mediadata2[ 'file' ] );
+            if( $maxsize > 0 
+            && $fs1 > $maxsize
+            ){
+                if( $fs1 < $fs2  ){
+                    $result = $mediadata1;
+                }else{
+                    $result = $mediadata2;
+                }
+            }elseif( $maxsize > 0 
+            && $fs2 > $maxsize
+            ){
+                $result = $mediadata2;
+            }elseif( ( $lowq = ffmpeg_video_compare( $mediadata1[ 'file' ], $mediadata2[ 'file' ] ) ) != FALSE
             ){
                 if( $mediadata1[ 'file' ] == $lowq ){
                     $result = $mediadata1;
