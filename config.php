@@ -83,7 +83,7 @@
 	//FILE SCRAPPERS
 	
 	//function.[scrapper].php to include
-	define( 'O_SCRAPPERS_INCLUDES', array( 'filebot', 'pymi', 'omdb', 'thetvdb' ) );
+	define( 'O_SCRAPPERS_INCLUDES', array( 'pymi', 'filebot', 'omdb', 'thetvdb' ) );
 	//Scrapper List ( title => array( function_search, function_add ) ) filled in each scrapper
 	$G_SCRAPPERS = array();
 	//SCRAPPERS API KEY ( title => function ) filled in each scrapper
@@ -92,7 +92,7 @@
         'thetvdb' => '120F8A1A0E6322F3',
     );
 	//SCRAPPER FOR CRON FILE SCRAPPER filebot recomended
-	define( 'O_SCRAP_CRON', 'filebot' );
+	define( 'O_SCRAP_CRON', 'pymi' );
 	
 	//EXTERNAL COMMANDS
 	
@@ -168,6 +168,8 @@
 	//CRON clean duplicated idmediainfo files min days (0 disable)
 	//if film/chapters have >1 file delete low quality duplicates if have more than days modified (seeding safe and be safe detected)
 	define( 'O_CRON_CLEAN_DUPLICATES_MEDIAINFO', 14 );
+	//max size to priority delete of files with max quality but not excceding this size (Mb)
+	define( 'O_CRON_CLEAN_DUPLICATES_MEDIAINFO_MAXSIZE', 0 );
 	//CRON clean not identified files min days (0 disable)
 	//if file not identified for more than days, delete (seeding safe and be safe detected)
 	define( 'O_CRON_CLEAN_NOTIDENT_MEDIA', 14 );
