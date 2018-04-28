@@ -2,10 +2,7 @@
 
 ## Screenshots
 
-[Galery](https://postimg.org/gallery/k0qi1t9y/)
-
-![example1](https://s18.postimg.org/dbta95ek5/Screenshot_20171211_193317.png)
-![example2](https://s18.postimg.org/ahq4vowyd/Screenshot_20171211_193532.png)
+![phpmediaserver](https://media.giphy.com/media/8A7qPRuF8jzRcaQiyj/giphy.gif)
 
 ## Description
 A bunch of utilities for:
