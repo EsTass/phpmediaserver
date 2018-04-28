@@ -6,18 +6,20 @@
 
 ## Description
 A bunch of utilities for:
- - Easy html5 web player with php7 + sqlite + jquery + ffmpeg.
- - Easy config.php and config.ws.php
+ - Simple html5 web player with php7 + sqlite + jquery + ffmpeg.
+ - Easy configuration with config.php and config.ws.php
  - Admins and player users.
- - Realtime transcoding, not needed to reencode before play.
- - Identify media files thanks to: www.filebot.net, www.omdbapi.com, www.thetvdb.com (cron, manual and helped).
- - Search new media to downloads adding webs with simple config (elinks, magnets and torrents supported, cron or manual).
+ - Realtime ffmpeg transcoding, not needed to reencode before play or create temp files.
+ - Identify media files thanks to: [pymediaident](https://github.com/EsTass/pymediaident), www.filebot.net, www.omdbapi.com, www.thetvdb.com (cron, manual and helped).
+ - Search new media from web adding scrappers with config.ws.php (elinks, magnets and torrents supported, cron or manual).
  - Clean duplicates by quality with safe seeding (min days to seed)
  - Country IP block thanks to www.geoplugin.net.
  - IP whitelist/blacklist.
  - Media info in configured language (if possible).
  - Lazy Load Images thanks to: http://jquery.eisbehr.de/lazy
  - Extract files on cron (php support needed Zip and Rar)
+ - Filtered remove files to recover extra free space
+ - Stop adding downloads on min space config
 
 ## Default User (Important: change pass on first login)
  - User: admin
