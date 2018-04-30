@@ -147,6 +147,8 @@
 	define( 'O_WEBSCRAP_LIMIT_FREESPACE', 500 );
 	//Web Scrappers Show Debug Log
 	define( 'PPATH_WEBSCRAP_DEBUG', FALSE );
+	//Web Scrapper for 'search' action to user, false = disabled
+	define( 'PPATH_WEBSCRAP_SEARCH', FALSE );
 	
 	//CRON Enable
 	
