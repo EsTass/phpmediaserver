@@ -85,7 +85,6 @@
             $G_PAGE = 0;
         }
         if( PPATH_WEBSCRAP_SEARCH != FALSE
-        && array_key_exists( PPATH_WEBSCRAP_SEARCH, $G_WEBSCRAPPER )
         && $G_PAGE == 0
         ){
             echo "" . get_html_list_newdownloads_base( $G_SEARCH );

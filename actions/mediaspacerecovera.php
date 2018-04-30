@@ -75,6 +75,7 @@
 	}
 	
 	//Clean Top size for file search
+	echo "<br />SEARCH: " . $G_SEARCH;
 	echo "<br />MAX FILESIZE: " . formatSizeUnits( $CUTSIZE );
 	echo "<br />QUANTITY: " . $MAXFILES;
     echo "<br />MIN RATING: " . $G_RATING;
@@ -88,6 +89,7 @@
 	
 	if( ( $edata = sqlite_media_getdata_identify( $G_SEARCH, 1000000 ) ) ){
         foreach( $edata AS $lrow ){
+            $duration = 0;
             if( ( $mediainfodata =sqlite_mediainfo_getdata( $lrow[ 'idmediainfo' ] ) ) != FALSE 
             && is_array( $mediainfodata )
             && array_key_exists( 0, $mediainfodata )
@@ -103,10 +105,18 @@
                     && (int)$mediainfodata[ 0 ][ 'rating' ] < $G_RATING
                     )
                 )
-            && ( $duration = ffmpeg_file_info_lenght_minutes( $lrow[ 'file' ] ) ) != FALSE
+            && 
+                (
+                $G_MAXTIME <= 0
+                ||
+                    (
+                        ( $duration = ffmpeg_file_info_lenght_minutes( $lrow[ 'file' ] ) ) != FALSE
+                        && $G_MAXTIME > $duration
+                    )
+                )
             && (
-                $G_MAXTIME > 0
-                || $G_MAXTIME > $duration
+                    strlen( $G_SEARCH ) == 0
+                    || inString( $lrow[ 'file' ], $G_SEARCH )
                 )
             ){
                 $file = $lrow[ 'file' ];
@@ -129,7 +139,7 @@
                         echo "<br />";
                         $MAXFILES--;
                     }else{
-                        echo ".";
+                        echo " .";
                     }
                     if( $MAXFILES <= 0 ){
                         break;

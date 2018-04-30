@@ -32,7 +32,11 @@
         die();
 	}
 	*/
+	
 	$SCRAPPER = PPATH_WEBSCRAP_SEARCH;
+	if( is_array( $SCRAPPER ) ){
+        $SCRAPPER = $SCRAPPER[ mt_rand( 0, ( count( $SCRAPPER ) - 1 ) ) ];
+	}
 	
 	//echo "<br />";
 	//echo get_msg( 'MENU_SEARCH', FALSE ) . ': ' . $SCRAPPER . ' => ' . $SEARCH;
@@ -41,7 +45,7 @@
 	&& $SCRAPPER
 	&& array_key_exists( $SCRAPPER, $G_WEBSCRAPPER )
 	&& strlen( $SEARCH ) > 0
-	&& ( $links = webscrapp_search( $SCRAPPER, $SEARCH ) ) != FALSE 
+	&& ( $links = webscrapp_search( $SCRAPPER, $SEARCH, FALSE ) ) != FALSE 
 	&& count( $links ) > 0
 	){
 	

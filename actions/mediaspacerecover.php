@@ -57,7 +57,7 @@ function action_spacerecover(){
             </td>
             <td>
                 Min. Timelength (Minutes)
-                <input type="number" name='minutes' id='minutes' value='60' step="10" />
+                <input type="number" name='minutes' id='minutes' value='0' step="10" />
             </td>
             <td>
                 <?php echo get_msg( 'MENU_YEAR', FALSE ) ?>: 
