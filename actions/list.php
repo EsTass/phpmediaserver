@@ -84,6 +84,12 @@
         if( $G_PAGE === FALSE ){
             $G_PAGE = 0;
         }
+        if( PPATH_WEBSCRAP_SEARCH != FALSE
+        && array_key_exists( PPATH_WEBSCRAP_SEARCH, $G_WEBSCRAPPER )
+        && $G_PAGE == 0
+        ){
+            echo "" . get_html_list_newdownloads_base( $G_SEARCH );
+        }
         $TITLE = get_msg( 'LIST_SEARCH_RESULT', FALSE );
         if( ( $edata_pages = sqlite_media_getdata_filtered_grouped_pages_total( $G_SEARCH, O_LIST_BIG_QUANTITY ) ) != FALSE 
         && ( $edata = sqlite_media_getdata_filtered( $G_SEARCH, O_LIST_BIG_QUANTITY, $G_PAGE, $edata_pages ) ) != FALSE 
@@ -92,7 +98,7 @@
             $edata_pages = (int)( $edata_pages / O_LIST_BIG_QUANTITY );
             echo get_html_list( $edata, $TITLE, $G_PAGE, $edata_pages );
         }else{
-            echo get_msg( 'DEF_EMPTYLIST', FALSE );
+            echo '<h2>' . get_msg( 'DEF_EMPTYLIST', FALSE ) . '</h2>';
         }
     }
 	

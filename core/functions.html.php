@@ -161,6 +161,28 @@
         return $result;
 	}
 	
+	//DOWNLOAD ELEMENTS
+	
+	function get_html_list_newdownloads_base( $search ){
+        $result = '';
+        $title = get_msg( 'DOWNLOADS_USER_TITLE', FALSE );
+        $url = 'javascript:load_in_id( "' . getURLBase() . '?r=r&action=listdownloads&search=' . $search . '", "newdownloadsresult" );return false;';
+        
+        $result .= "<div class='boxList'>";
+        $result .= "<h2>";
+        if( $url != FALSE ){
+            $result .= "<a class='cursorPointer' onclick='" . $url . "'>" . $title . '</a>';
+        }else{
+            $result .= $title;
+        }
+        $result .= "</h2>";
+        $result .= "<div id='newdownloadsresult' class='newdownloadsresult'>";
+        $result .= "</div>";
+        $result .= "</div>";
+        
+        return $result;
+	}
+	
 	// KODI
 	
 	/*

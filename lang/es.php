@@ -124,6 +124,8 @@
         'JOIN_REPLACETHIS' => 'Remplazar: ',
         'JOIN_WHITTHIS' => 'Con: ',
         'JOIN_BUTTONREPLACE' => 'Remplazar',
+        
+        'DOWNLOADS_USER_TITLE' => 'Descargar Elementos Similares',
 	);
 	
 ?>

@@ -124,6 +124,8 @@
         'JOIN_REPLACETHIS' => 'Replace this: ',
         'JOIN_WHITTHIS' => 'Whith this: ',
         'JOIN_BUTTONREPLACE' => 'Replace',
+        
+        'DOWNLOADS_USER_TITLE' => 'Search for Downloads',
 	);
 	
 ?>

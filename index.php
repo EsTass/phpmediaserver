@@ -259,6 +259,19 @@ function goToURL( url ){
     window.location.href = url;
 }
 
+//LOAD URL ON ID
+
+function load_in_id( url, id ){
+    loading_show();
+    $.get( url )
+    .done( function( data ){
+        loading_hide();
+        $( '#' + id ).html( data );
+    });
+    
+    return false;
+}
+
 </script>
 
 <?php
