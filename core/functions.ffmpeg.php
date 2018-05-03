@@ -137,7 +137,7 @@
         $result = FALSE;
         $cmd = O_FFPROBE . " -i " . escapeshellarg( $file ) . " -v quiet -print_format xml -show_format -show_streams -hide_banner";
         
-        if( file_exists( $file ) 
+        if( ( filter_var( $file, FILTER_VALIDATE_URL )  || file_exists( $file ) )
         && ( $data = runExtCommand( $cmd ) ) != FALSE
         ){
             $info = new SimpleXMLElement( $data );
@@ -155,11 +155,11 @@
             $duration = (int)$info->format['duration'];
             $audiotracks = array();
             $subtracks = array();
-            for( $s = 0; $s < count( $info->streams->stream ); $s++ ){
+            for( $s = 0; $s < @count( $info->streams->stream ); $s++ ){
                 if( (string)$info->streams->stream[ $s ][ 'codec_type' ] == 'audio'
                 ){
                     $audio = '';
-                    for( $t = 0; $t < count( $info->streams->stream[ $s ]->tag ); $t++ ){
+                    for( $t = 0; $t < @count( $info->streams->stream[ $s ]->tag ); $t++ ){
                         if( (string)$info->streams->stream[ $s ]->tag[ $t ][ 'key' ] == 'language'
                         ){
                             $audio = (int)$info->streams->stream[ $s ][ 'index' ] . '-' . (string)$info->streams->stream[ $s ]->tag[ $t ][ 'value' ];
@@ -167,7 +167,7 @@
                             break;
                         }
                     }
-                    for( $t = 0; $t < count( $info->streams->stream[ $s ]->tag ); $t++ ){
+                    for( $t = 0; $t < @count( $info->streams->stream[ $s ]->tag ); $t++ ){
                         if( (string)$info->streams->stream[ $s ]->tag[ $t ][ 'key' ] == 'title'
                         ){
                             $audio .= ' ' . (string)$info->streams->stream[ $s ]->tag[ $t ][ 'value' ];
@@ -181,7 +181,7 @@
                 }elseif( (string)$info->streams->stream[ $s ][ 'codec_type' ] == 'subtitle'
                 ){
                     $sub = '';
-                    for( $t = 0; $t < count( $info->streams->stream[ $s ]->tag ); $t++ ){
+                    for( $t = 0; $t < @count( $info->streams->stream[ $s ]->tag ); $t++ ){
                         if( (string)$info->streams->stream[ $s ]->tag[ $t ][ 'key' ] == 'language'
                         ){
                             $sub = (int)$info->streams->stream[ $s ][ 'index' ] . '-' . (string)$info->streams->stream[ $s ]->tag[ $t ][ 'value' ];
@@ -189,7 +189,7 @@
                             break;
                         }
                     }
-                    for( $t = 0; $t < count( $info->streams->stream[ $s ]->tag ); $t++ ){
+                    for( $t = 0; $t < @count( $info->streams->stream[ $s ]->tag ); $t++ ){
                         if( (string)$info->streams->stream[ $s ]->tag[ $t ][ 'key' ] == 'title'
                         ){
                             $sub .= ' ' . (string)$info->streams->stream[ $s ]->tag[ $t ][ 'value' ];

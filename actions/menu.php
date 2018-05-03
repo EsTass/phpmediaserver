@@ -6,6 +6,9 @@
         <div class='listMenuElement'>
             <a href='?action=listseries'><?php echo get_msg( 'MEDIA_TYPE_SERIE', FALSE ) ?></a>
         </div>
+        <div class='listMenuElement'>
+            <a href='?action=listlive'><?php echo get_msg( 'LIVETV_TITLE', FALSE ) ?></a>
+        </div>
         <?php
             if( defined( 'O_MENU_GENRES' )
             && is_array( O_MENU_GENRES )
@@ -98,6 +101,9 @@
         </div>
         <div class='listMenuElementAdmin'>
             <a href='?action=mediaspacerecover'><?php echo get_msg( 'MENU_HDDCLEAN', FALSE ) ?></a>
+        </div>
+        <div class='listMenuElementAdmin'>
+            <a href='?action=medialivelog'><?php echo get_msg( 'LIVETV_TITLE', FALSE ) ?></a>
         </div>
         <?php
             }

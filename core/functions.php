@@ -347,6 +347,32 @@
         return $result;
 	}
 	
+	function getURLPlayerSafe( $idmedia = FALSE, $idmediainfo = FALSE ){
+        global $G_MEDIADATA;
+        $result = getURLBase() . '?action=playersafe';
+        
+        if( $idmedia ){
+            $result .= '&idmedia=' . $idmedia;
+        }
+        
+        if( $idmediainfo ){
+            $result .= '&idmediainfo=' . $idmediainfo;
+        }
+        
+        return $result;
+	}
+	
+	function getURLPlayerLive( $idmedialive ){
+        global $G_MEDIADATA;
+        $result = getURLBase() . '?action=playerlive';
+        
+        if( $idmedialive ){
+            $result .= '&idmedialive=' . $idmedialive;
+        }
+        
+        return $result;
+	}
+	
 	function getURLDownload( $idmedia = FALSE, $idmediainfo = FALSE ){
         global $G_MEDIADATA;
         $result = getURLBase() . '?r=r&action=mediadownload';

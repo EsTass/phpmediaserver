@@ -248,4 +248,104 @@
         return $result;
 	}
 	
+	//LIVETV
+	
+	function get_html_list_live( $data, $title, $page = FALSE, $totalpages = FALSE, $urltitle = FALSE ){
+        $result = '';
+        global $G_DATA;
+        global $G_FILENAME_INFO;
+        
+        $result .= "<div class='boxList'>";
+        $result .= "<h2>";
+        if( $urltitle != FALSE ){
+            $result .= "<a href='" . $urltitle . "'>" . $title . '</a>';
+        }else{
+            $result .= $title;
+        }
+        if( $totalpages !== FALSE ){
+            $result .= " (" . get_msg( 'LIST_TITLE_PAGE', FALSE ) . " " . $page . "";
+            if( $page !== FALSE ){
+                $result .= "/" . $totalpages . "";
+            }
+            $result .= ")";
+        }
+        $result .= "</h2>";
+        if( array_key_exists( 'search', $G_DATA ) ){
+            $search = $G_DATA[ 'search' ];
+        }else{
+            $search = '';
+        }
+        
+        //Back
+        if( $page > 0
+        ){
+            if( array_key_exists( 'action', $G_DATA ) ){
+                $action = $G_DATA[ 'action' ];
+            }else{
+                $action = '';
+            }
+            $played = '';
+            $css_played = '';
+            $css_extra = '';
+            $urlposter = getURLImg( FALSE, 1, 'back' );
+            $result .= "<div class='listElement " . $css_extra . "' onclick='list_show_next( \"" . $action . "\", " . ( $page - 1 ) . ", \"" . $search .  "\" );'><a href='#' title='" . get_msg( 'LIST_TITLE_PREVPAGE', FALSE ) . "'><img class='listElementImg' src='" . $urlposter . "' title='" . get_msg( 'LIST_TITLE_PREVPAGE', FALSE ) . "' /><span class='" . $css_played . "'>" . get_msg( 'LIST_TITLE_PREVPAGE', FALSE ) . "" . $played . "</span></a></div>";
+        }
+        
+        $plot = '';
+        foreach( $data AS $element ){
+            $played = '';
+            $css_played = '';
+            $css_extra = '';
+            $urlinfo = '';
+            $ftitle = $element[ 'title' ];
+            $urlposter = getURLImg( FALSE, 1, 'poster' );
+            $urlplayer = getURLPlayerLive( $element[ 'idmedialive' ], FALSE, 'poster' );
+            
+            $onclick = 'goToURL( "' . $urlplayer . '" );';
+            
+            $extrainfo = "";
+            if( isset( $G_FILENAME_INFO )
+            && is_array( $G_FILENAME_INFO )
+            && count( $G_FILENAME_INFO ) > 0
+            ){
+                $extrai = '';
+                foreach( $G_FILENAME_INFO AS $ititle => $grep ){
+                    if( preg_match("/" . $grep . "/i", $element[ 'url' ] ) ){
+                        $extrai .= '' . $ititle . ' ';
+                    }
+                }
+                $extrai .= '';
+                if( strlen( $extrai ) > 0 ){
+                    $extrainfo = "<div style='position:absolute;top:1;right:0;background-color: blue !important;'>" . $extrai . "</div>";
+                }
+            }
+            $result .= "<div class='listElement " . $css_extra . "' onclick='" . $onclick .  "'><a href='#' title='" . htmlspecialchars( $ftitle, ENT_QUOTES ) . "'>" . $extrainfo . "<img title='" . htmlspecialchars( $ftitle, ENT_QUOTES ) . ": " . htmlspecialchars( $plot, ENT_QUOTES ) . "' class='listElementImg lazy' data-src='" . $urlposter . "' src='' /><span class='" . $css_played . "'>" . $ftitle . "" . $played . "</span></a></div>";
+        }
+        
+        //Next
+        if( $page !== FALSE 
+        && $page >= 0
+        && ( 
+            count( $data ) == O_LIST_MINI_QUANTITY
+            || count( $data ) == O_LIST_QUANTITY
+            || count( $data ) == O_LIST_BIG_QUANTITY
+        )
+        ){
+            if( array_key_exists( 'action', $G_DATA ) ){
+                $action = $G_DATA[ 'action' ];
+            }else{
+                $action = '';
+            }
+            $played = '';
+            $css_played = '';
+            $css_extra = '';
+            $urlposter = getURLImg( FALSE, 1, 'next' );
+            $result .= "<div class='listElement " . $css_extra . "' onclick='list_show_next( \"" . $action . "\", " . ( $page + 1 ) . ",\"" . $search .  "\" );'><a href='#' title='" . get_msg( 'LIST_TITLE_NEXTPAGE', FALSE ) . "'><img class='listElementImg' src='" . $urlposter . "' title='" . get_msg( 'LIST_TITLE_NEXTPAGE', FALSE ) . "' /><span class='" . $css_played . "'>" . get_msg( 'LIST_TITLE_NEXTPAGE', FALSE ) . "" . $played . "</span></a></div>";
+        }
+        $result .= "</div>";
+        
+        return $result;
+	}
+	
+	
 ?>

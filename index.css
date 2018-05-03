@@ -7,7 +7,7 @@ html, body
 	margin: 0px;
 	border: 0px;
 	padding: 0px;
-	padding-top: 20px;
+	/* padding-top: 20px; */
 }
 body { 
 	width:100%; 
@@ -137,7 +137,7 @@ input {
     cursor:pointer;
 }
 input:hover{
-    background-color: #6699bb;
+    /* background-color: #6699bb; */
 }
 
 /* COLOR LIST */

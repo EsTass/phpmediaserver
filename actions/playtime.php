@@ -174,6 +174,26 @@
             }
             
             switch( $G_MODE ){
+                //TEST IOS
+                case 'mp4ios':
+                    //testing
+                    //$encoder_outformat = 'mpegts';
+                    $encoder_outformat = 'mp4';
+                    //$encoder = 'h264';
+                    $encoder = 'libx264';
+                    $AUDIOCODEC = 'aac';
+                    //$AUDIOCODEC = 'mp3';
+                    //$AUDIOCODEC = 'opus';
+                    //EXTRA
+                    $G_FFMPEGLVL = '3.0';
+                    $minbitrate = '1M';
+                    $maxbitrate = '1M';
+                    $QUALITY = '';
+                    //$cmd = O_FFMPEG . " -nostdin -re " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -movflags +faststart -bufsize 1000k -g 74 -strict experimental -pix_fmt yuv420p -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -aspect 16:9 -level " . $G_FFMPEGLVL . " -profile:v baseline -level 3.0 -preset ultrafast -tune zerolatency -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+                    $cmd = O_FFMPEG . " -nostdin -re " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . '-strict experimental -pix_fmt yuv420p -profile:v baseline -level 3.0 -acodec aac -ar 44100 -ac 2 -ab 128k -f ' . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+                    
+                    header('Content-type: video/mp4');
+                break;
                 //TEST KODI
                 case 'direct':
                     //slow

@@ -57,6 +57,7 @@
         'MENU_REFERER' => 'Referer',
         'MENU_DATE' => 'Date',
         'MENU_UPDATE' => 'Update',
+        'MENU_EDIT' => 'Edit',
         'MENU_CONFIG' => 'Config',
         'MENU_GETEPISODES' => 'Get Episode List',
         'MENU_JOINMEDIA' => 'Join Media',
@@ -126,6 +127,8 @@
         'JOIN_BUTTONREPLACE' => 'Replace',
         
         'DOWNLOADS_USER_TITLE' => 'Search for Downloads',
+        
+        'LIVETV_TITLE' => 'LiveTV',
 	);
 	
 ?>

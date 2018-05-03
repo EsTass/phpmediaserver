@@ -4,6 +4,11 @@
 	
 	//SQLITE
 	
+	$G_SQLITE_TABLES = array(
+        //'table' => 'CREATE TABLE',
+        'medialive' => "CREATE TABLE 'medialive' ('idmedialive' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'title' TEXT, 'url' TEXT, 'poster' TEXT, 'date' DATETIME)",
+	);
+	
 	$G_DB = FALSE;
 	function sqlite_init(){
 		//Vars
@@ -63,6 +68,43 @@
 		}
 		
 		return $result;
+	}
+	
+	function sqlite_checktable_exist( $table, $create = FALSE ){
+        $result = FALSE;
+        
+        $sql = "SELECT name FROM sqlite_master WHERE type='table' AND name='" . $table . "'";
+        if( ( $dbhandle = sqlite_init() ) != FALSE ){
+            $result = sqlite_getarray( $dbhandle->query( $sql ) );
+			if( count( $result ) > 0 
+			&& array_key_exists( 0, $result )
+			&& array_key_exists( 'name', $result[ 0 ] )
+			){
+                $result = TRUE;
+			}else{
+                $result = FALSE;
+			}
+			sqlite_db_close();
+        }
+        
+        return $result;
+	}
+	
+	function sqlite_db_update(){
+        $result = FALSE;
+		global $G_SQLITE_TABLES;
+        
+		//Check extra G_SQLITE_TABLES
+		foreach( $G_SQLITE_TABLES AS $table => $sqlt ){
+            if( !sqlite_checktable_exist( $table ) 
+            && ( $dbhandle = sqlite_init() ) != FALSE 
+            ){
+                @$dbhandle->exec( $sqlt );
+                sqlite_db_close();
+            }
+		}
+		
+        return $result;
 	}
 	
 	//SQLITE ACTIONS
@@ -1661,6 +1703,108 @@
 		}else{
 			//var_dump( $data );
 			$result = FALSE;
+		}
+		
+		return $result;
+	}
+	
+	//MEDIALIVE
+	//idmedialive, title, url, poster, date
+	
+	function sqlite_medialive_getdata( $idmedialive = FALSE, $limit = 1000 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM medialive ';
+			if( $idmedialive != FALSE
+			&& is_numeric( $idmedialive )
+			&& (int)$idmedialive > 0
+			){
+				$sql .= ' WHERE idmedialive = ' . $idmedialive . ' ';
+			}
+			$sql .= ' ORDER BY title ASC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_medialive_getdata_filter( $title, $limit = 1000 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM medialive ';
+			if( strlen( $title ) > 0
+			){
+				$sql .= ' WHERE title LIKE "%' . $dbhandle->escapeString( $title ) . '%" ';
+			}
+			$sql .= ' ORDER BY title ASC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_medialive_insert( $idmedialive, $title, $url, $poster ){
+		//Vars
+		$result = FALSE;
+		$idmedialive = 0;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'INSERT INTO medialive VALUES(';
+			$sql .= '';
+			$sql .= ' NULL, ';
+			$sql .= ' "' . $title . '", ';
+			$sql .= ' "' . $url . '", ';
+			$sql .= ' "' . $poster . '", ';
+			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
+			$sql .= ')';
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_medialive_replace( $idmedialive, $title, $url, $poster ){
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'REPLACE INTO played VALUES(';
+			$sql .= '';
+			$sql .= ' ' . $idmedialive . ', ';
+			$sql .= ' "' . $title . '", ';
+			$sql .= ' "' . $url . '", ';
+			$sql .= ' "' . $poster . '", ';
+			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
+			$sql .= ')';
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+			
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_medialive_delete( $idmedialive ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'DELETE FROM medialive ';
+			$sql .= '';
+			$sql .= ' WHERE idmedialive = ' . $idmedialive . ' ';
+			//die( $sql );
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
 		}
 		
 		return $result;

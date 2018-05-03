@@ -62,7 +62,7 @@
                     }
                     $MAXFILES--;
                 }else{
-                    echo ".";
+                    echo " .";
                 }
                 if( $MAXFILES <= 0 ){
                     break;

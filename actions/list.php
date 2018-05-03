@@ -43,6 +43,16 @@
             echo get_html_list( $edata, $TITLE, FALSE, FALSE, FALSE, $urltitle );
         }
         
+        //LiveTV
+        if( //check_user_admin() && 
+        ( $edata = sqlite_medialive_getdata( FALSE, O_LIST_MINI_QUANTITY ) ) != FALSE 
+        && count( $edata ) > 0
+        ){
+            $TITLE = get_msg( 'LIVETV_TITLE', FALSE );
+            $urltitle = '?action=listlive';
+            echo get_html_list_live( $edata, $TITLE, FALSE, FALSE, $urltitle );
+        }
+        
         //Recommended
         if( ( $edata = media_get_recomended( O_LIST_MINI_QUANTITY ) ) != FALSE 
         && count( $edata ) > 0
