@@ -123,6 +123,10 @@
         array( 
             '.part', 
             '.part.met',
+            '.!qB', 
+            '.\!qB',
+            '.sub',
+            '.str',
         )
     );
 	
@@ -162,7 +166,7 @@
 	//CRON long cron minutes
 	define( 'O_CRON_LONG_TIME', ( 60 * 6 ) );
 	//CRON job: web petition to login shortcron + 10 secs
-	define( 'O_CRON_JOB', 'sleep ' . ( ( O_CRON_SHORT_TIME * 60 ) + 10 ) . ' && wget --no-check-certificate -O - https://127.0.0.1/' );
+	define( 'O_CRON_JOB', 'sleep ' . ( ( O_CRON_SHORT_TIME * 60 ) + 10 ) . ' && wget --no-check-certificate -O - https://127.0.0.1/?cronlaunch=1' );
 	//CRON Logs Files
 	define( 'PPATH_CRON_FILE', PPATH_CACHE . DS . 'cron' );
 	define( 'PPATH_CRON_HOUR_FILE', PPATH_CACHE . DS . 'cronhour' );
