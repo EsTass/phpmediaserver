@@ -5,8 +5,12 @@
     function initializeCron(){
         //Result
         $result = FALSE;
+        global $G_DATA;
+        $cronid = 'cron_hour';
         
-        if( O_CRON ){
+        if( O_CRON 
+        && array_key_exists( 'cronlaunch', $G_DATA )
+        ){
         
             if( !file_exists( PPATH_CRON_FILE ) ){
                 file_put_contents( PPATH_CRON_FILE , 'CREATED' );
@@ -43,6 +47,11 @@
             ){
                 run_in_background( O_CRON_JOB, 0 );
             }
+        }elseif( ( $data = sqlite_log_check_cron( $cronid, ( O_CRON_SHORT_TIME + 5 ) ) ) != FALSE 
+        && count( $data ) == 0
+        ){
+            //first time, time*2
+            run_in_background( $cmd, 0, PPATH_CRON_HOUR_FILE );
         }
         
         return $result;
