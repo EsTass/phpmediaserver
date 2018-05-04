@@ -48,9 +48,13 @@
                 run_in_background( O_CRON_JOB, 0 );
             }
         }elseif( ( $data = sqlite_log_check_cron( $cronid, ( O_CRON_SHORT_TIME + 5 ) ) ) != FALSE 
-        && count( $data ) == 0
+        && is_array( $data )
+        && count( $data ) < 0
+        && sqlite_log_insert( $cronid, 'Cron ' . O_CRON_LONG_TIME .'mins launched: ' . date( 'Y-m-d H:s:i' ) ) !== FALSE 
         ){
             //first time, time*2
+            //O_CRON_SHORT_TIME
+            $cmd = O_PHP . ' -f "' . PPATH_ACTIONS . DS . 'cronshort.php"';
             run_in_background( $cmd, 0, PPATH_CRON_HOUR_FILE );
         }
         
