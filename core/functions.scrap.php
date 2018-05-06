@@ -1258,7 +1258,8 @@
                 //var_dump( $search );
                 $images_own = array();
                 $imdb = FALSE;
-                
+                $file = FALSE;
+                $title = $MEDIAINFO[ 'title' ] . ' ' . $MEDIAINFO[ 'year' ];
                 if( ( $md = ident_detect_file_pymi( $file, $title, $movies, $imdb, $season, $episode ) ) != FALSE 
                 && array_key_exists( $type, $md )
                 ){
@@ -1296,6 +1297,7 @@
         $imdb = FALSE;
         
         //ONLY POSTER
+        $type = 'poster';
         if(  stripos( $search, 'poster' ) !== FALSE
         && ( $md = ident_detect_file_pymi( FALSE, $search, $movies, $imdb, $season, $episode ) ) != FALSE 
         && array_key_exists( $type, $md )
