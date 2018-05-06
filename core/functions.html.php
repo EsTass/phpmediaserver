@@ -348,4 +348,44 @@
 	}
 	
 	
+	function get_html_list_kodi_live( $data, $title ){
+        $result[ $title ] = array();
+        $session = '&PHPSESSION=' . session_id();
+        
+        foreach( $data AS $element ){
+            $genres = $element[ 'title' ];
+            $ftitle = $element[ 'title' ];
+            $plot = '';
+            $year = date( 'Y' );
+            $season = '';
+            $episode = '';
+            $urlposter = $element[ 'poster' ];
+            $urllandscape = '';
+            $urlbanner =  '';
+            //direct, fast, mp4, 
+            $urlplay = getURLBase() . '?r=r&action=playlive&mode=mp4&idmedialive=' . $element[ 'idmedialive' ] . $session;
+            if( $element[ 'season' ] > 0 ){
+                $ftitle .= ' ' . sprintf( '%02d', $element[ 'season' ] ) . 'x' . sprintf( '%02d', $element[ 'episode' ] );
+                if( strlen( $element[ 'titleepisode' ] ) > 0 ){
+                    $ftitle .= ' ' . $element[ 'titleepisode' ];
+                }
+            }
+            $e = array(
+                'name' => $ftitle,
+                'plot' => $plot,
+                'year' => $year,
+                'season' => $season,
+                'episode' => $episode,
+                'thumb' => $urlposter,
+                'landscape' => $urllandscape,
+                'banner' =>  $urlbanner,
+                'video' => $urlplay,
+                'genre' => $genres,
+            );
+            $result[ $title ][] = $e;
+        }
+        
+        return $result;
+	}
+	
 ?>

@@ -86,6 +86,7 @@
                 '+' . get_msg( 'MEDIA_TYPE_SERIE', FALSE ),
                 '-' . get_msg( 'MENU_SEARCH', FALSE ),
                 '*' . get_msg( 'MENU_UPDATE', FALSE ),
+                ' ' . get_msg( 'LIVETV_TITLE', FALSE ),
             );
             if( defined( 'O_MENU_GENRES' )
             && is_array( O_MENU_GENRES )
@@ -96,7 +97,31 @@
             }
         break;
         case 'category':
-            if( $G_CAT == ' ' . get_msg( 'LIST_TITLE_LAST', FALSE ) ){
+            if( $G_CAT == ' ' . get_msg( 'LIVETV_TITLE', FALSE ) ){
+                //Last Added
+                if( ( $edata = sqlite_medialive_getdata_filter( $G_SEARCH, O_LIST_BIG_QUANTITY ) ) != FALSE 
+                && count( $edata ) > 0
+                ){
+                    $TITLE = get_msg( 'LIVETV_TITLE', FALSE );
+                    $RESULT = get_html_list_kodi_live( $edata, $TITLE );
+                    $RESULT = $RESULT[ $TITLE ];
+                }else{
+                    $e = array(
+                        'name' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'plot' => get_msg( 'DEF_EMPTYLIST', FALSE ),
+                        'year' => '',
+                        'season' => '',
+                        'episode' => '',
+                        'thumb' => '',
+                        'landscape' => '',
+                        'banner' =>  '',
+                        'video' => '',
+                        'genre' => '',
+                    );
+                    $RESULT = array( $e );
+                }
+            
+            }elseif( $G_CAT == ' ' . get_msg( 'LIST_TITLE_LAST', FALSE ) ){
                 //Last Added
                 if( ( $edata = sqlite_media_getdata_filtered( $G_SEARCH, O_LIST_BIG_QUANTITY ) ) != FALSE 
                 && count( $edata ) > 0

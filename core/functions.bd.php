@@ -1810,4 +1810,35 @@
 		return $result;
 	}
 	
+	function sqlite_medialive_checkexist( $url ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT idmedialive FROM medialive ';
+			if( $idmedialive != FALSE
+			&& is_numeric( $idmedialive )
+			&& (int)$idmedialive > 0
+			){
+				$sql .= ' WHERE url LIKE "' . $dbhandle->escapeString( $url ) . '" ';
+			}
+			//$sql .= ' ORDER BY title ASC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+			if( is_array( $result ) 
+			&& array_key_exists( 0, $result )
+			&& is_array( $result[ 0 ] ) 
+			&& array_key_exists( 'idmedialive', $result[ 0 ] )
+			){
+                $result = $result[ 0 ][ 'idmedialive' ];
+			}else{
+                $result = FALSE;
+			}
+		}
+		
+		return $result;
+	}
+	
 ?>

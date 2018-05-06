@@ -150,8 +150,14 @@
                 $ltitle = '';
                 $URLs = 0;
                 $URLs_ERROR = 0;
+                $URLs_DUPLY = 0;
                 foreach( $G_LISTLINKS AS $line ){
-                    if( filter_var( $line, FILTER_VALIDATE_URL ) 
+                    if( filter_var( $line, FILTER_VALIDATE_URL )
+                    && sqlite_medialive_checkexist( $line ) != FALSE
+                    ){
+                        $URLs_DUPLY++;
+                    }elseif( filter_var( $line, FILTER_VALIDATE_URL )
+                    && sqlite_medialive_checkexist( $line ) == FALSE
                     && ffprobe_get_data( $line ) != FALSE
                     ){
                         //+1 url
@@ -182,7 +188,7 @@
                         //no data valid
                     }
                 }
-                echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ' ' . $URLs . '/E:' . $URLs_ERROR;
+                echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ' ' . $URLs . '/ERRORs:' . $URLs_ERROR . '/DUPLYs:' . $URLs_DUPLY;
             }else{
                 echo get_msg( 'WEBSCRAP_ADDKO' );
             }
@@ -205,6 +211,16 @@
             && ( $d = sqlite_medialive_getdata( $G_IDMEDIALIVE, 1 ) ) 
             && is_array( $d )
             && array_key_exists( 0, $d )
+            ){
+                if( sqlite_medialive_replace( $G_IDMEDIALIVE, $G_TITLE, $G_URL, $G_POSTER ) ){
+                    echo get_msg( 'DEF_ELEMENTUPDATED' );
+                }else{
+                    echo get_msg( 'WEBSCRAP_ADDKO' );
+                }
+            }elseif( $G_TITLE 
+            && $G_URL
+            && $G_POSTER
+            && ( $G_IDMEDIALIVE = sqlite_medialive_checkexist( $G_URL ) ) != FALSE
             ){
                 if( sqlite_medialive_replace( $G_IDMEDIALIVE, $G_TITLE, $G_URL, $G_POSTER ) ){
                     echo get_msg( 'DEF_ELEMENTUPDATED' );
@@ -241,7 +257,7 @@
 	
 	if( !$SHOW_LIST ){
 	
-	}elseif( ( $edata = sqlite_medialive_getdata_filter( $G_SEARCH, 100 ) ) 
+	}elseif( ( $edata = sqlite_medialive_getdata_filter( $G_SEARCH, 10000 ) ) 
 	){
 ?>
 
