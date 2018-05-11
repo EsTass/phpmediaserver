@@ -25,7 +25,9 @@
 	&& count( $userdata ) > 0
 	&& sqlite_session_update( $sessionid, $sessiondata[ 0 ][ 'user' ] ) != FALSE
 	){
-		$G_DATA[ 'user' ] = strtolower( $G_DATA[ 'user' ] );
+        if( array_key_exists( 'user', $G_DATA ) ){
+            $G_DATA[ 'user' ] = strtolower( $G_DATA[ 'user' ] );
+        }
 		define( 'USERNAME', $sessiondata[ 0 ][ 'user' ] );
 		if( sqlite_users_checkuseradmin( $sessiondata[ 0 ][ 'user' ] )
 		){
