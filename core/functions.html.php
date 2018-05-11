@@ -298,7 +298,7 @@
             $css_extra = '';
             $urlinfo = '';
             $ftitle = $element[ 'title' ];
-            $urlposter = getURLImg( FALSE, 1, 'poster' );
+            $urlposter = getURLImg( FALSE, 1, 'iptv' );
             $urlplayer = getURLPlayerLive( $element[ 'idmedialive' ], FALSE, 'poster' );
             
             $onclick = 'goToURL( "' . $urlplayer . '" );';

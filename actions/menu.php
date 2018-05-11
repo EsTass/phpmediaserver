@@ -105,6 +105,9 @@
         <div class='listMenuElementAdmin'>
             <a href='?action=medialivelog'><?php echo get_msg( 'LIVETV_TITLE', FALSE ) ?></a>
         </div>
+        <div class='listMenuElementAdmin'>
+            <a href='?action=medialiveurlslog'><?php echo get_msg( 'LIVETVURLS_TITLE', FALSE ) ?></a>
+        </div>
         <?php
             }
         ?>

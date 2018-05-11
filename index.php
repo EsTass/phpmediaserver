@@ -4,7 +4,7 @@
 	
     //DEBUG
     error_reporting( E_ALL );
-    ini_set( 'display_errors', '1' );
+    ini_set( 'display_errors', '0' );
 	
 	//FOLDERS
 	
@@ -72,6 +72,7 @@
 		//log_debug_add( 'index 132 check admin' );
 		error_reporting( E_ALL );
 		ini_set( 'display_errors', '1' );
+		sqlite_db_update();
 	}else{
 		error_reporting( 0 );
 		ini_set( 'display_errors', 0 );
@@ -143,6 +144,8 @@ $(function () {
     });
     //IMG LAZYLOAD
     $("img.lazy").Lazy();
+    //float header size
+    $( 'body' ).css("padding-top", $( '.menuBox' ).height() + "px");
 });
 
 //MSGBOX
@@ -151,8 +154,10 @@ function show_msg( url, data, idelement ){
 	data = typeof data !== 'undefined' ? data : {};
 	idelement = typeof idelement !== 'undefined' ? idelement : '';
 	//var url = "";
+    loading_show();
 	$.post( url, data )
 	.done( function( data ){
+        loading_hide();
 		//$( "#" + idelement ).html( data );
 		msgbox( data );
 	});
@@ -163,8 +168,10 @@ function show_msg( url, data, idelement ){
 function show_msgbox( url, data ){
 	data = typeof data !== 'undefined' ? data : {};
 	//var url = "";
+    loading_show();
 	$.post( url, data )
 	.done( function( data2 ){
+        loading_hide();
 		msgbox( data2 );
 	});
 	

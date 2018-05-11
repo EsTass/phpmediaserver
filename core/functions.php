@@ -268,6 +268,7 @@
         if( array_key_exists( $type, $G_MEDIADATA ) 
         || $type == 'back'
         || $type == 'next'
+        || $type == 'iptv'
         ){
             $result .= '&type=' . $type;
         }else{

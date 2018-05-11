@@ -85,7 +85,11 @@
                 $URLs_DEL = 0;
                 $URLs_DEL_E = 0;
                 foreach( $da AS $d ){
-                    if( ffprobe_get_data( $d[ 'url' ] ) != FALSE ){
+                    if( ( $ldata = ffprobe_get_data( $d[ 'url' ] ) ) != FALSE 
+                    && is_array( $ldata )
+                    && array_key_exists( 'width', $ldata )
+                    && $ldata[ 'width' ] > 0
+                    ){
                         //echo get_msg( 'DEF_EXIST' );
                         $URLs_OK++;
                     }else{
@@ -112,7 +116,11 @@
             && array_key_exists( 0, $d )
             ){
                 $d = $d[ 0 ];
-                if( ffprobe_get_data( $d[ 'url' ] ) != FALSE ){
+                if( ( $ldata = ffprobe_get_data( $d[ 'url' ] ) ) != FALSE 
+                && is_array( $ldata )
+                && array_key_exists( 'width', $ldata )
+                && $ldata[ 'width' ] > 0
+                ){
                     echo get_msg( 'DEF_EXIST' );
                 }else{
                     if( sqlite_medialive_delete( $G_IDMEDIALIVE )
@@ -132,7 +140,11 @@
             && array_key_exists( 0, $d )
             ){
                 $d = $d[ 0 ];
-                if( ffprobe_get_data( $d[ 'url' ] ) != FALSE ){
+                if( ( $ldata = ffprobe_get_data( $d[ 'url' ] ) ) != FALSE 
+                && is_array( $ldata )
+                && array_key_exists( 'width', $ldata )
+                && $ldata[ 'width' ] > 0
+                ){
                     echo get_msg( 'DEF_EXIST' );
                 }else{
                     echo get_msg( 'DEF_DELETED' );
@@ -145,7 +157,7 @@
             && strlen( $G_LISTLINKS ) > 0
             ){
                 $G_LISTLINKS = trim( $G_LISTLINKS );
-                $G_LISTLINKS = explode("\n", $G_LISTLINKS );
+                $G_LISTLINKS = explode( PHP_EOL, $G_LISTLINKS );
                 $G_LISTLINKS = array_filter( $G_LISTLINKS, 'trim' );
                 $ltitle = '';
                 $URLs = 0;
@@ -158,7 +170,10 @@
                         $URLs_DUPLY++;
                     }elseif( filter_var( $line, FILTER_VALIDATE_URL )
                     && sqlite_medialive_checkexist( $line ) == FALSE
-                    && ffprobe_get_data( $line ) != FALSE
+                    && ( $ldata = ffprobe_get_data( $line ) ) != FALSE 
+                    && is_array( $ldata )
+                    && array_key_exists( 'width', $ldata )
+                    && $ldata[ 'width' ] > 0
                     ){
                         //+1 url
                         if( strlen( $ltitle ) == 0 ){
@@ -252,12 +267,12 @@
             }
             break;
         default:
-            
+            echo "NO ACTION";
 	}
 	
 	if( !$SHOW_LIST ){
 	
-	}elseif( ( $edata = sqlite_medialive_getdata_filter( $G_SEARCH, 10000 ) ) 
+	}elseif( ( $edata = sqlite_medialive_getdata_filter( $G_SEARCH, 10000 ) ) !== FALSE
 	){
 ?>
 

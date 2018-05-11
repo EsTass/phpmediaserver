@@ -7,6 +7,7 @@
 	$G_SQLITE_TABLES = array(
         //'table' => 'CREATE TABLE',
         'medialive' => "CREATE TABLE 'medialive' ('idmedialive' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'title' TEXT, 'url' TEXT, 'poster' TEXT, 'date' DATETIME)",
+        'medialiveurls' => "CREATE TABLE 'medialiveurls' ('idmedialiveurls' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'title' TEXT, 'url' TEXT, 'date' DATETIME)",
 	);
 	
 	$G_DB = FALSE;
@@ -1778,7 +1779,7 @@
 		$result = FALSE;
 		
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
-			$sql = 'REPLACE INTO played VALUES(';
+			$sql = 'REPLACE INTO medialive VALUES(';
 			$sql .= '';
 			$sql .= ' ' . $idmedialive . ', ';
 			$sql .= ' "' . $title . '", ';
@@ -1817,12 +1818,7 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			
 			$sql = 'SELECT idmedialive FROM medialive ';
-			if( $idmedialive != FALSE
-			&& is_numeric( $idmedialive )
-			&& (int)$idmedialive > 0
-			){
-				$sql .= ' WHERE url LIKE "' . $dbhandle->escapeString( $url ) . '" ';
-			}
+            $sql .= ' WHERE url LIKE "' . $dbhandle->escapeString( $url ) . '" ';
 			//$sql .= ' ORDER BY title ASC LIMIT ' . $limit;
 			//die( $sql );
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
@@ -1833,6 +1829,132 @@
 			&& array_key_exists( 'idmedialive', $result[ 0 ] )
 			){
                 $result = $result[ 0 ][ 'idmedialive' ];
+			}else{
+                $result = FALSE;
+			}
+		}
+		
+		return $result;
+	}
+	
+	//MEDIALIVEURLS
+	//idmedialiveurls, title, url, date
+	
+	function sqlite_medialiveurls_getdata( $idmedialiveurls = FALSE, $limit = 1000 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM medialiveurls ';
+			if( $idmedialiveurls != FALSE
+			&& is_numeric( $idmedialiveurls )
+			&& (int)$idmedialiveurls > 0
+			){
+				$sql .= ' WHERE idmedialiveurls = ' . $idmedialiveurls . ' ';
+			}
+			$sql .= ' ORDER BY title ASC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_medialiveurls_getdata_filter( $title, $limit = 1000 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM medialiveurls ';
+			if( strlen( $title ) > 0
+			){
+				$sql .= ' WHERE title LIKE "%' . $dbhandle->escapeString( $title ) . '%" ';
+			}
+			$sql .= ' ORDER BY title ASC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_medialiveurls_insert( $idmedialiveurls, $title, $url ){
+		//Vars
+		$result = FALSE;
+		$idmedialiveurls = 0;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'INSERT INTO medialiveurls VALUES(';
+			$sql .= '';
+			$sql .= ' NULL, ';
+			$sql .= ' "' . $title . '", ';
+			$sql .= ' "' . $url . '", ';
+			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
+			$sql .= ')';
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_medialiveurls_replace( $idmedialiveurls, $title, $url ){
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'REPLACE INTO medialiveurls VALUES(';
+			$sql .= '';
+			$sql .= ' ' . $idmedialiveurls . ', ';
+			$sql .= ' "' . $title . '", ';
+			$sql .= ' "' . $url . '", ';
+			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
+			$sql .= ')';
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+			
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_medialiveurls_delete( $idmedialiveurls ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'DELETE FROM medialiveurls ';
+			$sql .= '';
+			$sql .= ' WHERE idmedialiveurls = ' . $idmedialiveurls . ' ';
+			//die( $sql );
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_medialiveurls_checkexist( $url ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT idmedialiveurls FROM medialiveurls ';
+            $sql .= ' WHERE url LIKE "' . $dbhandle->escapeString( $url ) . '" ';
+			//$sql .= ' ORDER BY title ASC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+			if( is_array( $result ) 
+			&& array_key_exists( 0, $result )
+			&& is_array( $result[ 0 ] ) 
+			&& array_key_exists( 'idmedialiveurls', $result[ 0 ] )
+			){
+                $result = $result[ 0 ][ 'idmedialiveurls' ];
 			}else{
                 $result = FALSE;
 			}
