@@ -170,6 +170,8 @@
 	//CRON Logs Files
 	define( 'PPATH_CRON_FILE', PPATH_CACHE . DS . 'cron' );
 	define( 'PPATH_CRON_HOUR_FILE', PPATH_CACHE . DS . 'cronhour' );
+	//CRON very long cron minutes for livetv
+	define( 'O_CRON_VLONG_TIME', ( 60 * 24 * 7 ) );
 	
 	//CRON clean duplicated idmediainfo files min days (0 disable)
 	//if film/chapters have >1 file delete low quality duplicates if have more than days modified (seeding safe and be safe detected)
