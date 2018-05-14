@@ -154,7 +154,10 @@ function infovideo_playlater( idmedia, idmediainfo ){
 					<a href='#' onclick='infovideo_playlater( <?php if( strlen( $IDMEDIA ) > 0 ){ echo $IDMEDIA; }else{ echo '0'; }; ?>, <?php echo $MEDIAINFO[ 'idmediainfo' ]; ?> )'>&#x25B7;&nbsp;<?php echo get_msg( 'INFO_PLAY_LATER', FALSE ); ?></a>
 				</span>
 				<?php
-                    if( strlen( $urlplayersafe ) > 0 ){
+                    if( defined( 'O_VIDEO_PLAYSAFE' )
+                    && O_VIDEO_PLAYSAFE
+                    && strlen( $urlplayersafe ) > 0 
+                    ){
 				?>
 				&nbsp;
 				<span style='background-color: DarkSalmon !important;'>
