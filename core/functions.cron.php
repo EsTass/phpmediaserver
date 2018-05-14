@@ -49,7 +49,7 @@
             }
         }elseif( ( $data = sqlite_log_check_cron( $cronid, ( O_CRON_SHORT_TIME + 5 ) ) ) != FALSE 
         && is_array( $data )
-        && count( $data ) < 0
+        && count( $data ) <= 0
         && sqlite_log_insert( $cronid, 'Cron ' . O_CRON_LONG_TIME .'mins launched: ' . date( 'Y-m-d H:s:i' ) ) !== FALSE 
         ){
             //first time, time*2
