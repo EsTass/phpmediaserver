@@ -77,6 +77,9 @@
 	//VIDEO EXTRA VOLUME
 	define( 'O_VIDEO_EXTRA_VOLUME', '2.0' );
 	
+	//SHOW PLAYSAFE
+	define( 'O_VIDEO_PLAYSAFE', TRUE );
+	
 	//Search Media Types
 	$G_STYPE = array( 'movies', 'series' );
 	
