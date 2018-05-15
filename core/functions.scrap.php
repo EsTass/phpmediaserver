@@ -1304,6 +1304,7 @@
         && ( $md = ident_detect_file_pymi( FALSE, $search, $movies, $imdb, $season, $episode ) ) != FALSE 
         && array_key_exists( 'url' . $type, $md )
         ){
+            $images_own = array();
             $fileimg = $pathtmpimg . DS . $filenum;
             if( ident_download_pymi( $md[ 'url' . $type ], $fileimg ) 
             && file_exists( $fileimg )
