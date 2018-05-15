@@ -1264,7 +1264,8 @@
                 && array_key_exists( $type, $md )
                 ){
                     $fileimg = $fileimgpath . DS . $filenum;
-                    if( ident_download_pymi( $md[ 'url' . $type ], $fileimg ) 
+                    if( array_key_exists( 'url' . $type, $md )
+                    && ident_download_pymi( $md[ 'url' . $type ], $fileimg ) 
                     && file_exists( $fileimg )
                     && getFileMimeTypeImg( $fileimg )
                     ){
@@ -1298,11 +1299,12 @@
         
         //ONLY POSTER
         $type = 'poster';
+        $pathtmpimg = PPATH_TEMP . DS . getRandomString();
         if(  stripos( $search, 'poster' ) !== FALSE
         && ( $md = ident_detect_file_pymi( FALSE, $search, $movies, $imdb, $season, $episode ) ) != FALSE 
-        && array_key_exists( $type, $md )
+        && array_key_exists( 'url' . $type, $md )
         ){
-            $fileimg = $fileimgpath . DS . $filenum;
+            $fileimg = $pathtmpimg . DS . $filenum;
             if( ident_download_pymi( $md[ 'url' . $type ], $fileimg ) 
             && file_exists( $fileimg )
             && getFileMimeTypeImg( $fileimg )
