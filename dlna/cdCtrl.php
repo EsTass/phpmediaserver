@@ -24,6 +24,19 @@ require( PPATH_BASE . DS . 'config.php' );
 require( PPATH_CORE . DS . 'functions.bd.php' );
 require( PPATH_CORE . DS . 'functions.dlna.php' );
 
+$IPALLOWED = explode( '.', DLNA_BINDIP );
+if( is_array( $IPALLOWED )
+&& count( $IPALLOWED ) == 4
+&& (
+    startsWith( USER_IP, '127.0.0.1' )
+    || startsWith( USER_IP, $IPALLOWED[ 0 ] . '.' . $IPALLOWED[ 1 ] . '.' . $IPALLOWED[ 2 ] )
+    )
+){
+
+}else{
+    die( 'HTTP/1.0 401 Unauthorized.<br />' );
+}
+
 if( !defined( 'DLNA_ACTIVE' ) 
 || DLNA_ACTIVE == FALSE
 ){
