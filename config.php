@@ -189,6 +189,25 @@
 	//CRON extracted compressed files deleted after X days, 0 disabled (seeding safe)
 	define( 'O_CRON_EXTRACTFILES_CLEAN', 14 );
 	
+	//DLNA CONFIG
+	
+	//ACTIVATE DLNA (bool)
+	define( 'DLNA_ACTIVE', TRUE );
+	//Username for dlna connections, pass is random, only for local connections
+    	define( 'DLNA_USERNAME', 'dlna' );
+	//Encode mode for playtime.php: direct (prefered, direct cat mode and 0cpu), fast, mp4, webm
+    	define( 'DLNA_ENCODEMODE', 'direct' );
+	//Base http internal server. Format: http://IP:PORT/
+    	define( 'DLNA_WEB_BASESERVER_HTTP', 'http://192.168.1.50:80/' );
+    	//Subfolder in server if needed, empty string if not needed. Format: folder/
+    	define( 'DLNA_WEB_BASEPATH_HTTP', '' );
+    	//URL to base with subfolder. Format: http://IP:PORT/[folder/]
+    	define( 'DLNA_WEB_BASEFOLDER_HTTP', DLNA_WEB_BASESERVER_HTTP . DLNA_WEB_BASEPATH_HTTP );
+    	//URL to base with subfolder to dlna folder. Format: http://IP:PORT/[folder/]dlna/
+    	define( 'DLNA_WEB_BASEFOLDER', DLNA_WEB_BASEFOLDER_HTTP . 'dlna/' );
+    	//BIND IP for internal lan
+	define( 'DLNA_BINDIP', '192.168.1.50' );
+	
 	//TIMEZONE
 	@date_default_timezone_set( 'Europe/Madrid' );
 	@setlocale( LC_ALL, 'es_ES.utf8' );
