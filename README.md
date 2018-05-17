@@ -20,6 +20,7 @@ A bunch of utilities for:
  - Extract files on cron (php support needed Zip and Rar)
  - Filtered remove files to recover extra free space
  - Stop adding downloads on min space config
+ - Mini dlna server thanks to: https://github.com/ttyridal/phpdlna && https://github.com/ampache/ampache/ (only tested vlc)
 
 ## Default User (Important: change pass on first login)
  - User: admin
@@ -53,6 +54,7 @@ Example vhost:
 NameVirtualHost *:80
 <VirtualHost *:80>
    ServerName YOURDOMAIN
+   #COMMENT IF DLNA SERVER or calls changed to https or only use domainname
    Redirect permanent / https://YOURDOMAIN
 </VirtualHost>
 <VirtualHost *:443>
@@ -85,6 +87,8 @@ extension=sqlite3.so
 extension=sockets.so
 extension=xmlrpc.so
 extension=zip.so
+#for dlna server
+extension=soap.so
 ```
 
 Restart apache, and login with default user/pass.
