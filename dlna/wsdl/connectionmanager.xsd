@@ -1,0 +1,17 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:u="urn:schemas-upnp-org:service:ConnectionManager:1"
+	targetNamespace="urn:schemas-upnp-org:service:ConnectionManager:1">
+
+	<xs:element name="GetProtocolInfo">
+		<xs:complexType />
+	</xs:element>
+	<xs:element name="GetProtocolInfoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Source" type="xs:string" minOccurs="1" maxOccurs="1" />
+				<xs:element name="Sink" type="xs:string" minOccurs="1" maxOccurs="1" />
+            </xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>	

@@ -32,6 +32,7 @@
 	require( PPATH_CORE . DS . 'functions.html.php' );
 	require( PPATH_CORE . DS . 'functions.ffmpeg.php' );
 	require( PPATH_CORE . DS . 'functions.cron.php' );
+	require( PPATH_CORE . DS . 'functions.dlna.php' );
 	
 	//SCRAPPERS
 	if( is_array( O_SCRAPPERS_INCLUDES )
