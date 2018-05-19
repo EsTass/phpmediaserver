@@ -11,7 +11,7 @@ A bunch of utilities for:
  - Admins and player users.
  - Realtime ffmpeg transcoding, not needed to reencode before play or create temp files.
  - Identify media files thanks to: [pymediaident](https://github.com/EsTass/pymediaident), www.filebot.net, www.omdbapi.com, www.thetvdb.com (cron, manual and helped).
- - Search new media from web adding scrappers with config.ws.php (elinks, magnets and torrents supported, cron or manual).
+ - Search new media from web adding scrappers with config.ws.php (youtube, elinks, magnets, torrents and dd supported, cron or manual).
  - Clean duplicates by quality with safe seeding (min days to seed)
  - Country IP block thanks to www.geoplugin.net.
  - IP whitelist/blacklist.
