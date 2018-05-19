@@ -1003,4 +1003,223 @@
         return $result;
     }
     
+    //DOWNLOAD HELPERS
+    
+	//HELPERS DOWNLOAD
+	
+	//download from youtube with external program
+	function youtube_download( $url, $debug = PPATH_WEBSCRAP_DEBUG ){
+        $result = TRUE;
+        
+        $cmd = PPATH_WEBSCRAP_YOUTUBE_CMD . ' ' . $url;
+        if( $debug ) echo "<br />Download Function: " . $cmd;
+        $result = run_in_background( $cmd );
+        $result = TRUE;
+        
+        return $result;
+	}
+	
+	//youtube search with ddkgo simple search (TODO SPAM searchs problems)
+	function youtube_search( $webscrapper, $search, $debug ){
+        $result = FALSE;
+        
+        $search .= '!v ' . $search;
+        $filterurl = 'watch?v';
+        $site = '';
+        $timed = FALSE;
+        if( ( $r = scrap_duckduckgo( $search, $filterurl, $site, $timed ) ) != FALSE ){
+            $result = $r;
+        }
+	
+        return $result;
+	}
+	
+	//PLOWSHARE
+	
+	/*
+	hotlink_cc
+    uplea
+    4share_vn
+    faststore
+    hdstream_to
+    euroshare_eu
+    chomikuj
+    openload
+    zippyshare
+    filecloud
+    sockshare
+    1fichier
+    catshare
+    hipfile
+    bitshare
+    filefactory
+    rapidgator
+    freakshare
+    dataport_cz
+    fileshark
+    netload_in
+    lunaticfiles
+    uploadrocket
+    fileover
+    multiupload
+    thefilebay
+    filedais
+    gamefront
+    rapidu
+    zalaa
+    filepost
+    espafiles
+    uploadboy
+    nowdownload_co
+    tempshare
+    upload_cd
+    promptfile
+    180upload
+    upstore
+    keep2share
+    myvdrive
+    divshare
+    uptobox
+    uploaded_net
+    filepup_net
+    letitbit
+    solidfiles
+    nakido
+    turbobit
+    megashares
+    tezfiles
+    fboom_me
+    firedrive
+    salefiles
+    gfile_ru
+    sendspace
+    ge_tt
+    yourvideohost
+    bayfiles
+    data_hu
+    fshare_vn
+    sharebeast
+    shareonline_biz
+    filecore
+    filejoker
+    uploading
+    mediafire
+    netkups
+    rghost
+    ziddu
+    flashx
+    115
+    dl_free_fr
+    filebin_ca
+    tempsend
+    oboom
+    datafile
+    hexupload
+    prefiles
+    billionuploads
+    ryushare
+    4shared
+    depositfiles
+    filer_net
+    anonfiles
+    sharehost
+    bigfile
+    2shared
+    bayimg
+    nitroflare
+    uloz_to
+    ultramegabit
+    crocko
+	*/
+	
+	function plowshare_downloader( $url, $debug = PPATH_WEBSCRAP_DEBUG ){
+        $result = TRUE;
+        
+        $cmd = PPATH_WEBSCRAP_PLOWSHARE_CMD . " '" . $url . "'";
+        if( $debug ) echo "<br />Download Function: " . $cmd;
+        $result = run_in_background( $cmd );
+        $result = TRUE;
+        
+        return $result;
+	}
+	
+	//JDOWNLOADER
+	
+	function jdownloader_downloader( $url, $debug = PPATH_WEBSCRAP_DEBUG ){
+        $result = TRUE;
+        
+        //INTERNAL crawljob
+        $file = PPATH_WEBSCRAP_JDOWNLOADER_FOLDER . getRandomString() . '.crawljob';
+        if( $debug ) echo "<br />Download Function JDOWNLOADER: file_put_contents->" . $file . ' - ' . $url;
+        file_put_contents( $file, $url );
+        
+        $result = TRUE;
+        
+        return $result;
+	}
+	
+	function externallinks_downloader( $href, $debug = PPATH_WEBSCRAP_DEBUG ){
+        $result = FALSE;
+        global $G_WEBSCRAPPER;
+        
+        $wsTitle = get_msg( 'WEBSCRAP_ADDKO', FALSE );
+        $wsResult = get_msg( 'WEBSCRAP_NOTHING', FALSE );
+        $filetitle = '';
+        if( startsWith( $href, 'ed2k:' ) ){
+            amuleAdd( $href );
+            $wsResult = get_msg( 'WEBSCRAP_ADDOK', FALSE ) . $href;
+            $wsTitle = extract_elinks_title( $href );
+        }elseif( startsWith( $href, 'magnet:' ) ){
+            magnetAdd( $href );
+            $wsResult = get_msg( 'WEBSCRAP_ADDOK', FALSE ) . $href;
+            $wsTitle = extract_magnets_title( $href );
+        }else{
+        
+            foreach( $G_WEBSCRAPPER AS $wsident => $wsdata ){
+                if( array_key_exists( 'searchdata', $wsdata ) 
+                && is_array( $wsdata[ 'searchdata' ] )
+                && array_key_exists( 'passdata', $wsdata ) 
+                && is_array( $wsdata[ 'passdata' ] )
+                &&
+                (
+                    (
+                    array_key_exists( 'linksappend', $wsdata[ 'searchdata' ] )
+                    && strlen( $wsdata[ 'searchdata' ][ 'linksappend' ] ) > 0
+                    && startsWith( $href, $wsdata[ 'searchdata' ][ 'linksappend' ] )
+                    ) || (
+                    array_key_exists( 'urlbase', $wsdata[ 'searchdata' ] )
+                    && strlen( $wsdata[ 'searchdata' ][ 'urlbase' ] ) > 0
+                    && startsWith( $href, $wsdata[ 'searchdata' ][ 'urlbase' ] )
+                    ) || (
+                    array_key_exists( 0, $wsdata[ 'passdata' ] )
+                    && is_array( $wsdata[ 'passdata' ][ 0 ] )
+                    && array_key_exists( 'linksappend', $wsdata[ 'passdata' ][ 0 ] )
+                    && strlen( $wsdata[ 'passdata' ][ 0 ][ 'linksappend' ] ) > 0
+                    && startsWith( $href, $wsdata[ 'passdata' ][ 0 ][ 'linksappend' ] )
+                    ) || (
+                    array_key_exists( 0, $wsdata[ 'passdata' ] )
+                    && is_array( $wsdata[ 'passdata' ][ 0 ] )
+                    && array_key_exists( 'urlbase', $wsdata[ 'passdata' ][ 0 ] )
+                    && strlen( $wsdata[ 'passdata' ][ 0 ][ 'urlbase' ] ) > 0
+                    && startsWith( $href, $wsdata[ 'passdata' ][ 0 ][ 'urlbase' ] )
+                    )
+                )
+                ){
+                    $wsTitle = $wsdata[ 'title' ];
+                    $filetitle = $wsident . '_' . date( 'YmdHis' ) . '_' . getRandomString( 6 );
+                    if( webscrapp_pass( $wsident, 0, $href, $filetitle ) ){
+                        $wsResult = get_msg( 'WEBSCRAP_ADDOK', FALSE ) . $href;
+                        $result = TRUE;
+                    }else{
+                        $wsResult = get_msg( 'WEBSCRAP_ADDKO', FALSE ) . $href;
+                    }
+                    break;
+                }
+            }
+        }
+        if( $debug ) echo "<br />externallinks_downloader: " . $wsResult;
+        
+        return $result;
+	}
+	
 ?>
