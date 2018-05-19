@@ -143,6 +143,12 @@
 	define( 'PPATH_WEBSCRAP_EMULE_CMD', 'ed2k "%ELINK%"' );
 	//CMD to Magnets Links Files (%MAGNET%=Magnet Link)
 	define( 'PPATH_WEBSCRAP_MAGNETS_CMD', 'transmissioncli "%MAGNET%"' );
+	//CMD Youtube Downloads (add url to the cmd end)
+	define( 'PPATH_WEBSCRAP_YOUTUBE_CMD', "youtube-dl -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best' -o '". PPATH_DOWNLOADS . DS . "%(title)s-%(id)s.%(ext)s' " );
+	//CMD PLOWSHARE DOWNLOADS (needed extra for captchas resolver like 9kw)
+	define( 'PPATH_WEBSCRAP_PLOWSHARE_CMD', "plowdown --no-plowsharerc -x -o " . PPATH_DOWNLOADS ." --9kweu=YOURKEY " );
+	//JDOWNLOADER folder to create crawljob files (JDownloader need to watch for this folder)
+	define( 'PPATH_WEBSCRAP_JDOWNLOADER_FOLDER', PPATH_DOWNLOADS . DS . 'adds' );
 	
 	//WEB SCRAPPERS CONFIG
 	if( file_exists( PPATH_BASE . DS . 'config.ws.php' ) ){
