@@ -13,18 +13,22 @@ function addNodeWithText($parent, $tag, $text) {
 class DIDLitem {
     protected $node=NULL;
     function __construct($node) { $this->node = $node; }
-//         function album_art($url) { addNodeWithText($this->node, 'upnp:albumArtURI', $url)
-// //             ->setAttribute('profileID','PNG_TN');
-//             ->setAttribute('profileID','JPEG_TN');
-//             return $this;
-//         }
+    /*
+    function album_art($url) { 
+        addNodeWithText($this->node, 'upnp:albumArtURI', $url)
+        ->setAttribute('profileID','PNG_TN');
+        ->setAttribute('profileID','JPEG_TN');
+        return $this;
+    }
+    */
     function icon($url) { addNodeWithText($this->node, 'upnp:icon', $url); return $this; }
     function creator($value) { addNodeWithText($this->node, 'dc:creator', $value); return $this; }
     function genre($value) { addNodeWithText($this->node, 'upnp:genre', $value); return $this; }
     function artist($value, $role=NULL) {
         $n = addNodeWithText($this->node, 'upnp:artist', $value);
         if ($role!==NULL) $n->setAttribute('role', $role);
-        return $this; }
+        return $this; 
+    }
     function author($value) { addNodeWithText($this->node, 'upnp:author', $value); return $this; }
     function album($value) { addNodeWithText($this->node, 'upnp:album', $value); return $this; }
     function track($value) { addNodeWithText($this->node, 'upnp:originalTrackNumber', $value); return $this; }
@@ -44,10 +48,10 @@ class DIDLitem {
         if (array_key_exists('duration', $optattr)) $ndRes->setAttribute('duration', $optattr['duration']);
         if (array_key_exists('bitrate', $optattr)) $ndRes->setAttribute('bitrate', $optattr['bitrate']);
         if (array_key_exists('resolution', $optattr)) $ndRes->setAttribute('resolution', $optattr['resolution']);
-//         $ndRes->setAttribute('bitrate', ""+(3780)); //kbps
-// //         $ndRes->setAttribute('sampleFrequency', "48000");
-// //         $ndRes->setAttribute('nrAudioChannels', "6");
-//         $ndRes->setAttribute('resolution', "1280x720");
+        //$ndRes->setAttribute('bitrate', ""+(3780)); //kbps
+        //$ndRes->setAttribute('sampleFrequency', "48000");
+        //$ndRes->setAttribute('nrAudioChannels', "6");
+        //$ndRes->setAttribute('resolution', "1280x720");
         $ndRes_text = $this->node->ownerDocument->createTextNode($url);
         $ndRes->appendChild($ndRes_text);
         $this->node->appendChild($ndRes);
@@ -88,7 +92,7 @@ class DIDL {
         $ndItem->setAttribute('id', $id);
         $ndItem->setAttribute('parentID', $this->parent_id);
         $ndItem->setAttribute('restricted', '1');
-//         $ndItem->setAttribute('childCount', '1');
+        //$ndItem->setAttribute('childCount', '1');
         addNodeWithText($ndItem, 'dc:title', $title);
         addNodeWithText($ndItem, 'upnp:class', 'object.container.storageFolder');
         $this->didlroot->appendChild($ndItem);

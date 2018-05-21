@@ -23,6 +23,7 @@ require( PPATH_BASE . DS . 'config.php' );
 //CORE EXT
 require( PPATH_CORE . DS . 'functions.bd.php' );
 require( PPATH_CORE . DS . 'functions.dlna.php' );
+require( PPATH_CORE . DS . 'functions.media.php' );
 
 $IPALLOWED = explode( '.', DLNA_BINDIP );
 if( is_array( $IPALLOWED )
@@ -55,9 +56,15 @@ function get_dlna_profile($path) {
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $ct = finfo_file($finfo, $path);
     switch ($ct) {
-        case 'image/png': $profile = 'DLNA.ORG_PN=PNG_TN'; break;
-        case 'image/jpeg': $profile = 'DLNA.ORG_PN=JPEG_TN'; break;
-        default: $profile = '*';
+        case 'image/png': 
+            $profile = 'DLNA.ORG_PN=PNG_TN'; 
+        break;
+        case 'image/jpeg': 
+        case 'image/jpg': 
+            $profile = 'DLNA.ORG_PN=JPEG_TN'; 
+        break;
+        default: 
+            $profile = '*';
     }
     finfo_close($finfo);
     return $profile;
@@ -69,6 +76,9 @@ class InvalidInputException extends Exception { }
 
 class ContentDirectory {
     
+    //TODO control changes on list?
+    protected $SystemUpdateID = '1';
+    
     function Search($req) {
         //TODO
         $items = new DIDL(DIDL::ROOT_PARENT_ID);
@@ -77,7 +87,7 @@ class ContentDirectory {
 
     protected function BrowseMetadata($req)
     {
-        
+        //TODO: no use?
         if ($req->ObjectID == DIDL::ROOT_ID) {
             //ROOT base directory
             $items = new DIDL(DIDL::ROOT_PARENT_ID);
@@ -102,7 +112,15 @@ class ContentDirectory {
                     $pid = explode('$', $req->ObjectID)[0];
             }
             $items = new DIDL($pid);
-
+            //Quantity
+            $QUANTITY = (int)$req->RequestedCount;
+            if( $QUANTITY <= 0 
+            || $QUANTITY > O_LIST_BIG_QUANTITY
+            ){
+                $QUANTITY = O_LIST_BIG_QUANTITY;
+            }
+            $G_PAGE = 0;
+            
             if( is_array( $idd )
             && count( $idd ) == 2
             && is_numeric( $idd[ 0 ] )
@@ -143,7 +161,7 @@ class ContentDirectory {
             && count( $idd ) == 1
             && is_numeric( $idd[ 0 ] )
             && array_key_exists( $idd[ 0 ] - 1, $genres )
-            && ( $edata = sqlite_media_getdata_filtered( $genres[ ( $idd[ 0 ] - 1 ) ], O_LIST_BIG_QUANTITY, $G_PAGE ) ) != FALSE 
+            && ( $edata = sqlite_media_getdata_filtered( $genres[ ( $idd[ 0 ] - 1 ) ], $QUANTITY, $G_PAGE ) ) != FALSE 
             ){
                 //1 element: only root or base items
                 $items = new DIDL($idd[ 0 ]);
@@ -159,7 +177,7 @@ class ContentDirectory {
 
     protected function BrowseDirectChildren($req)
     {
-        //TODO
+        //TODO: more element info
         $items = new DIDL($req->ObjectID);
         $folderid = 0;
         $fileid = 0;
@@ -177,6 +195,7 @@ class ContentDirectory {
                     ->date(date( 'Y-m-d' ))
                     ->actor('')
                     ->director('')
+                    //->description('Genre: ' . $gk )
                     ->icon( DLNA_WEB_BASEFOLDER . 'imgs/bg.jpg');
                     ;
             }
@@ -187,12 +206,19 @@ class ContentDirectory {
             $id = $req->ObjectID;
             $idd = explode( '.', $id );
             $G_PAGE = 0;
+            //Quantity
+            $QUANTITY = (int)$req->RequestedCount;
+            if( $QUANTITY <= 0 
+            || $QUANTITY > O_LIST_BIG_QUANTITY
+            ){
+                $QUANTITY = O_LIST_BIG_QUANTITY;
+            }
             
             if( is_array( $idd )
             && count( $idd ) == 1
             && is_numeric( $idd[ 0 ] )
             && array_key_exists( $idd[ 0 ] - 1, $genres )
-            && ( $edata = sqlite_media_getdata_filtered( $genres[ ( $idd[ 0 ] - 1 ) ], O_LIST_BIG_QUANTITY, $G_PAGE ) ) != FALSE 
+            && ( $edata = sqlite_media_getdata_filtered( $genres[ ( $idd[ 0 ] - 1 ) ], $QUANTITY, $G_PAGE ) ) != FALSE 
             ){
                 //1 elements: BASE.idgenre
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -215,13 +241,20 @@ class ContentDirectory {
                         )
                     );
                     
-                    /* TEST
-                    $icon = DLNA_WEB_BASEFOLDER_HTTP . getURLImg( $f[ 'idmedia' ], FALSE, 'poster' );
-                    if($icon) {
-                        $itm->resource($icon, array('protocolInfo'=>'http-get:*:'.$ct.':'.get_dlna_profile($icon)));
+                    /* TEST POSTER */
+                    $icon = getURLImg( $f[ 'idmedia' ], FALSE, 'poster' );
+                    $icon = str_replace( getURLBase(), DLNA_WEB_BASEFOLDER_HTTP, $icon );
+                    //get file for type PPATH_MEDIAINFO
+                    $fileicon = PPATH_MEDIAINFO . DS . $f[ 'idmediainfo' ] . '.poster';
+                    if( !file_exists( $fileicon ) ){
+                        $fileicon = PPATH_IMGS . DS . 'def.jpg';
+                    }
+                    if( $icon 
+                    && file_exists( $fileicon )
+                    ){
+                        $itm->resource($icon, array('protocolInfo'=>'http-get:*:'.$ct.':'.get_dlna_profile($fileicon)));
                         $itm->icon($icon);
                     }
-                    */
                 }
                 finfo_close($finfo);
                 
@@ -229,7 +262,7 @@ class ContentDirectory {
             && count( $idd ) == 2
             && is_numeric( $idd[ 0 ] )
             && array_key_exists( $idd[ 0 ] - 1, $genres )
-            //&& ( $edata = sqlite_media_getdata_filtered( $genres[ ( $idd[ 0 ] - 1 ) ], O_LIST_BIG_QUANTITY, $G_PAGE ) ) != FALSE 
+            //&& ( $edata = sqlite_media_getdata_filtered( $genres[ ( $idd[ 0 ] - 1 ) ], $QUANTITY, $G_PAGE ) ) != FALSE 
             ){
                 //2 elements: BASE.idgenre.???
                 return array('illegal');
@@ -245,6 +278,7 @@ class ContentDirectory {
     }
 
     function Browse($req) {
+        dlna_debug( $req );
         if ($req->BrowseFlag == 'BrowseMetadata')
             return $this->BrowseMetadata($req);
         else
@@ -256,17 +290,27 @@ class ContentDirectory {
     }
 
     function GetSearchCapabilities() {
-//         return array('SearchCaps'=>'dc:creator,dc:title,upnp:album,upnp:actor,upnp:artist,upnp:class,upnp:genre,@refID');
+        //return array('SearchCaps'=>'dc:creator,dc:title,upnp:album,upnp:actor,upnp:artist,upnp:class,upnp:genre,@refID');
         return array('SearchCaps'=>'');
     }
     function GetSortCapabilities() {
-//         return array('SortCaps'=>'dc:title,dc:date,upnp:class,upnp:originalTrackNumber');
+        //return array('SortCaps'=>'dc:title,dc:date,upnp:class,upnp:originalTrackNumber');
         return array('SortCaps'=>'');
     }
 
     /* From ConnectionManager.. but simple enough to handle it here */
     function GetProtocolInfo() {
         return array('Source' => file_get_contents('protocol_info.txt'), 'Sink'=>'');
+    }
+}
+
+function dlna_debug( $req ){
+    if( FALSE ){
+        $dfile = './debug_dlna.txt';
+        $data = "\n\r" . date( 'Y-m-d H:i:s' );
+        $data .= "\n\r" . getReferer();
+        $data .= "\n\r" . print_r( $req, TRUE );
+        file_put_contents( $dfile, $data, FILE_APPEND );
     }
 }
 
