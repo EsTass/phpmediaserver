@@ -446,7 +446,26 @@
                 if( ( $season_e = get_media_chapter( $title ) ) != FALSE
                 || ffmpeg_file_info_lenght_seconds( $media[ 'file' ] ) < 3600
                 ){
-                    if( $echo ) echo get_msg( 'IDENT_FILETODETECTED' ) . 'TV';
+                    //If not valid seasonXepisode get episode at least (agresive mode X||XX)
+                    //var_dump( $season_e );die();
+                    if( (
+                        !is_array( $season_e ) 
+                        || !array_key_exists( 0, $season_e )
+                        || !array_key_exists( 1, $season_e )
+                        )
+                    && ( $season_e = get_media_chapter_aggresive( $title ) ) != FALSE
+                    ){
+                        if( !is_array( $season_e ) 
+                        || !array_key_exists( 0, $season_e )
+                        || !array_key_exists( 1, $season_e )
+                        ){
+                            $season_e[ 0 ] = '1';
+                            $season_e[ 1 ] = '';
+                        }
+                    }
+                    if( $echo ){
+                        echo get_msg( 'IDENT_FILETODETECTED' ) . 'TV';
+                    }
                     $type = FALSE;//Series
                     if( is_array( $season_e ) ){
                         $season = $season_e[ 0 ];
@@ -1115,6 +1134,58 @@
         return $result;
     }
     
+    function get_media_chapter_aggresive( $title ){
+        $result = array();
+        $result[] = 1;
+        $result[] = 1;
+        
+        if( preg_match_all( "/([0-9]{1,4})/", basename( $title ), $match ) 
+        && is_array( $match )
+        && count( $match ) > 1
+        && is_array( $match[ 1 ] )
+        && count( $match[ 1 ] ) > 0
+        && strlen( $match[ 1 ][ 0 ] ) > 0
+        ){
+            foreach( $match[ 1 ] AS $mm ){
+                if( (int)$mm > 99 ){
+                    //3 numbers
+                    //Exclude Years
+                    if( (int)$mm < 1920
+                    || (int)$mm > ( (int)date( 'Y' ) + 1 )
+                    ){
+                        $season = (int)( (int)$row / 100 );
+                        $episode = (int)( (int)$row - ( $season * 100 ) );
+                        if( 
+                        ( $season == 10 && $episode == 80 )
+                        || ( $season == 7 && $episode == 20 )
+                        || ( $season == 2 && $episode == 64 )
+                        || ( $season == 2 && $episode == 65 )
+                        ||  $season < 0 
+                        || $season > 40
+                        ){
+                    
+                        }else{
+                            $result = array();
+                            $result[] = $season;
+                            $result[] = $episode;
+                            break;
+                        }
+                    }else{
+                        //Year or format number excluded
+                        
+                    }
+                }else{
+                    //2 numbers = 1xEpisode
+                    $result[ 0 ] = 1;
+                    $result[ 1 ] = (int)$mm;
+                    break;
+                }
+            }
+        }
+        
+        return $result;
+    }
+    
     function clean_media_chapter( $title, $replace = '' ){
         $result = $title;
         
@@ -1146,10 +1217,17 @@
             && is_array( $match[ 1 ] )
             && count( $match[ 1 ] ) > 0
             && strlen( $match[ 1 ][ 0 ] ) > 2
+            && str_ireplace( 'x', '', $replace ) == $match[ 1 ][ 0 ]
             ){
                 $title = str_ireplace( $match[ 1 ][ 0 ], $replace, $title );
+            }else{
+                $result = $title . ' ' . $replace;
+                $result = trim( $result );
             }
             $result = $title;
+            $result = trim( $result );
+        }else{
+            $result = $title . ' ' . $replace;
             $result = trim( $result );
         }
         
