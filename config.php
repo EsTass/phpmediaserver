@@ -110,7 +110,7 @@
 	//WGET (run cron jobs)
 	define( 'O_WGET', 'wget' );
 	//pymediaident
-	define( 'O_PYMEDIAIDENT', 'pymediaident.py' );
+	define( 'O_PYMEDIAIDENT', 'PYTHONWARNINGS="ignore" pymediaident.py' );
 	
 	//FOLDERS
 	
