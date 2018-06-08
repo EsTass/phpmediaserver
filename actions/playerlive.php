@@ -93,6 +93,7 @@ $(function () {
         <?php
             $num = 1;
             $vtotal = count( $CODECORDER );
+            $session = '&PHPSESSION=' . session_id();
             foreach( $CODECORDER AS $urlident => $videoheader ){
                 if( $num == $vtotal ){
                     $extra_vdata = " data-last='1'";
@@ -100,7 +101,7 @@ $(function () {
                     $extra_vdata = "";
                 }
         ?>
-        <source id='my-player-source' src="?r=r&action=playlive&mode=<?php echo $urlident; ?>&idmedialive=<?php echo $IDMEDIALIVE; ?>" type="video/<?php echo $videoheader; ?>" <?php echo $extra_vdata; ?> preload="auto" >
+        <source id='my-player-source' src="?r=r&action=playlive&mode=<?php echo $urlident; ?>&idmedialive=<?php echo $IDMEDIALIVE; ?><?php echo $session; ?>" type="video/<?php echo $videoheader; ?>" <?php echo $extra_vdata; ?> preload="auto" >
         <?php
                 $num++;
             }
