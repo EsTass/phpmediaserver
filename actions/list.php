@@ -96,6 +96,10 @@
         }
         if( PPATH_WEBSCRAP_SEARCH != FALSE
         && $G_PAGE == 0
+        && ( defined( 'O_MENU_GENRES' )
+            && is_array( O_MENU_GENRES )
+            && !array_key_exists( $G_SEARCH, O_MENU_GENRES )
+            )
         ){
             echo "" . get_html_list_newdownloads_base( $G_SEARCH );
         }

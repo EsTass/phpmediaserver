@@ -166,7 +166,7 @@
 	function get_html_list_newdownloads_base( $search ){
         $result = '';
         $title = get_msg( 'DOWNLOADS_USER_TITLE', FALSE );
-        $url = 'javascript:load_in_id( "' . getURLBase() . '?r=r&action=listdownloads&search=' . $search . '", "newdownloadsresult" );return false;';
+        $url = 'javascript:load_in_id( "' . getURLBase() . '?r=r&action=listdownloads&search=' . urlencode( $search ) . '", "newdownloadsresult" );return false;';
         
         $result .= "<div class='boxList'>";
         $result .= "<h2>";
