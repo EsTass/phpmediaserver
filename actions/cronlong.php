@@ -145,6 +145,19 @@
         }
     }
 	
+	//AUTOCLEAN SPACE ON LOW (BIGFILES)
+	
+	if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
+	&& defined( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN' )
+	&& O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN != FALSE
+	&& ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
+	&& $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
+	){
+        //10 pass: from O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN to -1Gb (10*0.1)
+        //10 files deleted on each pass
+        cleanLowDiskSpace( FALSE, 10, 10 );
+	}
+	
 	//LIVE TV CHECK
 	
     $cronid = 'cron_7d';
@@ -159,126 +172,9 @@
     ){
         
     }elseif( sqlite_log_insert( $cronid, 'Cron ' . $crontime .'mins launched: ' . date( 'Y-m-d H:s:i' ) ) !== FALSE  ){
-        echo "<br />LIVETV Clean: " . $cronid;
-        echo "<br />";
-        //LiveTV Clean
-        if( ( $da = sqlite_medialive_getdata( FALSE, 10000 ) ) 
-        && is_array( $da )
-        && array_key_exists( 0, $da )
-        ){
-            $URLs_OK = 0;
-            $URLs_DEL = 0;
-            $URLs_DEL_E = 0;
-            foreach( $da AS $d ){
-                if( ( $ldata = ffprobe_get_data( $d[ 'url' ] ) ) != FALSE 
-                && is_array( $ldata )
-                && array_key_exists( 'width', $ldata )
-                && $ldata[ 'width' ] > 0
-                ){
-                    //echo get_msg( 'DEF_EXIST' );
-                    $URLs_OK++;
-                }else{
-                    if( sqlite_medialive_delete( $G_IDMEDIALIVE )
-                    ){
-                        //echo get_msg( 'DEF_DELETED' );
-                        $URLs_DEL++;
-                    }else{
-                        //echo get_msg( 'DEF_DELETED_ERROR' );
-                        $URLs_DEL_E++;
-                    }
-                }
-            }
-            echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ' OKs: ' . $URLs_OK . '/Del:' . $URLs_DEL . '/DelError:' . $URLs_DEL_E;
-        }else{
-            echo get_msg( 'WEBSCRAP_ADDKO' );
-        }
-        
-        //LiveTVUrls UPDATE
-        echo "<br />LIVETVURLs Update: " . $cronid;
-        echo "<br />";
-        if( ( $da = sqlite_medialiveurls_getdata( FALSE, 10000 ) ) 
-        && is_array( $da )
-        && array_key_exists( 0, $da )
-        ){
-            $URLs_OK = 0;
-            $URLs_DEL = 0;
-            $URLs_DEL_E = 0;
-            foreach( $da AS $d ){
-                if( ( $ldata = @file_get_contents( $d[ 'url' ] ) ) != FALSE 
-                && strlen( $ldata ) > 0
-                ){
-                    //echo get_msg( 'DEF_EXIST' );
-                    //ADD URLS
-                    $G_LISTLINKS = $ldata;
-                    if( $G_LISTLINKS
-                    && strlen( $G_LISTLINKS ) > 0
-                    ){
-                        $G_LISTLINKS = trim( $G_LISTLINKS );
-                        $G_LISTLINKS = explode( PHP_EOL, $G_LISTLINKS );
-                        $G_LISTLINKS = array_filter( $G_LISTLINKS, 'trim' );
-                        $ltitle = '';
-                        $URLs = 0;
-                        $URLs_ERROR = 0;
-                        $URLs_DUPLY = 0;
-                        $LINES = count( $G_LISTLINKS );
-                        foreach( $G_LISTLINKS AS $line ){
-                            if( filter_var( $line, FILTER_VALIDATE_URL )
-                            && sqlite_medialive_checkexist( $line ) != FALSE
-                            ){
-                                $URLs_DUPLY++;
-                            }elseif( filter_var( $line, FILTER_VALIDATE_URL )
-                            && sqlite_medialive_checkexist( $line ) == FALSE
-                            && ( $ldata = ffprobe_get_data( $line ) ) != FALSE 
-                            && is_array( $ldata )
-                            && array_key_exists( 'width', $ldata )
-                            && $ldata[ 'width' ] > 0
-                            ){
-                                //+1 url
-                                if( strlen( $ltitle ) == 0 ){
-                                    $ltitle = 'NO-TITLE';
-                                }
-                                if( sqlite_medialive_insert( 0, $ltitle, $line, '' ) ){
-                                    //echo get_msg( 'DEF_ELEMENTUPDATED' );
-                                }else{
-                                    //echo get_msg( 'WEBSCRAP_ADDKO' );
-                                    $URLs_ERROR++;
-                                }
-                                $URLs++;
-                            }elseif( startsWith( $line, '#EXTINF' ) ){
-                                //extract title
-                                $tt = explode( ',', $line );
-                                if( array_key_exists( 1, $tt ) ){
-                                    $ltitle = $tt[ 1 ];
-                                }else{
-                                    $ltitle = $line;
-                                    $ltitle = str_ireplace( '#EXTINF:', '', $ltitle );
-                                    $ltitle = trim( $ltitle );
-                                }
-                            }elseif( filter_var( $line, FILTER_VALIDATE_URL ) ){
-                                //no data valid
-                                $URLs_ERROR++;
-                            }else{
-                                //no data valid
-                            }
-                        }
-                        echo '<br />' . get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ' URL: ' . $d[ 'url' ] . ' STATUS ' . $URLs . '/ERRORs:' . $URLs_ERROR . '/DUPLYs:' . $URLs_DUPLY . '/LINES:' . $LINES;
-                    }else{
-                        echo '<br />' . get_msg( 'WEBSCRAP_ADDKO' ) . ' URL: ' . $d[ 'url' ];
-                    }
-                    //END ADD
-                    $URLs_OK++;
-                }else{
-                    $URLs_DEL++;
-                    echo '<br />' . get_msg( 'WEBSCRAP_ADDKO' ) . ' URL: ' . $d[ 'url' ];
-                }
-            }
-            //echo '<br />' . get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ' OKs: ' . $URLs_OK . '/Del:' . $URLs_DEL . '/DelError:' . $URLs_DEL_E;
-        }else{
-            echo '<br />' . get_msg( 'WEBSCRAP_ADDKO' );
-        }
+        cronLiveTV( $cronid );
     }
-        
-	
+    
 	//END
 	echo "<br />--END--" . date( 'Y-m-d H:i:s' );
 ?>
