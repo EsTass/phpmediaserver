@@ -194,6 +194,8 @@
 	define( 'O_CRON_EXTRACTFILES', TRUE );
 	//CRON extracted compressed files deleted after X days, 0 disabled (seeding safe)
 	define( 'O_CRON_EXTRACTFILES_CLEAN', 14 );
+	//Clean BIG files if freespace<O_WEBSCRAP_LIMIT_FREESPACE (try with this value in GB and decrements of -0,1) OR FALSE
+	define( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN', 4 );
 	
 	//DLNA CONFIG
 	
