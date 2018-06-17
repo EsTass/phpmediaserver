@@ -89,6 +89,7 @@
     }
     
 	function cleanLowDiskSpace( $preview = TRUE, $maxpass = 10, $fileseachpass = 10 ){
+        $G_SEARCH = '';
         
         //Autoclean Space on Low
         if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
@@ -97,7 +98,7 @@
         && ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
         && $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
         ){
-            $G_REMOVE = $preview; //PREVIEW MODE
+            $G_REMOVE = !$preview; //PREVIEW MODE
             $CLEANSIZE = ( O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN * 1024 * 1024 * 1024 );
             $MAXFILES = $fileseachpass; //delete 5 each time
             $MAXTIMES = $maxpass;
