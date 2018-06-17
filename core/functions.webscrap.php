@@ -1136,11 +1136,26 @@
         $result = TRUE;
         
         $cmd = PPATH_WEBSCRAP_PLOWSHARE_CMD . " '" . $url . "'";
-        if( $debug ) echo "<br />Download Function: " . $cmd;
+        if( $debug ) echo "<br />Download Function PLOWSHARE: " . $cmd;
         $result = run_in_background( $cmd );
         $result = TRUE;
         
         return $result;
+	}
+	
+	//WGET DOWNLOADER (for webs with redirect, etc)
+	
+	function wget_downloader( $url, $debug ){
+        $result = FALSE;
+        
+        $filename = basename( $url );
+        $file = PPATH_WEBSCRAP_DOWNLOAD . DS . $filename;
+        //Get Data
+        $cmd = O_WGET . ' -O "' . $file . '" "' . $url . '"';
+        runExtCommand( $cmd );
+        $result = TRUE;
+		
+		return $result;
 	}
 	
 	//JDOWNLOADER
@@ -1149,7 +1164,7 @@
         $result = TRUE;
         
         //INTERNAL crawljob
-        $file = PPATH_WEBSCRAP_JDOWNLOADER_FOLDER . getRandomString() . '.crawljob';
+        $file = PPATH_WEBSCRAP_JDOWNLOADER_FOLDER . DS . getRandomString() . '.crawljob';
         if( $debug ) echo "<br />Download Function JDOWNLOADER: file_put_contents->" . $file . ' - ' . $url;
         file_put_contents( $file, $url );
         
