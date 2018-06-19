@@ -56,12 +56,14 @@
         //extract links
         //extrack p2p links in links
         //extract p2p links in html
+        //extract dd links in html
         $htmldata = file_get_contents_timed( $url );
         $result = array(
             'ishtml' => TRUE,
             'html' => $htmldata,
             'links' => array(),
             'p2p' => array(),
+            'dd' => array(),
         );
         
         //Check File type
@@ -171,6 +173,22 @@
                     }
                 }
             }
+            
+            //Extract DD links
+            if( defined( 'O_WEBSPIDER_DD_DOMAINS' ) 
+            && is_array( O_WEBSPIDER_DD_DOMAINS )
+            && count( O_WEBSPIDER_DD_DOMAINS ) > 0
+            && ( $ddlinks = extract_links( $htmldata ) ) != FALSE
+            ){
+                foreach( $ddlinks AS $ddlink ){
+                    if( inString( $ddlink, O_WEBSPIDER_DD_DOMAINS ) 
+                    && !in_array( $ddlink, $result[ 'dd' ] )
+                    ){
+                        $result[ 'dd' ][ $ddlink ] = 'DDLINK_' . getRandomString();
+                    }
+                }
+            }
+            
         }else{
             //NON HTML TYPE
             $result[ 'ishtml' ] = FALSE;
@@ -214,6 +232,19 @@
                             echo "<br />" . $deepstr . "LINKS P2P DOWNLOADED: " . PPATH_WEBSCRAP_DOWNLOAD . DS . $title;
                         }
                     }
+                }
+            }
+            //DD LINKS
+            if( count( $data[ 'dd' ] ) > 0 ){
+                foreach( $data[ 'dd' ] AS $link => $title ){
+                    echo "<br />" . $deepstr . "LINKS DD DOWNLOAD: " . $title . ' - ' . $link;
+                    //PPATH_WEBSCRAP_DOWNLOAD  PPATH_TEMP
+                    if( in_array( $link, $scrapped ) ){
+                        echo "<br />" . $deepstr . "SCRAPPED BEFORE: " . $link;
+                    }elseif( jdownloader_downloader( $link ) ){
+                        echo "<br />" . $deepstr . "LINKS DD ADDED: " . PPATH_WEBSCRAP_DOWNLOAD . DS . $title;
+                    }
+                    $scrapped[] = $link;
                 }
             }
             //Check deep
