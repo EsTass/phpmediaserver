@@ -163,6 +163,18 @@
 	//Web Scrapper for 'search' action to user, false = disabled
 	define( 'PPATH_WEBSCRAP_SEARCH', FALSE );
 	
+	//WEBSPIDER
+	
+	//Defined domains to detect DD downloads to jdownloader or FALSE
+	define( 'O_WEBSPIDER_DD_DOMAINS', array(
+        'openload.co',
+        'streamango.com',
+        'hqq.watch',
+        'vidoza.net',
+        '1fichier.com',
+        'mega.nz',
+	));
+	
 	//CRON Enable
 	
 	define( 'O_CRON', FALSE );
