@@ -918,6 +918,43 @@
         return $response;
 	}
 	
+	//SIMILARITY
+	
+	function strSimilarity( $str1, $str2, $debug = FALSE ){
+        $result = 0;
+        
+        $str1 = strtoupper( $str1 );
+        $str2 = strtoupper( $str2 );
+        
+        if( $debug ) echo "<br />MEDIAINFO FINDED TITLE: " . $str1;
+        if( $debug ) echo "<br />MEDIAINFO FINDED TITLE: " . $str2;
+        $modifs = similar_text( $str1, $str2, $result );
+        if( $debug ) echo "<br />MEDIAINFO SIMILARITY: " . $result;
+        if( $debug ) echo "<br />MEDIAINFO SIMILARITY(L): " . levenshtein( $str1, $str2 );
+        similar_text( soundex( $str1 ), soundex( $str2 ), $pc_sd );
+        if( $debug ) echo "<br />MEDIAINFO SIMILARITY(SD): " . $pc_sd;
+        if( $debug ) echo "<br />MEDIAINFO SIMILARITY(SD1): " . soundex( $str1 );
+        if( $debug ) echo "<br />MEDIAINFO SIMILARITY(SD2): " . soundex( $str2 );
+        similar_text( metaphone( $str1 ), metaphone( $str2 ), $pc_mp );
+        if( $debug ) echo "<br />MEDIAINFO SIMILARITY(MP): " . $pc_mp;
+        if( $debug ) echo "<br />MEDIAINFO SIMILARITY(MP1): " . metaphone( $str1 );
+        if( $debug ) echo "<br />MEDIAINFO SIMILARITY(MP2): " . metaphone( $str2 );
+        
+        //Better similarity
+        if( $result < $pc_sd 
+        && $pc_sd >= 100 //soundex test min % needed (4 letters at least 4)
+        ){
+            $result = $pc_sd;
+        }
+        if( $result < $pc_mp 
+        && $pc_mp >= 70 //metaphone test min % needed
+        ){
+            $result = $pc_mp;
+        }
+        
+        return $result;
+	}
+	
 	//OWN DB SCRAPPER
 	
 	$G_SCRAPPERS[ 'my_db' ] = array( '', 'ident_detect_file_db' );
@@ -949,6 +986,7 @@
         if( $debug ) echo "<br />TITLE CLEAN 1: " . $title;
         
         $title = clean_media_chapter( $title );
+        $titlebase = $title;
         $title = clean_filename( $title, TRUE );
         $title = trim( $title );
         
@@ -957,15 +995,25 @@
         //Clean non standar chars
         $title = preg_replace( '/[^\x20-\x7E]/','_', $title );
         $title = str_ireplace( '__', '_', $title );
+        if( $debug ) echo "<br />TITLE CLEAN 2b: " . $title;
+        //remove 1 letter words
+        $title = preg_replace('/(^| )[a-z0-9]{1}( |$)/i', ' ', $title);
+        if( $debug ) echo "<br />TITLE CLEAN 2c: " . $title;
+        //remove 1 number between letters (2 time double numbers TODO)
+        $title = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d|[a-z]| |$)/i', '$1_$2', $title);
+        $title = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d|[a-z]| |$)/i', '$1_$2', $title);
+        if( $debug ) echo "<br />TITLE CLEAN 2d: " . $title;
         $title = str_ireplace( ' ', '%', $title );
         $title = trim( $title, '_' );
         $title = trim( $title, '%' );
         $title = trim( $title, '_' );
         $title = trim( $title, '%' );
+        //add full search variants title
+        $title = '%' . $title . '%';
         if( $debug ) echo "<br />TITLE CLEAN 3: " . $title;
         
         //BASE MODE: string similarity by search
-        if( ( $mediainfo = sqlite_mediainfo_search( $title ) ) != FALSE
+        if( ( $mediainfo = sqlite_mediainfo_search_title( $title ) ) != FALSE
         && is_array( $mediainfo )
         && count( $mediainfo ) > 0
         ){
@@ -974,13 +1022,20 @@
             $midata = array();
             foreach( $mediainfo AS $mi ){
                 if( $debug ) echo "<br />MEDIAINFO FINDED TITLE: " . $mi[ 'title' ];
-                $modifs = similar_text( $title, $mi[ 'title' ], $pc );
-                if( $debug ) echo "<br />MEDIAINFO SIMILARITY: " . $pc;
+                
+                //Similarity check
+                $pc = strSimilarity( $title, $mi[ 'title' ], $debug );
+                if( ( $pc2 = strSimilarity( $titlebase, $mi[ 'title' ], $debug ) ) > $pc ){
+                    $pc = $pc2;
+                }
+                
+                if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
                 $similars[ $pc ] = $mi;
             }
             krsort( $similars );
+            if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
             foreach( $similars AS $pc => $mi ){
-                if( $pc > 80 ){
+                if( $pc > 50 ){
                     if( $debug ) echo "<br />MEDIAINFO FINDED: " . $mi[ 'title' ];
                     $midata = $mi;
                 }
@@ -1012,13 +1067,20 @@
                 $midata = array();
                 foreach( $mediadata AS $mi ){
                     if( $debug ) echo "<br />MEDIA FINDED FILE: " . $mi[ 'title' ];
-                    $modifs = similar_text( $title, $mi[ 'title' ], $pc );
-                    if( $debug ) echo "<br />MEDIA SIMILARITY: " . $pc;
+                    
+                    //Similarity check
+                    $pc = strSimilarity( $title, $mi[ 'title' ], $debug );
+                    if( ( $pc2 = strSimilarity( $titlebase, $mi[ 'title' ], $debug ) ) > $pc ){
+                        $pc = $pc2;
+                    }
+                    
+                    if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
                     $similars[ $pc ] = $mi;
                 }
                 krsort( $similars );
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
                 $pcmin = ( 10 * ( ( strlen( $title ) ) + 1 ) );
-                if( $pcmin > 80 ) $pcmin = 80;
+                if( $pcmin > 50 ) $pcmin = 50;
                 if( $debug ) echo "<br />MEDIA PC NEEDED: " . $pcmin;
                 foreach( $similars AS $pc => $mi ){
                     if( $pc > $pcmin 
@@ -1057,11 +1119,21 @@
                 if( $debug ) echo "<br />MEDIA FINDED (FILE2): " . count( $mediadata );
                 $similars = array();
                 $midata = array();
+                $f1 = clean_filename( basename( $file ) );
                 foreach( $mediadata AS $mi ){
-                    $f1 = clean_filename( basename( $file ) );
                     $f2 = clean_filename( basename( $mi[ 'file' ] ) );
-                    $modifs = similar_text( $f1, $f2, $pc );
-                    if( $pc > 50 ){
+                    if( $debug ) echo "<br />MEDIA FINDED FILE1: " . $f1;
+                    if( $debug ) echo "<br />MEDIA FINDED FILE2: " . $f2;
+                    
+                    //Similarity check
+                    $pc = strSimilarity( $f1, $f2, $debug );
+                    if( ( $pc2 = strSimilarity( $titlebase, $f2, $debug ) ) > $pc ){
+                        $pc = $pc2;
+                    }
+                    
+                    if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
+                    
+                    if( $pc > 60 ){
                         if( $debug ) echo "<br />MEDIA FINDED FILE: " . basename( $mi[ 'file' ] );
                         if( $debug ) echo "<br />MEDIA SIMILARITY STRINGA: " . $f1;
                         if( $debug ) echo "<br />MEDIA SIMILARITY STRINGB: " . $f2;
@@ -1070,7 +1142,8 @@
                     $similars[ $pc ] = $mi;
                 }
                 krsort( $similars );
-                $pcmin = 75;
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
+                $pcmin = 50;
                 if( $debug ) echo "<br />MEDIA PC NEEDED: " . $pcmin;
                 foreach( $similars AS $pc => $mi ){
                     if( $pc > $pcmin 

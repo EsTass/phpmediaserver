@@ -28,6 +28,7 @@
 			$G_DB->exec( 'PRAGMA journal_mode = MEMORY;' );
 			$G_DB->exec( "PRAGMA synchronous = OFF;" );
 			$G_DB->exec( "PRAGMA temp_store = MEMORY;" );
+			$G_DB->exec( "PRAGMA case_sensitive_like = false;" );
 			if( !$G_DB ){
 				//echo "<br />SQLITE3: " . $filedb;
 			}
