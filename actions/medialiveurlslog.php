@@ -64,14 +64,14 @@
 	switch( $G_ACTION2 ){
         case 'import':
             if( $G_IDMEDIALIVEURLS > 0
-            && ( $d = sqlite_medialiveurls_getdata( $G_IDMEDIALIVEURLS, 1 ) ) 
-            && is_array( $d )
-            && array_key_exists( 0, $d )
+            && ( $dl = sqlite_medialiveurls_getdata( $G_IDMEDIALIVEURLS, 1 ) ) 
+            && is_array( $dl )
+            && array_key_exists( 0, $dl )
             ){
                 $URLs_OK = 0;
                 $URLs_DEL = 0;
                 $URLs_DEL_E = 0;
-                foreach( $da AS $d ){
+                foreach( $dl AS $d ){
                     if( ( $ldata = @file_get_contents( $d[ 'url' ] ) ) != FALSE 
                     && strlen( $ldata ) > 0
                     ){
