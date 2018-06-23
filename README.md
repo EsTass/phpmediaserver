@@ -7,6 +7,9 @@
 ## Description
 A bunch of utilities for:
  - Simple html5 web player with php7 + sqlite + jquery + ffmpeg.
+ - Player support for audio and subs tracks selector
+ - Poster list with search by genres, actors, years or rating
+ - Groups by premiere, continue, recomended and last added
  - Easy configuration with config.php and config.ws.php
  - Admins and player users.
  - Realtime ffmpeg transcoding, not needed to reencode before play or create temp files.
@@ -21,6 +24,7 @@ A bunch of utilities for:
  - Filtered remove files to recover extra free space
  - Stop adding downloads on min space config
  - Mini dlna server thanks to: https://github.com/ttyridal/phpdlna && https://github.com/ampache/ampache/ (only tested vlc)
+ - [Kodi pluging](https://github.com/EsTass/phpmediaserver-kodi)
 
 ## Default User (Important: change pass on first login)
  - User: admin
