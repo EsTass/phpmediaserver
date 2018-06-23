@@ -789,19 +789,31 @@
 	
 	function webscrap_extract_links_all_html( $html, $title ){
         $result = array();
-        preg_match_all('#\bhttps?://[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/))#', $html, $match);
-        if( is_array( $match )
-        && count( $match ) > 0
-        && array_key_exists( 0, $match )
-        && is_array( $match[ 0 ] )
-        ){
-            foreach( $match[ 0 ] AS $link ){
-                while( array_key_exists( $title, $result ) ){
-                    $title .= '+';
+        $regex = array(
+            //primary, full check
+            '#\bhttps?://[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/))#',
+            //seconday mode, more lazy
+            '#\bhttp[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+#',
+        );
+        
+        foreach( $regex AS $re ){
+            preg_match_all( $re, $html, $match);
+            if( is_array( $match )
+            && count( $match ) > 0
+            && array_key_exists( 0, $match )
+            && is_array( $match[ 0 ] )
+            ){
+                foreach( $match[ 0 ] AS $link ){
+                    if( !in_array( $link, $result ) ){
+                        while( array_key_exists( $title, $result ) ){
+                            $title .= '+';
+                        }
+                        $result[ $title ] = $link;
+                    }
                 }
-                $result[ $title ] = $link;
             }
         }
+        
         return $result;
     }
     
