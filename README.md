@@ -3,6 +3,8 @@
 ## Screenshots
 
 ![phpmediaserver](https://media.giphy.com/media/8A7qPRuF8jzRcaQiyj/giphy.gif)
+![phpmediaserver2](http://i63.tinypic.com/2rqzwcw.png)
+![phpmediaserver3](http://i63.tinypic.com/2hdtcmh.png)
 
 ## Description
 A bunch of utilities for:
