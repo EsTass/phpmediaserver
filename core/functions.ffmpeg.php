@@ -92,6 +92,7 @@
 		
 		return $result;
 	}
+	
     //return idmedia data low quality
 	function ffmpeg_media_compare( $mediadata1, $mediadata2 ) {
         $result = FALSE;
@@ -159,6 +160,7 @@
                 if( (string)$info->streams->stream[ $s ][ 'codec_type' ] == 'audio'
                 ){
                     $audio = '';
+                    if( $debug ) echo "<br />AUDIOINFO: " . nl2br( print_r( $info->streams->stream[ $s ], TRUE ) );
                     for( $t = 0; $t < @count( $info->streams->stream[ $s ]->tag ); $t++ ){
                         if( (string)$info->streams->stream[ $s ]->tag[ $t ][ 'key' ] == 'language'
                         ){
@@ -175,12 +177,16 @@
                         }
                     }
                     
-                    if( strlen( $audio ) > 0 ){
-                        $audiotracks[] = $audio;
+                    if( strlen( $audio ) == 0 ){
+                        $audio = 'Audio-' . count( $audiotracks );
                     }
+                    $audiotracks[ $s ] = $audio;
                 }elseif( (string)$info->streams->stream[ $s ][ 'codec_type' ] == 'subtitle'
+                //EXCLUDE OCR SUBS
+                && (string)$info->streams->stream[ $s ][ 'codec_name' ] != 'dvd_subtitle'
                 ){
                     $sub = '';
+                    if( $debug ) echo "<br />SUBINFO: " . nl2br( print_r( $info->streams->stream[ $s ], TRUE ) );
                     for( $t = 0; $t < @count( $info->streams->stream[ $s ]->tag ); $t++ ){
                         if( (string)$info->streams->stream[ $s ]->tag[ $t ][ 'key' ] == 'language'
                         ){
@@ -196,10 +202,10 @@
                             break;
                         }
                     }
-                    
-                    if( strlen( $sub ) > 0 ){
-                        $subtracks[] = $sub;
+                    if( strlen( $sub ) == 0 ){
+                        $sub = 'Subs-' . count( $subtracks );
                     }
+                    $subtracks[ $s ] = $sub;
                 }
             }
             $result = array(
@@ -211,9 +217,24 @@
                 'audiotracks' => $audiotracks,
                 'subtracks' => $subtracks,
             );
-            
+        }
+        
+        if( $debug ) echo "<br />RESULT: " . nl2br( print_r( $result, TRUE ) );
+        return $result;
+	}
+	
+	//extract subs
+	
+	function ffmpeg_extract_subfile( $filevideo, $filesubs, $track, $debug = FALSE ){
+        $result = FALSE;
+        
+        $cmd = O_FFMPEG . " -i " . escapeshellarg( $filevideo ) . " -map 0:" . $track . " " . escapeshellarg( $filesubs );
+        if( $debug ) echo "<br />" . $cmd;
+        if( ( $data = runExtCommand( $cmd ) ) != FALSE ){
+            $result = TRUE;
         }
         
         return $result;
 	}
+	
 ?>

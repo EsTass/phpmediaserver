@@ -107,7 +107,7 @@
             'webm2' => 'webm',
         );
         
-        if( ( $videoinfo = ffprobe_get_data( $FMEDIA ) ) != FALSE 
+        if( ( $videoinfo = ffprobe_get_data( $FMEDIA, FALSE ) ) != FALSE 
         && is_array( $videoinfo )
         ){
             if( array_key_exists( 'audiotracks', $videoinfo )
@@ -340,11 +340,19 @@ $(function () {
 	//timeupdate
 	$( '#my-player' ).on( "timeupdate", function( event ) {
         var total = parseInt( this.currentTime ) + parseInt( playedtotaltime );
-        if( DEBUG ) console.log( 'VIDEO timeupdate: ' + parseInt( total ) + ' - ' + this.duration + ' - ' + this.currentTime );
+        if( DEBUG ) console.log( 'VIDEO timeupdate: ' + parseInt( total ) + ' - ' + this.duration + ' - ' + this.currentTime + ' - ' + parseFloat( playedtotaltime ) );
 		$( '#slideTime' ).val( total );
 		$( '#slideTime' ).attr( 'title', secondsTimeSpanToHMS( total ) );
 		slideUpdate( total );
 		$( '.playerControlTimeNowData' ).html( secondsTimeSpanToHMS( total ) );
+		//SUBS CONTROL
+		if( subtrack !== false 
+		&& subtrack_data != false
+		){
+            //SUBS TIMER
+            var total2 = parseFloat( this.currentTime ) + parseFloat( playedtotaltime );
+            show_subs_timed( parseFloat( total2 ) );
+		}
 	});
 	//error video
 	$( '#my-player' ).on( "error", function( event ) {
@@ -510,7 +518,7 @@ function setAudioTrack( e, track ){
 	playerTimeChanged( playedtotaltime, audiotracknow, subtracknow, qualitynow );
 }
 
-//SUBS TRACKS
+//SUBS TRACKS INVIDEO
 
 var subtracknow = -1;
 function setSubTrack( e, track ){
@@ -572,6 +580,40 @@ function send_video_error(){
     loading_hide();
 }
 
+//SUBS BASIC
+
+var subtrack = false;
+var subtrack_data = false;
+//datasub = array( 'timestart', 'timeend', 'text' )
+function loadSubTrack( e, id ){
+    //subsTracks
+    $( '.playerControlSubsList .subsTracks' ).removeClass( 'playerBoxBarControlsButtonSelected' );
+    $( e ).addClass( 'playerBoxBarControlsButtonSelected' );
+    subtrack = id;
+    var url = '?r=r&action=playsubs&idmedia=<?php echo $IDMEDIA; ?>&subtrack=' + id;
+    $.getJSON( url )
+    .done( function( data ){
+        if( DEBUG ) console.log( 'SUBS LOAD TRACK: ' + url );
+        subtrack_data = data;
+    });
+}
+
+function show_subs_timed( timenow ){
+    var added = false;
+    if( DEBUG ) console.log( 'SUBS CHECK TEXT: ' + timenow );
+    $.each( subtrack_data, function( key, data ){
+        if( timenow >= parseFloat( data[ 'timestart' ] )
+        && timenow <= parseFloat( data[ 'timeend' ] )
+        ){
+            $( '#subOverlay' ).html( data[ 'text' ] );
+            added = true;
+        }
+    });
+    if( added == false ){
+        $( '#subOverlay' ).html( '' );
+    }
+}
+
 </script>
 
 <style type='text/css'>
@@ -591,6 +633,25 @@ html, body
     padding: 0px !important;
     border: 0px !important;
     background-color: black !important;
+}
+
+/* SUBS */
+
+.subOverlay{
+    text-align: center;
+    font-size: 4em;
+    color: yellow;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: auto;
+    position: fixed;
+    bottom: 5%;
+    left: 0px;
+    z-index: 1001;
+    background-color: transparent;
+    padding: 2px;
 }
 
 </style>
@@ -619,6 +680,10 @@ html, body
         ?>
         Your browser does not support the video tag.
 	</video>
+	
+    <div id="subOverlay" class="subOverlay">
+        
+    </div>
 	
 	<div id='playerBoxC' class='playerBoxControls'>
         <div class='playerBoxBarInfo'>
@@ -699,20 +764,19 @@ html, body
                     <?php
                         }
                     ?>
-                    <!--
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                     <?php
                         if( is_array( $subslist ) 
-                        && count( $audiolist ) > 0
+                        && count( $subslist ) > 0
                         ){
                     ?>
-                    <div id='playerControlSubsList' class='playerBoxBarControlsButton text120'>
+                    <div class='playerBoxBarControlsButton text120'>
                         &#x225F; Subs: 
                     </div>
                             <?php
-                                foreach( $subslist AS $al ){
-                                    $l = (int)$al;
+                                foreach( $subslist AS $l => $al ){
                             ?>
-                    <div class='playerBoxBarControlsButton text120' onclick='setSubTrack( this, <?php echo $l; ?> );'><?php echo $al; ?></div>
+                        <div class='playerBoxBarControlsButton text120 subsTracks' onclick='loadSubTrack( this, <?php echo $l; ?> );'><?php echo $al; ?></div>
                             <?php   
                                 }
                             ?>
@@ -720,7 +784,7 @@ html, body
                         <?php
                             }
                         ?>
-                    -->
+                </div>
             </div>
         </div>
 	</div>
