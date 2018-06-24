@@ -472,6 +472,8 @@ function playerTimeChanged( seconds, audiotrack, subtrack, quality ){
 		document.getElementById( 'my-player' ).load();
 		$( "#my-player source" ).attr( 'src', url );
 		document.getElementById( 'my-player' ).load();
+		//reset subs line
+		subtrack_lastline = 0;
 	}
 }
 
@@ -598,15 +600,22 @@ function loadSubTrack( e, id ){
     });
 }
 
+var subtrack_lastline = 0;
 function show_subs_timed( timenow ){
     var added = false;
     if( DEBUG ) console.log( 'SUBS CHECK TEXT: ' + timenow );
+    if( DEBUG ) console.log( 'SUBS CHECK KEY: ' + subtrack_lastline );
     $.each( subtrack_data, function( key, data ){
-        if( timenow >= parseFloat( data[ 'timestart' ] )
+        if( subtrack_lastline <= parseInt( key )
+        && timenow >= parseFloat( data[ 'timestart' ] )
         && timenow <= parseFloat( data[ 'timeend' ] )
         ){
-            $( '#subOverlay' ).html( data[ 'text' ] );
+            subtrack_lastline = parseInt( key );
+            if( data[ 'text' ] != $( '#subOverlay' ).html() ){
+                $( '#subOverlay' ).html( data[ 'text' ] );
+            }
             added = true;
+            return false;
         }
     });
     if( added == false ){
