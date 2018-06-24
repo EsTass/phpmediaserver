@@ -951,3 +951,22 @@ input[type=range].slider:focus::-ms-fill-upper {
     font-size: 80%;
     border-right: 2px solid white;
 }
+
+/* SUBS */
+
+.subOverlay{
+    text-align: center;
+    font-size: 4em;
+    color: yellow;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: auto;
+    position: fixed;
+    bottom: 5%;
+    left: 0px;
+    z-index: 1001;
+    background-color: transparent;
+    padding: 2px;
+}
