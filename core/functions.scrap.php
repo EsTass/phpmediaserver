@@ -139,12 +139,17 @@
 		&& is_array( $xml[ 'channel' ][ 'item' ] )
 		){
             foreach( $xml[ 'channel' ][ 'item' ] AS $item ){
-                $title = $item[ 'title' ];
-                $href = $item[ 'link' ];
-                if( strlen( $filterurl ) == 0
-                || stripos( $href, $filterurl ) !== FALSE
+                if( is_array( $item )
+                && array_key_exists( 'title', $item ) 
+                && array_key_exists( 'link', $item ) 
                 ){
-                    $result[ $title ] = $href;
+                    $title = $item[ 'title' ];
+                    $href = $item[ 'link' ];
+                    if( strlen( $filterurl ) == 0
+                    || stripos( $href, $filterurl ) !== FALSE
+                    ){
+                        $result[ $title ] = $href;
+                    }
                 }
             }
 		}
