@@ -132,10 +132,15 @@
                 $subslist = $videoinfo[ 'subtracks' ];
             }
             
+            if( array_key_exists( 'subtracksv', $videoinfo )
+            ){
+                $subslistv = $videoinfo[ 'subtracksv' ];
+            }
+            
             if( array_key_exists( 'codec', $videoinfo )
             && strlen( $videoinfo[ 'codec' ] ) > 0 
             ){
-                //ORDER BY CODEC
+                //TODO ORDER BY CODEC in video
                 /*
                 if( stripos( $videoinfo[ 'codec' ], 'mpeg' ) !== FALSE
                 || stripos( $videoinfo[ 'codec' ], '264' ) !== FALSE
@@ -157,7 +162,7 @@
 $(function () {
 	$( window ).on( 'beforeunload', function(){
 		$.ajax({
-			url : '?action=playstop&timeplayed=' + parseInt( $( '#slideTime' ).val() ) + '&timetotal=<?php echo $time; ?>&idmedia=<?php echo $IDMEDIA; ?>',
+			url : '?r=r&action=playstop&timeplayed=' + parseInt( $( '#slideTime' ).val() ) + '&timetotal=<?php echo $time; ?>&idmedia=<?php echo $IDMEDIA; ?>',
 			type : 'GET',
 			dataType : 'json',
 			success : function (result) {
@@ -367,7 +372,7 @@ $(function () {
 	$( '#my-player' ).on( "ended", function( event ) {
 		if( DEBUG ) console.log( 'VIDEO ended: ' + parseInt( playedtotaltime ) + ' - ' + this.duration + ' - ' + this.networkState );
 		$.ajax({
-			url : '?action=playstop&timeplayed=<?php echo $time; ?>&timetotal=<?php echo $time; ?>&idmedia=<?php echo $IDMEDIA; ?>',
+			url : '?r=r&action=playstop&timeplayed=<?php echo $time; ?>&timetotal=<?php echo $time; ?>&idmedia=<?php echo $IDMEDIA; ?>',
 			type : 'GET',
 			dataType : 'json',
 			success : function (result) {
@@ -520,13 +525,18 @@ function setAudioTrack( e, track ){
 	playerTimeChanged( playedtotaltime, audiotracknow, subtracknow, qualitynow );
 }
 
-//SUBS TRACKS INVIDEO
+//SUBS TRACKS INVIDEO (imagesubs)
 
 var subtracknow = -1;
 function setSubTrack( e, track ){
-	$( '.playerControlSubsList .playerBoxBarControlsButton' ).removeClass( 'playerBoxBarControlsButtonSelected' );
+	$( '.subsTracks' ).removeClass( 'playerBoxBarControlsButtonSelected' );
     $( e ).addClass( 'playerBoxBarControlsButtonSelected' );
 	subtracknow = track;
+	//quit text subbed
+	subtrack = false;
+    subtrack_data = false;
+    subtrack_lastline = false;
+    $( '#subOverlay' ).html( '' );
 	playerTimeChanged( playedtotaltime, audiotracknow, subtracknow, qualitynow );
 }
 
@@ -576,7 +586,7 @@ function send_video_error(){
     //Stop Player and info
     $( "#my-player" ).remove();
     //send error
-    var url = '?action=playervideoerror&idmedia=<?php echo $IDMEDIA; ?>';
+    var url = '?r=r&action=playervideoerror&idmedia=<?php echo $IDMEDIA; ?>';
     var data = [];
     show_msgbox( url, data );
     loading_hide();
@@ -589,7 +599,7 @@ var subtrack_data = false;
 //datasub = array( 'timestart', 'timeend', 'text' )
 function loadSubTrack( e, id ){
     //subsTracks
-    $( '.playerControlSubsList .subsTracks' ).removeClass( 'playerBoxBarControlsButtonSelected' );
+    $( '.subsTracks' ).removeClass( 'playerBoxBarControlsButtonSelected' );
     $( e ).addClass( 'playerBoxBarControlsButtonSelected' );
     subtrack = id;
     var url = '?r=r&action=playsubs&idmedia=<?php echo $IDMEDIA; ?>&subtrack=' + id;
@@ -643,26 +653,6 @@ html, body
     border: 0px !important;
     background-color: black !important;
 }
-
-/* SUBS */
-
-.subOverlay{
-    text-align: center;
-    font-size: 4em;
-    color: yellow;
-    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
-    width: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    height: auto;
-    position: fixed;
-    bottom: 5%;
-    left: 0px;
-    z-index: 1001;
-    background-color: transparent;
-    padding: 2px;
-}
-
 </style>
 	
 	<video id="my-player" class="videoplayer"
@@ -775,8 +765,15 @@ html, body
                     ?>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <?php
-                        if( is_array( $subslist ) 
-                        && count( $subslist ) > 0
+                        if( ( 
+                            is_array( $subslist ) 
+                            && count( $subslist ) > 0
+                            )
+                            ||
+                            ( 
+                            is_array( $subslistv ) 
+                            && count( $subslistv ) > 0
+                            )
                         ){
                     ?>
                     <div class='playerBoxBarControlsButton text120'>
@@ -786,6 +783,14 @@ html, body
                                 foreach( $subslist AS $l => $al ){
                             ?>
                         <div class='playerBoxBarControlsButton text120 subsTracks' onclick='loadSubTrack( this, <?php echo $l; ?> );'><?php echo $al; ?></div>
+                            <?php   
+                                }
+                            ?>
+                            <?php
+                                foreach( $subslistv AS $l => $al ){
+                                    //hardsubs start from sub 0, fixed on ffprobe_get_data
+                            ?>
+                        <div class='playerBoxBarControlsButton text120 subsTracks' onclick='setSubTrack( this, <?php echo $l; ?> );'><?php echo $al; ?></div>
                             <?php   
                                 }
                             ?>

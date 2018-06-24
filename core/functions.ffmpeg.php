@@ -137,6 +137,9 @@
 	function ffprobe_get_data( $file, $debug = FALSE ){
         $result = FALSE;
         $cmd = O_FFPROBE . " -i " . escapeshellarg( $file ) . " -v quiet -print_format xml -show_format -show_streams -hide_banner";
+        $ocrsubs = array(
+            'dvd_subtitle',
+        );
         
         if( ( filter_var( $file, FILTER_VALIDATE_URL )  || file_exists( $file ) )
         && ( $data = runExtCommand( $cmd ) ) != FALSE
@@ -156,6 +159,8 @@
             $duration = (int)$info->format['duration'];
             $audiotracks = array();
             $subtracks = array();
+            $subtracksv = array();
+            $subtracksc = array();
             for( $s = 0; $s < @count( $info->streams->stream ); $s++ ){
                 if( (string)$info->streams->stream[ $s ][ 'codec_type' ] == 'audio'
                 ){
@@ -183,7 +188,7 @@
                     $audiotracks[ $s ] = $audio;
                 }elseif( (string)$info->streams->stream[ $s ][ 'codec_type' ] == 'subtitle'
                 //EXCLUDE OCR SUBS
-                && (string)$info->streams->stream[ $s ][ 'codec_name' ] != 'dvd_subtitle'
+                && !in_array( strtolower( (string)$info->streams->stream[ $s ][ 'codec_name' ] ), $ocrsubs )
                 ){
                     $sub = '';
                     if( $debug ) echo "<br />SUBINFO: " . nl2br( print_r( $info->streams->stream[ $s ], TRUE ) );
@@ -205,7 +210,35 @@
                     if( strlen( $sub ) == 0 ){
                         $sub = 'Subs-' . count( $subtracks );
                     }
+                    $subtracksc[] = (string)$info->streams->stream[ $s ][ 'codec_name' ];
                     $subtracks[ $s ] = $sub;
+                }elseif( (string)$info->streams->stream[ $s ][ 'codec_type' ] == 'subtitle'
+                //OCR SUBS
+                ){
+                    $sub = '';
+                    if( $debug ) echo "<br />SUBINFOOCR: " . nl2br( print_r( $info->streams->stream[ $s ], TRUE ) );
+                    for( $t = 0; $t < @count( $info->streams->stream[ $s ]->tag ); $t++ ){
+                        if( (string)$info->streams->stream[ $s ]->tag[ $t ][ 'key' ] == 'language'
+                        ){
+                            $sub = (int)$info->streams->stream[ $s ][ 'index' ] . '-' . (string)$info->streams->stream[ $s ]->tag[ $t ][ 'value' ];
+                            $sub .= ' (' . $info->streams->stream[ $s ][ 'channel_layout' ] . ')';
+                            break;
+                        }
+                    }
+                    for( $t = 0; $t < @count( $info->streams->stream[ $s ]->tag ); $t++ ){
+                        if( (string)$info->streams->stream[ $s ]->tag[ $t ][ 'key' ] == 'title'
+                        ){
+                            $sub .= ' ' . (string)$info->streams->stream[ $s ]->tag[ $t ][ 'value' ];
+                            break;
+                        }
+                    }
+                    if( strlen( $sub ) == 0 ){
+                        $sub = 'Subs-' . count( $subtracksv );
+                    }
+                    $stocr = count( $subtracksc );
+                    $subtracksc[] = (string)$info->streams->stream[ $s ][ 'codec_name' ];
+                    //OCR subs start on sub=0
+                    $subtracksv[ $stocr ] = $sub;
                 }
             }
             $result = array(
@@ -216,6 +249,8 @@
                 'duration' => (int)$duration,
                 'audiotracks' => $audiotracks,
                 'subtracks' => $subtracks,
+                'subtracksv' => $subtracksv,
+                'subscodecs' => $subtracksc,
             );
         }
         
