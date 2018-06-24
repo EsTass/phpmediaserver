@@ -3,29 +3,30 @@
 ## Screenshots
 
 ![phpmediaserver](https://media.giphy.com/media/8A7qPRuF8jzRcaQiyj/giphy.gif)
-[phpmediaserver1](http://i67.tinypic.com/33opaiv.png)
+![phpmediaserver1](http://i67.tinypic.com/33opaiv.png)
 
 ## Description
 A bunch of utilities for:
- - Simple html5 web player with php7 + sqlite + jquery + ffmpeg.
- - Player support for audio and subs tracks selector
+ - Html5 web player with php7 + sqlite + jquery + ffmpeg
+ - WebPlayer support for audio and subs tracks selector
  - Poster list with search by genres, actors, years or rating
  - Groups by premiere, continue, recomended and last added
  - Easy configuration with config.php and config.ws.php
- - Admins and player users.
- - Realtime ffmpeg transcoding, not needed to reencode before play or create temp files.
+ - Admins and player users
+ - Realtime ffmpeg transcoding of any type of video supported by ffmpeg, not needed to reencode before play or create temp files
  - Identify media files thanks to: [pymediaident](https://github.com/EsTass/pymediaident), www.filebot.net, www.omdbapi.com, www.thetvdb.com (cron, manual and helped).
- - Search new media from web adding scrappers with config.ws.php (youtube, elinks, magnets, torrents and dd supported, cron or manual).
- - Clean duplicates by quality with safe seeding (min days to seed)
+ - Search and download new media from web adding scrappers with config.ws.php (youtube, elinks, magnets, torrents and dd supported, cron or manual with any external program like transmission, jdownloader, amule, qbittorent, etc).
+ - Clean duplicates by quality with safe seeding (min days to seed) and max filesize to maintanin
  - Country IP block thanks to www.geoplugin.net.
- - IP whitelist/blacklist.
+ - IP whitelist/blacklist (autoban non included countrys)
  - Media info in configured language (if possible).
  - Lazy Load Images thanks to: http://jquery.eisbehr.de/lazy
  - Extract files on cron (php support needed Zip and Rar)
- - Filtered remove files to recover extra free space
+ - Filtered remove files to recover extra free space (manual, helped and cron)
  - Stop adding downloads on min space config
- - Mini dlna server thanks to: https://github.com/ttyridal/phpdlna && https://github.com/ampache/ampache/ (only tested vlc)
+ - Mini dlna server thanks to: https://github.com/ttyridal/phpdlna && https://github.com/ampache/ampache/ (tested vlc and android)
  - [Kodi pluging](https://github.com/EsTass/phpmediaserver-kodi)
+ - Multilanguaje (lang/CODE.php and select on config, default ENG)
 
 ## Default User (Important: change pass on first login)
  - User: admin
@@ -34,9 +35,9 @@ A bunch of utilities for:
 ## Install
 Copy files to your server folder and edit:
  - `config.php`: basic configuration, read comments and edit needed
- - `config.ws.php`: only if want to add more web searchs for media (example provided)
+ - `config.ws.php`: only if want to add more web searchs for media (examples provided)
 
-## Apache vhost
+## Install: Apache vhost
 If needed add vhost file to apache and include or edit main host conf. 
 
 Example vhost:
@@ -76,9 +77,9 @@ NameVirtualHost *:80
 </VirtualHost>
 ```
 
-## PHP config
+## Install: PHP config
 
-If needed add paths to php.ini:
+If needed add paths to php.ini (needed access to download folder):
 ```
 open_basedir = ...:/path/to/server/:/path/to/downloads
 ```
@@ -102,12 +103,12 @@ Restart apache, and login with default user/pass.
  - [ffmpeg and ffprobe](https://ffmpeg.org/)
  
 ## Recomended
- - [Filebot](https://www.filebot.net)
+- [pymediaident](https://github.com/EsTass/pymediaident)
+- [Filebot](https://www.filebot.net)
  - [wget](https://www.gnu.org/software/wget/)
  - [omdbapi APIKEY](https://www.omdbapi.com)
  - [www.thetvdb.com APIKEY](https://www.thetvdb.com)
- - [pymediaident](https://github.com/EsTass/pymediaident)
 
 ## Admin SQLite DB
 
-Adding https://www.phpliteadmin.org/ file to base folder add a menu entry to access sqlite DB file (need to configure db file and user).
+Adding https://www.phpliteadmin.org/ file to base folder add a menu entry to access sqlite DB file (need to configure db file and user in phpliteadmin file).
