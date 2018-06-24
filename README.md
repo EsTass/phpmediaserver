@@ -3,7 +3,8 @@
 ## Screenshots
 
 ![phpmediaserver](https://media.giphy.com/media/8A7qPRuF8jzRcaQiyj/giphy.gif)
-![phpmediaserver1](http://i67.tinypic.com/33opaiv.png)
+
+[IMG1](http://i67.tinypic.com/33opaiv.png)
 
 ## Description
 A bunch of utilities for:
