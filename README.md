@@ -33,6 +33,9 @@ A bunch of utilities for:
  - Pass: admin01020304
  
 ## Install
+
+[Full Install on Linux(arch)](https://github.com/EsTass/phpmediaserver/wiki/Install-In-linux-(arch))
+
 Copy files to your server folder and edit:
  - `config.php`: basic configuration, read comments and edit needed
  - `config.ws.php`: only if want to add more web searchs for media (examples provided)
