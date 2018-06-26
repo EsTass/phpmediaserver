@@ -23,6 +23,7 @@
         'LOGIN_FORM_PASS' => 'Clave',
         'LOGIN_FORM_BUTTON' => 'Login',
         
+        'MENU_HOME_MS' => 'Menu',
         'MENU_HOME' => 'Home',
         'MENU_LOGOUT' => 'Salir',
         'MENU_SEARCH' => 'Buscar',
@@ -99,6 +100,8 @@
         'INFO_CHAPTERLIST' => 'Capítulos',
         'INFO_ACTORS' => 'Actores',
         'INFO_RELATED' => 'Relacionadas',
+        'INFO_TIMEEND' => 'Termina a: ',
+        'INFO_FILELIST' => 'Archivos',
         
         'WEBSCRAP_SEARCH_ERROR' => 'Error, no se puede acceder a la URL: ',
         'WEBSCRAP_NOTHING' => 'Scrappers no definido.',
@@ -129,6 +132,8 @@
         'DOWNLOADS_USER_TITLE' => 'Descargar Elementos Similares',
         
         'LIVETV_TITLE' => 'LiveTV',
+        
+        'LIVETVURLS_TITLE' => 'LiveTV URLs',
 	);
 	
 ?>

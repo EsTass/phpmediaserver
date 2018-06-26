@@ -1,3 +1,12 @@
+
+<div class='menuBoxMS'>
+    <div class='dRowMS tCenter'>
+        <div class='listMenuElementMS'>
+            <a onclick='menus_ms_show();' class='pointer'>PHPMediaServer &#9776;<?php echo get_msg( 'MENU_HOME_MS',  FALSE ); ?></a>
+        </div>
+    </div>
+</div>
+
 <div class='menuBox'>
     <div class='dRow'>
         <div class='listMenuElement'>
@@ -114,5 +123,8 @@
         <?php
             }
         ?>
+    </div>
+    <div class='MenuDRowCloseMenu dRow'>
+        <a onclick='menus_ms_show();' class='pointer'>&#10006;<?php echo get_msg( 'MENU_HOME_MS',  FALSE ); ?></a>
     </div>
 </div>

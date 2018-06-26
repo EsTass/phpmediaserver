@@ -23,6 +23,7 @@
         'LOGIN_FORM_PASS' => 'Password',
         'LOGIN_FORM_BUTTON' => 'Login',
         
+        'MENU_HOME_MS' => 'Menu',
         'MENU_HOME' => 'Home',
         'MENU_LOGOUT' => 'Logout',
         'MENU_SEARCH' => 'Search',
@@ -99,6 +100,8 @@
         'INFO_CHAPTERLIST' => 'Chapter List',
         'INFO_ACTORS' => 'Characters',
         'INFO_RELATED' => 'Related',
+        'INFO_TIMEEND' => 'End: ',
+        'INFO_FILELIST' => 'Files',
         
         'WEBSCRAP_SEARCH_ERROR' => 'Error, cant access to url: ',
         'WEBSCRAP_NOTHING' => 'Scrappers not defined.',
@@ -129,6 +132,8 @@
         'DOWNLOADS_USER_TITLE' => 'Search for Downloads',
         
         'LIVETV_TITLE' => 'LiveTV',
+        
+        'LIVETVURLS_TITLE' => 'LiveTV URLs',
 	);
 	
 ?>

@@ -71,6 +71,7 @@
 .boxInfo span a{
     padding: 4px 8px;
     text-decoration: none;
+    white-space:nowrap;
 }
 .boxInfo h2{
     padding: 4px;
@@ -85,6 +86,9 @@
     text-decoration: none;
     
 }
+
+/* INFO DATA ACTOR LIST */
+
 .tListInfoActors{
     display: table;
     text-align: center;
@@ -123,14 +127,14 @@
     display: block;
 }
 
-/* INFO */
+/* ELEMENT INFO */
 
 .tListInfo{
 	width: 100%;
 	height: auto;
 	border: 0px;
 	margin: 0px;
-	background-color: transparent;
+	background-color: rgba(50,50,50,.3);
 	color: LightGray;
 	margin: 4px solid transparent;
 }
@@ -145,6 +149,16 @@
 	/* text-shadow: 2px 2px Gainsboro; */
 	font-weight: bold;
 	font-size: 140%;
+}
+.tListInfoTitle{
+    /*
+    background-color: black;
+    background: rgba( 0,0,0,0.5 );
+    */
+}
+/* IMG2 TO MINISCREENS */
+.tListInfoTRImgMS{
+    display: none;
 }
 
 /* MSGBOX */
@@ -220,6 +234,47 @@
 
 /* MENU */
 
+.menuBoxMS{
+    display: none;
+	cursor: pointer;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+	height: auto;
+	text-align: center;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	z-index: 9999999;
+	background-color: black;
+	padding: 2px;
+    border-bottom: 1px solid gray;
+    text-align: right;
+}
+.MenuDRowCloseMenu{
+    display: none !important;
+}
+.MenuDRowCloseMenu a{
+    width: 100%;
+    padding: 4px;
+    -webkit-border-radius: .25em;
+    border-radius: .25em;
+    color: #ddd;
+    font-size: 100%;
+    background: rgba(50,50,50,.5);
+    -webkit-align-items: center;
+    align-items: center;
+    background-color: indigo;
+}
+.dRowMS{
+    display: block;
+}
+.listMenuElementMS{
+    display: inline;
+    width: 50%;
+    height: auto;
+    padding: 4px;
+}
 .menuBox{
 	display: table;
 	width: 100%;
@@ -276,6 +331,16 @@
 	display: table;
 	width: 100%;
 	/* height: 100%; */
+}
+.boxList h2{
+    text-transform: uppercase;
+    background-color: dimgray;
+    background: rgba( 0,0,0,0.5 );
+    border-bottom: 2px solid white;
+    text-decoration: none !important;
+}
+.boxList h2 a{
+    text-decoration: none !important;
 }
 .listElementPoster{
 	display: table-cell;
@@ -841,15 +906,18 @@
 }
 
 /* RANGE */
+
 input[type=range].slider {
   -webkit-appearance: none;
   width: 100%;
   margin: 0.7px 0;
   background-color: transparent;
 }
+
 input[type=range].slider:focus {
   outline: none;
 }
+
 input[type=range].slider::-webkit-slider-runnable-track {
   width: 100%;
   height: 25.6px;
@@ -859,6 +927,7 @@ input[type=range].slider::-webkit-slider-runnable-track {
   border-radius: 0px;
   border: 0px solid #010101;
 }
+
 input[type=range].slider::-webkit-slider-thumb {
   box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
   border: 0px solid #ff1e00;
@@ -870,9 +939,11 @@ input[type=range].slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   margin-top: -0.7px;
 }
+
 input[type=range].slider:focus::-webkit-slider-runnable-track {
   background: #545a5a;
 }
+
 input[type=range].slider::-moz-range-track {
   width: 100%;
   height: 25.6px;
@@ -882,6 +953,7 @@ input[type=range].slider::-moz-range-track {
   border-radius: 0px;
   border: 0px solid #010101;
 }
+
 input[type=range].slider::-moz-range-thumb {
   box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
   border: 0px solid #ff1e00;
@@ -891,6 +963,7 @@ input[type=range].slider::-moz-range-thumb {
   background: rgba(202, 200, 202, 0.81);
   cursor: pointer;
 }
+
 input[type=range].slider::-ms-track {
   width: 100%;
   height: 25.6px;
@@ -899,18 +972,21 @@ input[type=range].slider::-ms-track {
   border-color: transparent;
   color: transparent;
 }
+
 input[type=range].slider::-ms-fill-lower {
   background: #3c4040;
   border: 0px solid #010101;
   border-radius: 0px;
   box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
 }
+
 input[type=range].slider::-ms-fill-upper {
   background: #484d4d;
   border: 0px solid #010101;
   border-radius: 0px;
   box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
 }
+
 input[type=range].slider::-ms-thumb {
   box-shadow: 0px 0px 1px #670000, 0px 0px 0px #810000;
   border: 0px solid #ff1e00;
@@ -921,9 +997,11 @@ input[type=range].slider::-ms-thumb {
   cursor: pointer;
   height: 25.6px;
 }
+
 input[type=range].slider:focus::-ms-fill-lower {
   background: #484d4d;
 }
+
 input[type=range].slider:focus::-ms-fill-upper {
   background: #545a5a;
 }
@@ -952,7 +1030,7 @@ input[type=range].slider:focus::-ms-fill-upper {
     border-right: 2px solid white;
 }
 
-/* SUBS */
+/* PLAYER SUBS OVERLAY */
 
 .subOverlay{
     text-align: center;
@@ -969,4 +1047,159 @@ input[type=range].slider:focus::-ms-fill-upper {
     z-index: 1001;
     background-color: transparent;
     padding: 2px;
+}
+
+/* SCREEN SIZES */
+
+/* <480 */
+@media only screen and (max-width: 480px) {
+    /* SHOW INFO BASE IMG ON SIZE */
+    .tListInfoTRImgMS{
+        display: inherit;
+    }
+    .tListInfoTRImgMS td{
+        text-align: center;
+    }
+    .tListInfoImgMS{
+        display: inherit;
+    }
+    .listElementImgMS {
+        width: 100%;
+        height: auto;
+    }
+    /* HIDE INFO BASE IMG ON SIZE */
+    .tListInfoImg{
+        display: none;
+    }
+    /* HIDE INFO BASE IMG TD ON SIZE */
+    .tListInfoTDImg{
+        max-width: 0px;
+        display: none;
+    }
+    /* LIST ELEMENTS RESIZE */
+    .listElement, .listElementImg{
+        width: 102px;
+        height: 150px;
+    }
+    .listElement span{
+        width: 102px;
+        margin: 0px;
+        padding: 0px;
+    }
+    /* MEDIA INFO LINE SIZE LINKS */
+    .boxInfo span a {
+        line-height: 200%;
+    }
+    /* MENU BOX */
+    .MenuDRowCloseMenu{
+        display: inherit !important;
+        padding: 2%;
+        text-transform: uppercase;
+        /* text-shadow: 2px 2px black; */
+        font-weight: bold;
+    }
+    .menuBoxMS{
+        display: inherit;
+    }
+    .listMenuElement, .listMenuElementAdmin{
+        /* display: table-cell; */
+        display: inline-block;
+        text-transform: uppercase;
+        /* text-shadow: 2px 2px black; */
+        font-weight: bold;
+        background-color: transparent;
+        width: auto;
+        margin: auto;
+        padding: 1%;
+        width: 30%;
+    }
+    .listMenuElementAdmin{
+        background-color: indigo !important;
+    }
+    .listMenuElementMS{
+        display: inline;
+        width: 50%;
+        height: auto;
+        padding: 4px;
+        min-width: 50%;
+        text-transform: uppercase;
+        /* text-shadow: 2px 2px black; */
+        font-weight: bold;
+    }
+    .menuBox{
+        display: none;
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        height: auto;
+        text-align: center;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        z-index: 9999999;
+        background-color: black;
+        padding: 2px;
+        border-bottom: 1px solid gray;
+    }
+}
+
+/* <1024 Only Menu */
+@media only screen and (max-width: 1024px) {
+    /* MENU BOX */
+    .MenuDRowCloseMenu{
+        display: inherit !important;
+        padding: 2%;
+        text-transform: uppercase;
+        /* text-shadow: 2px 2px black; */
+        font-weight: bold;
+    }
+    .menuBoxMS{
+        display: inherit;
+    }
+    .listMenuElement, .listMenuElementAdmin{
+        /* display: table-cell; */
+        display: inline-block;
+        text-transform: uppercase;
+        /* text-shadow: 2px 2px black; */
+        font-weight: bold;
+        background-color: transparent;
+        width: auto;
+        margin: auto;
+        padding: 1%;
+        width: 25%;
+    }
+    .listMenuElementAdmin{
+        background-color: indigo !important;
+    }
+    .listMenuElementMS{
+        display: inline;
+        width: 50%;
+        height: auto;
+        padding: 4px;
+        min-width: 50%;
+        text-transform: uppercase;
+        /* text-shadow: 2px 2px black; */
+        font-weight: bold;
+    }
+    .menuBox{
+        display: none;
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        height: auto;
+        text-align: center;
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        z-index: 9999999;
+        background-color: black;
+        padding: 2px;
+        border-bottom: 1px solid gray;
+    }
+}
+
+/* >1024 Remake Menu */
+@media only screen and (min-width: 1024px) {
+    /* MENU BOX */
+    
 }

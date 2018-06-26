@@ -49,6 +49,7 @@
 	){
 		header("HTTP/1.1 401 Unauthorized");
 		echo "HTTP/1.1 401 Unauthorized";
+		sqlite_log_insert( 'BANNEDIP', 'TRY TO ACCESS: ' . USER_IP );
 		exit();
 	}
 	
@@ -146,7 +147,11 @@ $(function () {
     //IMG LAZYLOAD
     $("img.lazy").Lazy();
     //float header size
-    $( 'body' ).css("padding-top", $( '.menuBox' ).height() + "px");
+    if( $( '.menuBox' ).is(":visible") ){
+        $( 'body' ).css("padding-top", $( '.menuBox' ).height() + "px");
+    }else{
+        $( 'body' ).css("padding-top", $( '.menuBoxMS' ).height() + "px");
+    }
 });
 
 //MSGBOX
@@ -278,6 +283,20 @@ function load_in_id( url, id ){
     });
     
     return false;
+}
+
+//SHOW MENU MS
+
+function menus_ms_show(){
+    if( $( '.menuBox' ).is(":visible") ){
+        $( '.menuBox' ).slideUp( "fast", function() {
+            // Animation complete.
+        });
+    }else{
+        $( '.menuBox' ).slideDown( "fast", function() {
+            // Animation complete.
+        });
+    }
 }
 
 </script>

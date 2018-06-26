@@ -73,6 +73,7 @@
 <style type='text/css'>
 .boxInfoOverlayBg{
     background-image: url("<?php echo $urllandscape ?>");
+    /* position:fixed; */
 }
 </style>
 
@@ -106,20 +107,35 @@ function infovideo_playlater( idmedia, idmediainfo ){
 </script>
 
 <div class='boxInfo'>
-
+    
+    <br />
 	<table class='tListInfo'>
+        <tr class='tListInfoTRImgMS'>
+            <td colspan='100'>
+                <div class='tListInfoImgMS'>
+                    <img class='listElementImgMS listElementImgInfoPoster <?php echo $css_extra; ?>' src='<?php echo $urlposter; ?>' 
+                    title='<?php $f = 'title'; if( array_key_exists( $f, $MEDIAINFO ) && is_string( $MEDIAINFO[ $f ] ) ) echo $MEDIAINFO[ $f ]; ?>' 
+                    />
+				</div>
+            </td>
+        </tr>
 		<tr>
-			<td rowspan='8'>
-				<img class='listElementImg listElementImgInfoPoster <?php echo $css_extra; ?>' src='<?php echo $urlposter; ?>' 
-				title='<?php $f = 'title'; if( array_key_exists( $f, $MEDIAINFO ) && is_string( $MEDIAINFO[ $f ] ) ) echo $MEDIAINFO[ $f ]; ?>' 
-				/>
+			<td rowspan='10' class='tListInfoTDImg'>
+                <div class='tListInfoImg'>
+                    <img class='listElementImg listElementImgInfoPoster <?php echo $css_extra; ?>' src='<?php echo $urlposter; ?>' 
+                    title='<?php $f = 'title'; if( array_key_exists( $f, $MEDIAINFO ) && is_string( $MEDIAINFO[ $f ] ) ) echo $MEDIAINFO[ $f ]; ?>' 
+                    />
+				</div>
 			</td>
-			<th>
-				<?php $f = 'title'; if( array_key_exists( $f, $MEDIAINFO ) ) echo $MEDIAINFO[ $f ]; ?>
-				&nbsp;&nbsp;
-				<?php $f = 'season'; if( array_key_exists( $f, $MEDIAINFO ) && $MEDIAINFO[ $f ] > 0 ) echo sprintf( '%02d', $MEDIAINFO[ $f ] ) . 'x'; ?><?php $f = 'episode'; if( array_key_exists( $f, $MEDIAINFO ) && $MEDIAINFO[ $f ] > 0 ) echo sprintf( '%02d', $MEDIAINFO[ $f ] ); ?>
-				&nbsp;&nbsp;
-				<?php $f = 'titleepisode'; if( array_key_exists( $f, $MEDIAINFO ) ) echo $MEDIAINFO[ $f ]; ?>
+			<th class='tListInfoTitle'>
+                <div>
+                    &nbsp;&nbsp;
+                    <?php $f = 'title'; if( array_key_exists( $f, $MEDIAINFO ) ) echo $MEDIAINFO[ $f ]; ?>
+                    &nbsp;&nbsp;
+                    <?php $f = 'season'; if( array_key_exists( $f, $MEDIAINFO ) && $MEDIAINFO[ $f ] > 0 ) echo sprintf( '%02d', $MEDIAINFO[ $f ] ) . 'x'; ?><?php $f = 'episode'; if( array_key_exists( $f, $MEDIAINFO ) && $MEDIAINFO[ $f ] > 0 ) echo sprintf( '%02d', $MEDIAINFO[ $f ] ); ?>
+                    &nbsp;&nbsp;
+                    <?php $f = 'titleepisode'; if( array_key_exists( $f, $MEDIAINFO ) ) echo $MEDIAINFO[ $f ]; ?>
+                </div>
 			</th>
 		</tr>
 		<tr>
@@ -142,54 +158,64 @@ function infovideo_playlater( idmedia, idmediainfo ){
 				<span><?php $f = 'mpaa'; if( array_key_exists( $f, $MEDIAINFO ) && is_string( $MEDIAINFO[ $f ] ) ) echo $MEDIAINFO[ $f ]; ?></span>
 				&nbsp;
 				<span>
-				Termina a:
+				<?php echo get_msg( 'INFO_TIMEEND', FALSE ); ?>
 				<?php echo date( 'H:i:s', strtotime( 'NOW + ' . $duration . ' minute' ) ); ?>
 				</span>
-				&nbsp;
+			</td>
+		</tr>
+		
+			<td>
+				&nbsp;&nbsp;
 				<span style='background-color: lightgreen !important;'>
 					<a href='<?php echo $urlplayer; ?>'>&#x25B7;&nbsp;<?php echo get_msg( 'INFO_PLAY', FALSE ); ?></a>
 				</span>
-				&nbsp;
-				<span style='background-color: lightgreen !important;'>
-					<a href='#' onclick='infovideo_playlater( <?php if( strlen( $IDMEDIA ) > 0 ){ echo $IDMEDIA; }else{ echo '0'; }; ?>, <?php echo $MEDIAINFO[ 'idmediainfo' ]; ?> )'>&#x25B7;&nbsp;<?php echo get_msg( 'INFO_PLAY_LATER', FALSE ); ?></a>
-				</span>
-				<?php
-                    if( defined( 'O_VIDEO_PLAYSAFE' )
-                    && O_VIDEO_PLAYSAFE
-                    && strlen( $urlplayersafe ) > 0 
-                    ){
-				?>
-				&nbsp;
-				<span style='background-color: DarkSalmon !important;'>
-					<a href='<?php echo $urlplayersafe; ?>'>&#x25B7;&nbsp;<?php echo get_msg( 'INFO_PLAY_SAFE', FALSE ); ?></a>
-				</span>
-				<?php
-                    }
-				?>
-				&nbsp;
-				<span style='background-color: lightblue !important;'>
-					<a href='<?php echo $urldowload; ?>'>&#x21E3;&nbsp;<?php echo get_msg( 'INFO_DOWNLOAD', FALSE ); ?></a>
-				</span>
-				<?php if( $SHOW_CHAPTERS ){ ?>
-				&nbsp;
-				<span style='background-color: DarkKhaki !important;'>
-					<a href='<?php echo $urlchapters; ?>'><?php echo get_msg( 'INFO_CHAPTERLIST', FALSE ); ?></a>
-				</span>
-				<?php } ?>
 				<?php if( strlen( $nextfileinfo ) > 0 ){ ?>
 				&nbsp;
 				<span style='background-color: orange !important;'>
 					<a href='<?php echo $nextfileinfo; ?>'><?php echo get_msg( 'INFO_NEXT', FALSE ); ?></a>
 				</span>
 				<?php } ?>
-				&nbsp;
-				<span style='background-color: blue !important;'>
-					<a href='<?php echo $searchimages; ?>'><?php echo get_msg( 'MENU_IMGS_SEARCH', FALSE ); ?></a>
-				</span>
+			</td>
+		</tr>
+		</tr>
+		
+			<td>
+                &nbsp;&nbsp;
+                <span style='background-color: lightgreen !important;'>
+                    <a href='#' onclick='infovideo_playlater( <?php if( strlen( $IDMEDIA ) > 0 ){ echo $IDMEDIA; }else{ echo '0'; }; ?>, <?php echo $MEDIAINFO[ 'idmediainfo' ]; ?> )'>&#x25B7;&nbsp;<?php echo get_msg( 'INFO_PLAY_LATER', FALSE ); ?></a>
+                </span>
+                <?php
+                    if( defined( 'O_VIDEO_PLAYSAFE' )
+                    && O_VIDEO_PLAYSAFE
+                    && strlen( $urlplayersafe ) > 0 
+                    ){
+                ?>
+                &nbsp;
+                <span style='background-color: DarkSalmon !important;'>
+                    <a href='<?php echo $urlplayersafe; ?>'>&#x25B7;&nbsp;<?php echo get_msg( 'INFO_PLAY_SAFE', FALSE ); ?></a>
+                </span>
+                <?php
+                    }
+                ?>
+                &nbsp;
+                <span style='background-color: lightblue !important;'>
+                    <a href='<?php echo $urldowload; ?>'>&#x21E3;&nbsp;<?php echo get_msg( 'INFO_DOWNLOAD', FALSE ); ?></a>
+                </span>
+                <?php if( $SHOW_CHAPTERS ){ ?>
+                &nbsp;
+                <span style='background-color: DarkKhaki !important;'>
+                    <a href='<?php echo $urlchapters; ?>'><?php echo get_msg( 'INFO_CHAPTERLIST', FALSE ); ?></a>
+                </span>
+                <?php } ?>
+                &nbsp;&nbsp;
+                <span style='background-color: blue !important;'>
+                    <a href='<?php echo $searchimages; ?>'><?php echo get_msg( 'MENU_IMGS_SEARCH', FALSE ); ?></a>
+                </span>
 			</td>
 		</tr>
 		<tr>
             <td>
+                <div>
 				<?php 
                     if( check_user_admin()
 					){
@@ -210,9 +236,17 @@ function infovideo_playlater( idmedia, idmediainfo ){
                         }
                         
                         foreach( $listidmedia AS $ext_idmedia => $ext_title ){
+                            //add filesize
+                            if( file_exists( $ext_title ) ){
+                                $fs = formatSizeUnits( filesize( $ext_title ) );
+                            }else{
+                                $fs = get_msg( 'DEF_FILENOTEXIST', FALSE );
+                            }
+                            $ext_title_b = $ext_title . ' (' . $fs . ')';
 				?>
+				<h2><?php echo get_msg( 'INFO_FILELIST', FALSE ); ?></h2>
 				<span style='background-color: lowgray !important;font-size: 80%;'>
-                    File: <?php echo $ext_title; ?>
+                    <?php echo get_msg( 'WEBSCRAP_FILEDOWNLOADED', FALSE ); ?><?php echo $ext_title_b; ?>
 				</span>
 				&nbsp;
 				<span style='background-color: red !important;'>
@@ -227,6 +261,7 @@ function infovideo_playlater( idmedia, idmediainfo ){
                         }
                     }
                 ?>
+                </div>
             </td>
 		</tr>
 		<tr>
@@ -260,6 +295,7 @@ function infovideo_playlater( idmedia, idmediainfo ){
 		<tr>
 			<td>
 				<?php
+                    //TODO
 					if( array_key_exists( 'fileinfo', $MEDIAINFO )
 					&& array_key_exists( 'streamdetails', $MEDIAINFO[ 'fileinfo' ] ) 
 					&& array_key_exists( 'video', $MEDIAINFO[ 'fileinfo' ][ 'streamdetails' ] ) 
@@ -344,41 +380,42 @@ function infovideo_playlater( idmedia, idmediainfo ){
 				&& count( $data_a ) > 1
 				){
         ?>
-        
-	<h2><?php echo get_msg( 'INFO_ACTORS', FALSE ); ?></h2>
+    <div class='boxList'>
+        <h2><?php echo get_msg( 'INFO_ACTORS', FALSE ); ?></h2>
 	
-	<div class='tListInfoActors'>
-        <?php
-                    foreach( $data_a AS $actor ){
-                        if( $x > 9 ){
-                            $x = 0;
-                            echo "<div class='tListInfoActorsSep'></div>";
+        <div class='tListInfoActors'>
+            <?php
+                        foreach( $data_a AS $actor ){
+                            if( $x > 9 ){
+                                $x = 0;
+                                echo "<div class='tListInfoActorsSep'></div>";
+                            }
+                            $urlactor = getURLActor( $actor );
+            ?>
+                    <div class='tListInfoActorsE eColors0<?php echo $x; ?>' >
+                        <a href='?action=list&search=<?php echo urlencode( $actor ); ?>' title='<?php echo urlencode( $actor ); ?>'>
+                            <img class='lazy' data-src='<?php echo $urlactor; ?>' src='' />
+                        </a>
+                        <span><?php echo $actor; ?></span>
+                    </div>
+            <?php
+                            $x++;
                         }
+                    }elseif( strlen( $MEDIAINFO[ $f ] ) > 0 ){
+                        $actor = $MEDIAINFO[ $f ];
                         $urlactor = getURLActor( $actor );
-		?>
-				<div class='tListInfoActorsE eColors0<?php echo $x; ?>' >
-					<a href='?action=list&search=<?php echo urlencode( $actor ); ?>' title='<?php echo urlencode( $actor ); ?>'>
-                        <img class='lazy' data-src='<?php echo $urlactor; ?>' src='' />
-					</a>
-					<span><?php echo $actor; ?></span>
-				</div>
-		<?php
-						$x++;
+                    ?>
+                    <div class='tListInfoActorsE eColors0<?php echo $x; ?>' >
+                        <a href='?action=list&search=<?php echo urlencode( $actor ); ?>' title='<?php echo urlencode( $actor ); ?>'><img src='<?php echo $urlactor; ?>' />
+                        <span><?php echo $actor; ?></span>
+                    </div>
+            <?php
                     }
-				}elseif( strlen( $MEDIAINFO[ $f ] ) > 0 ){
-                    $actor = $MEDIAINFO[ $f ];
-                    $urlactor = getURLActor( $actor );
-				?>
-				<div class='tListInfoActorsE eColors0<?php echo $x; ?>' >
-					<a href='?action=list&search=<?php echo urlencode( $actor ); ?>' title='<?php echo urlencode( $actor ); ?>'><img src='<?php echo $urlactor; ?>' />
-					<span><?php echo $actor; ?></span>
-				</div>
-		<?php
-				}
-			}
-		?>
-	</div>
-	
+                }
+            ?>
+        </div>
+    </div>
+    
 </div>
 
 <?php 
