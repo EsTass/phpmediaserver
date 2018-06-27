@@ -190,11 +190,11 @@ $(function () {
 	//mouse move
 	$(document).on('mousemove', function() {
 		clearTimeout(mousemovetimeout);
-		$( "#playerBoxI, #playerBoxC, .menuBox" ).show();
+		$( "#playerBoxI, #playerBoxC, .menuBoxContainer" ).show();
 		$( '#my-player' ).removeClass( 'cursorTransparent' ); 
 		$( '#my-player' ).css( 'cursor', 'pointer' ); 
 		mousemovetimeout = setTimeout(function() {
-			$( "#playerBoxI, #playerBoxC, .menuBox" ).hide();
+			$( "#playerBoxI, #playerBoxC, .menuBoxContainer" ).hide();
 			$( '#my-player' ).addClass( 'cursorTransparent' ); 
 			$( '#my-player' ).css( 'cursor', 'none' ); 
 		}, 2000);
