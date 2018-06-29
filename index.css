@@ -82,7 +82,7 @@ h2{
     background-color: #bbbbbb;
 }
 .tList tr td{
-	padding: 2px;
+	padding: 5px;
     border: 0px;
     margin: 0px;
 }
@@ -99,6 +99,12 @@ h2{
 }
 .tCenter{
     text-align: center;
+}
+.tLeft{
+    text-align: left;
+}
+.tRight{
+    text-align: right;
 }
 .widthFull{
     width: 100%;
@@ -138,6 +144,19 @@ input {
 }
 input:hover{
     /* background-color: #6699bb; */
+}
+.button{
+    margin: 0px;
+	border: 1px solid gray;
+	padding: 0px;
+	border-color: #e8e8e8;
+	border-radius: 0 !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+	color: black;
+    padding: 5px 10px !important;
+    background-color: #F3F3F3;
+    text-decoration: none;
 }
 
 /* COLOR LIST */
@@ -201,6 +220,7 @@ input:hover{
 	background-image: url("imgs/l.gif");
 	background-repeat: no-repeat;
 	background-position: center;
+    background-size: 100%;
 	/*
 	-ms-background-size: cover;
 	-o-background-size: cover;

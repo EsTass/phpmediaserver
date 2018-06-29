@@ -53,6 +53,7 @@
         'MENU_QUANTITY' => 'Quantity',
         'MENU_IMDB' => 'IMDBid',
         'MENU_IP' => 'IP',
+        'MENU_IPCONTROL' => 'IP Control',
         'MENU_DESCRIPTION' => 'Description',
         'MENU_URL' => 'URL',
         'MENU_REFERER' => 'Referer',
@@ -134,6 +135,16 @@
         'LIVETV_TITLE' => 'LiveTV',
         
         'LIVETVURLS_TITLE' => 'LiveTV URLs',
+        
+        'IPCONTROL_BANS' => 'IP Bans',
+        'IPCONTROL_WHITELIST' => 'IP Whitelist',
+        'IPCONTROL_ADD' => 'IP Add',
+        'IPCONTROL_DELETE' => 'IP Delete',
+        'IPCONTROL_MSG_INVALIDIP' => 'Invalid IP: ',
+        'IPCONTROL_MSG_ADDBANIP_OK' => 'BAN IP Added: ',
+        'IPCONTROL_MSG_ADDWLIP_OK' => 'Whitelist IP Added: ',
+        'IPCONTROL_MSG_ADDBANIP_KO' => 'BAN IP Error: ',
+        'IPCONTROL_MSG_ADDWLIP_KO' => 'Whitelist IP Error: ',
 	);
 	
 ?>

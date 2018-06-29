@@ -421,7 +421,7 @@ function log_import_medialive( idmedialiveurls ){
                 <input onclick='log_clean_medialive( <?php echo $lrow[ 'idmedialiveurls' ]; ?> );' type='button' id='bLogClean' name='bLogClean' value='CheckAndClean' />
                 <input onclick='log_delete_medialive( <?php echo $lrow[ 'idmedialiveurls' ]; ?> );' type='button' id='bLogDelete' name='bLogDelete' value='<?php echo get_msg( 'MENU_DELETE', FALSE ); ?>' />
                 <input onclick='log_import_medialive( <?php echo $lrow[ 'idmedialiveurls' ]; ?> );' type='button' id='bLogUpdate' name='bLogUpdate' value='<?php echo get_msg( 'MENU_IMPORT', FALSE ); ?>' />
-                <a href="<?php echo O_ANON_LINK . $lrow[ 'url' ]; ?>" target="_black">Open</a>
+                <a href="<?php echo O_ANON_LINK . $lrow[ 'url' ]; ?>" target="_black" class="button">Open</a>
             </td>
         </tr>
                 <?php

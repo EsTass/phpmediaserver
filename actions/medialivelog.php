@@ -436,7 +436,7 @@ function log_cleanall_medialive(){
                 <input onclick='log_check_medialive( <?php echo $lrow[ 'idmedialive' ]; ?> );' type='button' id='bLogCheck' name='bLogCheck' value='Check' />
                 <input onclick='log_clean_medialive( <?php echo $lrow[ 'idmedialive' ]; ?> );' type='button' id='bLogClean' name='bLogClean' value='CheckAndClean' />
                 <input onclick='log_delete_medialive( <?php echo $lrow[ 'idmedialive' ]; ?> );' type='button' id='bLogDelete' name='bLogDelete' value='<?php echo get_msg( 'MENU_DELETE', FALSE ); ?>' />
-                <a href="?action=playerlive&idmedialive=<?php echo $lrow[ 'idmedialive' ]; ?>" target="_black">Open</a>
+                <a href="?action=playerlive&idmedialive=<?php echo $lrow[ 'idmedialive' ]; ?>" target="_black" class="button">Open</a>
             </td>
         </tr>
                 <?php

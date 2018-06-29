@@ -64,6 +64,9 @@
                 <a href='?action=config'><?php echo get_msg( 'MENU_CONFIG', FALSE ) ?></a>
             </div>
             <div class='listMenuElementAdmin'>
+                <a href='?action=ipcontrol'><?php echo get_msg( 'MENU_IPCONTROL', FALSE ) ?></a>
+            </div>
+            <div class='listMenuElementAdmin'>
                 <a href='?action=webspider'>WebSpider</a>
             </div>
             <?php

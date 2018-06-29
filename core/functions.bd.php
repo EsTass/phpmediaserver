@@ -238,6 +238,124 @@
 		return $result;
 	}
 	
+	//IPs WHITELIST/BANS
+	
+	//BANS
+	
+	function sqlite_bans_insert( $ip, $date = FALSE ){
+		//Vars
+		$result = FALSE;
+		
+		//1 year of ban
+		if( $date == FALSE ){
+            //$date = date( 'Y-m-d H:i:s' );
+            $date = date('Y-m-d H:i:s',strtotime('+1 year',strtotime(date('Y-m-d H:i:s'))));
+		}
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'REPLACE INTO bans VALUES(';
+			$sql .= '';
+			$sql .= ' "' . $dbhandle->escapeString( $ip ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $date ) . '" ';
+			$sql .= ')';
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_bans_delete( $ip ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'DELETE FROM bans ';
+			$sql .= '';
+			$sql .= ' WHERE ip LIKE "' . $ip . '" ';
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_bans_getdata( $search = '' ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM bans ';
+			if( strlen( $search ) > 0 ){
+				$sql .= ' WHERE ip LIKE "%' . $search . '%" ';
+				$sql .= ' OR date LIKE "%' . $search . '%" ';
+			}
+			$sql .= ' ORDER BY date DESC LIMIT 10000';
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	//WHITELIST
+	
+	function sqlite_whitelist_insert( $ip, $date = FALSE ){
+		//Vars
+		$result = FALSE;
+		
+		if( $date == FALSE ){
+            $date = date( 'Y-m-d H:i:s' );
+		}
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'REPLACE INTO whitelist VALUES(';
+			$sql .= '';
+			$sql .= ' "' . $dbhandle->escapeString( $ip ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $date ) . '" ';
+			$sql .= ')';
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_whitelist_delete( $ip ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'DELETE FROM whitelist ';
+			$sql .= '';
+			$sql .= ' WHERE ip LIKE "' . $ip . '" ';
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_whitelist_getdata( $search = '' ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM whitelist ';
+			if( strlen( $search ) > 0 ){
+				$sql .= ' WHERE ip LIKE "%' . $search . '%" ';
+				$sql .= ' OR date LIKE "%' . $search . '%" ';
+			}
+			$sql .= ' ORDER BY date DESC LIMIT 10000';
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
 	//SQLITE LOGS
 	
 	function sqlite_log_insert( $action, $description ){
