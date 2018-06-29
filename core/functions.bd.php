@@ -146,7 +146,7 @@
 			$sql = 'SELECT * FROM ' . $table;
 			$sql .= ' WHERE 1 = 1 ';
 			foreach( $filters AS $f => $v ){
-                $sql .= ' AND ' . $f . ' = "' . $v . '" ';
+                $sql .= ' AND ' . $f . ' = "' . $dbhandle->escapeString( $v ) . '" ';
 			}
 			if( $order ){
                 $sql .= ' ORDER BY ' . $order . ' ASC';
@@ -174,7 +174,7 @@
 			$sql = 'SELECT COUNT( * ) AS total FROM ' . $table;
 			$sql .= ' WHERE 1 = 1 ';
 			foreach( $filters AS $f => $v ){
-                $sql .= ' AND ' . $f . ' = "' . $v . '" ';
+                $sql .= ' AND ' . $f . ' = "' . $dbhandle->escapeString( $v ) . '" ';
 			}
 			if( $order ){
                 $sql .= ' ORDER BY ' . $order . ' ASC';
@@ -204,7 +204,7 @@
 			
 			$sql = 'SELECT * FROM bans ';
 			$sql .= ' WHERE 1 = 1 ';
-			$sql .= ' AND ip = "' . $ip . '" ';
+			$sql .= ' AND ip = "' . $dbhandle->escapeString( $ip ) . '" ';
 			$date = date('Y-m-d H:i:s',strtotime('-' . $hours . ' hour',strtotime(date('Y-m-d H:i:s'))));
 			$sql .= ' AND date > "' . $date . '" ';
 			$sql .= ' ORDER BY date DESC LIMIT 1000';
@@ -226,7 +226,7 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'REPLACE INTO bans VALUES(';
 			$sql .= '';
-			$sql .= ' "' . $ip . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $ip ) . '", ';
 			$date = date('Y-m-d H:i:s',strtotime('+' . $extra_time . ' hour',strtotime(date('Y-m-d H:i:s'))));
 			$sql .= ' "' . $date . '" ';
 			$sql .= ')';
@@ -272,7 +272,7 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'DELETE FROM bans ';
 			$sql .= '';
-			$sql .= ' WHERE ip LIKE "' . $ip . '" ';
+			$sql .= ' WHERE ip LIKE "' . $dbhandle->escapeString( $ip ) . '" ';
 			$result = $dbhandle->exec( $sql );
 			sqlite_db_close();
 		}
@@ -288,8 +288,8 @@
 			
 			$sql = 'SELECT * FROM bans ';
 			if( strlen( $search ) > 0 ){
-				$sql .= ' WHERE ip LIKE "%' . $search . '%" ';
-				$sql .= ' OR date LIKE "%' . $search . '%" ';
+				$sql .= ' WHERE ip LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
+				$sql .= ' OR date LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
 			}
 			$sql .= ' ORDER BY date DESC LIMIT 10000';
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
@@ -329,7 +329,7 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'DELETE FROM whitelist ';
 			$sql .= '';
-			$sql .= ' WHERE ip LIKE "' . $ip . '" ';
+			$sql .= ' WHERE ip LIKE "' . $dbhandle->escapeString( $ip ) . '" ';
 			$result = $dbhandle->exec( $sql );
 			sqlite_db_close();
 		}
@@ -345,8 +345,8 @@
 			
 			$sql = 'SELECT * FROM whitelist ';
 			if( strlen( $search ) > 0 ){
-				$sql .= ' WHERE ip LIKE "%' . $search . '%" ';
-				$sql .= ' OR date LIKE "%' . $search . '%" ';
+				$sql .= ' WHERE ip LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
+				$sql .= ' OR date LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
 			}
 			$sql .= ' ORDER BY date DESC LIMIT 10000';
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
@@ -394,13 +394,13 @@
 			
 			$sql = 'SELECT * FROM logs ';
 			if( strlen( $search ) > 0 ){
-				$sql .= ' WHERE user LIKE "%' . $search . '%" ';
-				$sql .= ' OR date LIKE "%' . $search . '%" ';
-				$sql .= ' OR action LIKE "%' . $search . '%" ';
-				$sql .= ' OR description LIKE "%' . $search . '%" ';
-				$sql .= ' OR ip LIKE "%' . $search . '%" ';
-				$sql .= ' OR url LIKE "%' . $search . '%" ';
-				$sql .= ' OR referer LIKE "%' . $search . '%" ';
+				$sql .= ' WHERE user LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
+				$sql .= ' OR date LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
+				$sql .= ' OR action LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
+				$sql .= ' OR description LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
+				$sql .= ' OR ip LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
+				$sql .= ' OR url LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
+				$sql .= ' OR referer LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
 			}
 			$sql .= ' ORDER BY date DESC LIMIT 1000';
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
@@ -417,8 +417,10 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			
 			$sql = 'SELECT * FROM logs ';
-            $sql .= ' WHERE action LIKE "' . $action . '" ';
-            $sql .= ' AND date LIKE "' . $date . '%" ';
+            $sql .= ' WHERE action LIKE "' . $dbhandle->escapeString( $action ) . '" ';
+            if( strlen( $date ) > 0 ){
+                $sql .= ' AND date LIKE "' . $dbhandle->escapeString( $action ) . '%" ';
+            }
 			$sql .= ' ORDER BY date DESC LIMIT 1';
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
 			sqlite_db_close();
@@ -451,7 +453,7 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$date = date('Y-m-d H:i:s',strtotime('-1 hour',strtotime(date('Y-m-d H:i:s'))));
 			$sql = 'SELECT * FROM logs ';
-			$sql .= ' WHERE ip LIKE "' . USER_IP . '" ';
+			$sql .= ' WHERE ip LIKE "' . $dbhandle->escapeString( USER_IP ) . '" ';
 			$sql .= ' AND date > "' . $date . '" ';
 			$sql .= ' AND action LIKE "loginerr" ';
 			$sql .= ' ORDER BY date DESC LIMIT 1000';
@@ -469,7 +471,7 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$date = date('Y-m-d H:i:s',strtotime('-24 hour',strtotime(date('Y-m-d H:i:s'))));
 			$sql = 'SELECT * FROM logs ';
-			$sql .= ' WHERE ip LIKE "' . USER_IP . '" ';
+			$sql .= ' WHERE ip LIKE "' . $dbhandle->escapeString( USER_IP ) . '" ';
 			$sql .= ' AND date > "' . $date . '" ';
 			$sql .= ' AND action LIKE "loginerr" ';
 			$sql .= ' ORDER BY date DESC LIMIT 1000';
@@ -489,9 +491,9 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'INSERT INTO users VALUES(';
 			$sql .= '';
-			$sql .= ' "' . $user . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $user ) . '", ';
 			$sql .= ' "' . sha1( $pass ) . '", ';
-			$sql .= ' "' . $admin . '" ';
+			$sql .= ' "' . $dbhandle->escapeString( $admin ) . '" ';
 			$sql .= ')';
 			$result = $dbhandle->exec( $sql );
 			sqlite_db_close();
@@ -507,9 +509,9 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'UPDATE users SET ';
 			$sql .= '';
-			$sql .= ' username = "' . $user . '", ';
+			$sql .= ' username = "' . $dbhandle->escapeString( $user ) . '", ';
 			$sql .= ' password = "' . sha1( $pass ) . '", ';
-			$sql .= ' admin = "' . $admin . '" ';
+			$sql .= ' admin = "' . $dbhandle->escapeString( $admin ) . '" ';
 			$sql .= ' WHERE username = "' . $user . '" ';
 			$result = $dbhandle->exec( $sql );
 			sqlite_db_close();
@@ -526,7 +528,7 @@
 			$sql = 'UPDATE users SET ';
 			$sql .= '';
 			$sql .= ' password = "' . sha1( $pass ) . '" ';
-			$sql .= ' WHERE username = \'' . $user . '\' ';
+			$sql .= ' WHERE username = \'' . $dbhandle->escapeString( $user ) . '\' ';
 			$result = $dbhandle->exec( $sql );
 			sqlite_db_close();
 		}
@@ -541,7 +543,7 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'DELETE FROM users ';
 			$sql .= '';
-			$sql .= ' WHERE username LIKE "' . $user . '" ';
+			$sql .= ' WHERE username LIKE "' . $dbhandle->escapeString( $user ) . '" ';
 			$result = $dbhandle->exec( $sql );
 			sqlite_db_close();
 		}
@@ -558,8 +560,8 @@
 			$sql = 'SELECT * FROM users ';
 			if( strlen( $username ) > 0 ){
 				$sql .= ' WHERE username LIKE \'' . $dbhandle->escapeString( $username ) . '\' ';
-				//$sql .= ' OR password LIKE "%' . $username . '%" ';
-				//$sql .= ' OR admin LIKE "%' . $username . '%" ';
+				//$sql .= ' OR password LIKE "%' . $dbhandle->escapeString( $username ) . '%" ';
+				//$sql .= ' OR admin LIKE "%' . $dbhandle->escapeString( $username ) . '%" ';
 			}
 			$sql .= ' ORDER BY username DESC LIMIT 1000';
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
@@ -804,7 +806,7 @@
 			
 			$sql = 'SELECT * FROM whitelist ';
 			$sql .= ' WHERE 1 = 1 ';
-			$sql .= ' AND ip = "' . $ip . '" ';
+			$sql .= ' AND ip = "' . $dbhandle->escapeString( $ip ) . '" ';
 			$date = date('Y-m-d H:i:s',strtotime('-' . $hours . ' hour',strtotime(date('Y-m-d H:i:s'))));
 			$sql .= ' AND date > "' . $date . '" ';
 			$sql .= ' ORDER BY date DESC LIMIT 1';
@@ -826,7 +828,7 @@
 			
 			$sql = 'REPLACE INTO whitelist VALUES(';
 			$sql .= '';
-			$sql .= ' "' . $ip . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $ip ) . '", ';
 			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
 			$sql .= ')';
 			$result = $dbhandle->exec( $sql );
@@ -847,7 +849,7 @@
 			$sql = 'INSERT INTO media VALUES(';
 			$sql .= '';
 			$sql .= ' NULL, ';
-			$sql .= ' "' . $file . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $file ) . '", ';
 			$sql .= ' "", ';
 			$sql .= ' "", ';
 			$sql .= ' 0 ';
@@ -871,9 +873,9 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'UPDATE media SET ';
 			$sql .= '';
-			$sql .= ' file = "' . $file . '", ';
-			$sql .= ' langs = "' . $langs . '", ';
-			$sql .= ' subs = "' . $subs . '" ';
+			$sql .= ' file = "' . $dbhandle->escapeString( $file ) . '", ';
+			$sql .= ' langs = "' . $dbhandle->escapeString( $langs ) . '", ';
+			$sql .= ' subs = "' . $dbhandle->escapeString( $subs ) . '" ';
 			$sql .= ' idmediainfo = ' . $idmediainfo . ' ';
 			$sql .= ' WHERE idmedia = "' . $idmedia . '" ';
 			$result = $dbhandle->exec( $sql );
@@ -947,7 +949,7 @@
 			$sql .= ' INNER JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
 			if( strlen( $search ) > 0
 			){
-				$sql .= ' WHERE file LIKE \'%' . $search . '%\' ';
+				$sql .= ' WHERE file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
 			}
 			$sql .= ' ORDER BY file DESC LIMIT ' . $limit;
 			//die( $sql );
@@ -1098,7 +1100,7 @@
 				&& strlen( $lan_genres[ $tk ] ) > 0
 				&& strlen( $tk ) > 0
 				){
-                    $sql .= ' OR mediainfo.genre LIKE \'%' . $tk . '%\' ';
+                    $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $tk ) . '%\' ';
 				}
 				$sql .= ')';
 			}
@@ -1276,13 +1278,13 @@
 				if( array_key_exists( $g, $lan_genres ) 
 				&& strlen( $lan_genres[ $g ] ) > 0
 				){
-                    $sql .= ' OR mediainfo.genre LIKE \'%' . $lan_genres[ $g ] . '%\' ';
+                    $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $lan_genres[ $g ] ) . '%\' ';
 				}
 				if( ( $tk = array_search( $g, $lan_genres ) ) !== FALSE
 				&& strlen( $lan_genres[ $tk ] ) > 0
 				&& strlen( $tk ) > 0
 				){
-                    $sql .= ' OR mediainfo.genre LIKE \'%' . $tk . '%\' ';
+                    $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $tk ) . '%\' ';
 				}
             }
 			$sql .= ' GROUP BY mediainfo.title ORDER BY RANDOM() LIMIT ' . $limit;
@@ -1660,7 +1662,7 @@
 			$sql = 'INSERT INTO played VALUES(';
 			$sql .= '';
 			$sql .= ' ' . $idmedia . ', ';
-			$sql .= ' "' . USERNAME . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( USERNAME ) . '", ';
 			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '", ';
 			$sql .= ' ' . $time . ', ';
 			$sql .= ' ' . $totaltime . ' ';
@@ -1679,12 +1681,12 @@
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'UPDATE played SET ';
 			$sql .= '';
-			$sql .= ' user = "' . USERNAME . '", ';
+			$sql .= ' user = "' . $dbhandle->escapeString( USERNAME ) . '", ';
 			$sql .= ' idmedia = "' . $idmedia . '", ';
 			$sql .= ' date = "' . date( 'Y-m-d H:i:s' ) . '", ';
 			$sql .= ' now = ' . $time . ', ';
 			$sql .= ' max = ' . $totaltime . ' ';
-			$sql .= ' WHERE user LIKE "' . USERNAME . '" ';
+			$sql .= ' WHERE user LIKE "' . $dbhandle->escapeString( USERNAME ) . '" ';
 			$sql .= ' AND idmedia = ' . $idmedia . ' ';
 			//die( $sql );
 			$result = $dbhandle->exec( $sql );
@@ -1702,9 +1704,9 @@
 			$sql = 'DELETE FROM played ';
 			$sql .= '';
 			if( $user == FALSE ){
-                $sql .= ' WHERE user LIKE "' . USERNAME . '" ';
+                $sql .= ' WHERE user LIKE "' . $dbhandle->escapeString( USERNAME ) . '" ';
             }else{
-                $sql .= ' WHERE user LIKE "' . $user . '" ';
+                $sql .= ' WHERE user LIKE "' . $dbhandle->escapeString( $user ) . '" ';
             }
 			$sql .= ' AND idmedia = ' . $idmedia . ' ';
 			$result = $dbhandle->exec( $sql );
@@ -1722,7 +1724,7 @@
 			
 			$sql = 'SELECT * FROM played ';
 			if( $force_user ){
-				$sql .= ' WHERE user LIKE "' . USERNAME . '" ';
+				$sql .= ' WHERE user LIKE "' . $dbhandle->escapeString( USERNAME ) . '" ';
 			}else{
 				$sql .= ' WHERE user LIKE "%" ';
 			}
@@ -1731,7 +1733,7 @@
 			}
 			if( strlen( $search ) > 0 ){
                 $sql .= 'AND (';
-				$sql .= ' user LIKE "%' . $search . '%" ';
+				$sql .= ' user LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
 				$sql .= ')';
 			}
 			$sql .= ' ORDER BY date DESC';
@@ -1754,7 +1756,7 @@
 			$sql .= ' INNER JOIN media ON played.idmedia = media.idmedia ';
 			$sql .= ' INNER JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
 			if( $force_user ){
-				$sql .= ' WHERE user LIKE "' . USERNAME . '" ';
+				$sql .= ' WHERE user LIKE "' . $dbhandle->escapeString( USERNAME ) . '" ';
 			}else{
 				$sql .= ' WHERE user LIKE "%" ';
 			}
@@ -1763,7 +1765,7 @@
 			}
 			if( strlen( $search ) > 0 ){
                 $sql .= 'AND (';
-				$sql .= ' user LIKE "%' . $search . '%" ';
+				$sql .= ' user LIKE "%' . $dbhandle->escapeString( $search ) . '%" ';
 				$sql .= ')';
 			}
 			if( $grouped )$sql .= ' GROUP BY mediainfo.title ';
@@ -1784,7 +1786,7 @@
 			$sql = 'REPLACE INTO played VALUES(';
 			$sql .= '';
 			$sql .= ' ' . $idmedia . ', ';
-			$sql .= ' "' . USERNAME . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( USERNAME ) . '", ';
 			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '", ';
 			$sql .= ' ' . $time . ', ';
 			$sql .= ' ' . $totaltime . ' ';
@@ -1882,9 +1884,9 @@
 			$sql = 'INSERT INTO medialive VALUES(';
 			$sql .= '';
 			$sql .= ' NULL, ';
-			$sql .= ' "' . $title . '", ';
-			$sql .= ' "' . $url . '", ';
-			$sql .= ' "' . $poster . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $title ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $url ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $poster ) . '", ';
 			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
 			$sql .= ')';
 			$result = $dbhandle->exec( $sql );
@@ -1901,9 +1903,9 @@
 			$sql = 'REPLACE INTO medialive VALUES(';
 			$sql .= '';
 			$sql .= ' ' . $idmedialive . ', ';
-			$sql .= ' "' . $title . '", ';
-			$sql .= ' "' . $url . '", ';
-			$sql .= ' "' . $poster . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $title ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $url ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $poster ) . '", ';
 			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
 			$sql .= ')';
 			$result = $dbhandle->exec( $sql );
@@ -2010,8 +2012,8 @@
 			$sql = 'INSERT INTO medialiveurls VALUES(';
 			$sql .= '';
 			$sql .= ' NULL, ';
-			$sql .= ' "' . $title . '", ';
-			$sql .= ' "' . $url . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $title ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $url ) . '", ';
 			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
 			$sql .= ')';
 			$result = $dbhandle->exec( $sql );
@@ -2028,8 +2030,8 @@
 			$sql = 'REPLACE INTO medialiveurls VALUES(';
 			$sql .= '';
 			$sql .= ' ' . $idmedialiveurls . ', ';
-			$sql .= ' "' . $title . '", ';
-			$sql .= ' "' . $url . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $title ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $url ) . '", ';
 			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
 			$sql .= ')';
 			$result = $dbhandle->exec( $sql );
