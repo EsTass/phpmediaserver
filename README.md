@@ -30,6 +30,7 @@ A bunch of utilities for:
  - Mini dlna server thanks to: https://github.com/ttyridal/phpdlna && https://github.com/ampache/ampache/ (tested vlc and android)
  - [Kodi pluging](https://github.com/EsTass/phpmediaserver-kodi)
  - Multilanguaje (lang/CODE.php and select on config, default ENG)
+ - Logo thanks to [leonardoderoy](https://github.com/leonardoderoy)
 
 ## Default User (Important: change pass on first login)
  - User: admin
