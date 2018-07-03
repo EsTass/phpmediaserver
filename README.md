@@ -1,5 +1,7 @@
 # phpmediaserver
 
+![image.png](https://github.com/leonardoderoy/phpmediaserver/blob/master/imgs/logo/1.png?raw=true)
+
 ## Screenshots
 
 ![phpmediaserver](https://media.giphy.com/media/8A7qPRuF8jzRcaQiyj/giphy.gif)
