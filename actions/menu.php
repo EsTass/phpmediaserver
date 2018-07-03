@@ -3,7 +3,7 @@
     <div class='menuBoxMS'>
         <div class='dRowMS tCenter'>
             <div class='listMenuElementMS'>
-                <a onclick='menus_ms_show();' class='pointer'>PHPMediaServer &#9776;<?php echo get_msg( 'MENU_HOME_MS',  FALSE ); ?></a>
+                <a onclick='menus_ms_show();' class='pointer'><img src="imgs/logo/3.png" class="imgLogo" title="PHPMediaServer Logo" />PHPMediaServer &#9776;<?php echo get_msg( 'MENU_HOME_MS',  FALSE ); ?></a>
             </div>
         </div>
     </div>
@@ -11,7 +11,7 @@
     <div class='menuBox'>
         <div class='dRow'>
             <div class='listMenuElement'>
-                <a href='?action='><?php echo get_msg( 'MENU_HOME', FALSE ) ?></a>
+                <a href='?action='><img src="imgs/logo/3.png" class="imgLogo" title="PHPMediaServer Logo" /><?php echo get_msg( 'MENU_HOME', FALSE ) ?></a>
             </div>
             <div class='listMenuElement'>
                 <a href='?action=listseries'><?php echo get_msg( 'MEDIA_TYPE_SERIE', FALSE ) ?></a>

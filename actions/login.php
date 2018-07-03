@@ -49,6 +49,11 @@ $(function () {
 			<br />
 			
 			<table class='loginT'>
+                <tr>
+                    <td colspan=100 class="tCenter">
+                        <img src="imgs/logo/1.png" class="imgLogo" title="PHPMediaServer Logo" />
+                    </td>
+                </tr>
 				<tr>
 					<td>
 						<label for='user'><?php echo get_msg( 'LOGIN_FORM_USER' ); ?></label>

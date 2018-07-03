@@ -230,6 +230,15 @@ input:hover{
 	*/
 }
 
+/* LOGO */
+
+.imgLogo{
+    width: 20%;
+    min-width: 40px;
+    text-align: center;
+	vertical-align: middle;
+}
+
 /* LOGIN */
 
 .loginBox{
