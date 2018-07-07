@@ -54,9 +54,9 @@
                             $filenum++;
                         }
                     }
-                    if( !is_array( $HTMLDATA ) ) $HTMLDATA = array();
-                    $HTMLDATA[ $k ] = $images_own;
                 }
+                if( !is_array( $HTMLDATA ) ) $HTMLDATA = array();
+                $HTMLDATA[ $k ] = $images_own;
             }
         }
 	}

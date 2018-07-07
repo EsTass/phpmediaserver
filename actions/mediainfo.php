@@ -87,7 +87,7 @@ $(function () {
 	){
 ?>
 function infovideo_delete( element ){
-	var url = '?r=r&action=mediadelete';
+	var url = '?r=r&action=mediadeletefile';
 	var data = { 
 		"idmedia": element
 	};
