@@ -48,8 +48,9 @@
             || ident_thetvdb_login( $debug ) != FALSE
             )
         ){
-            if( $imdb != FALSE 
-            && ( $result = ident_detect_thetvdb( $imdb, $title, $debug ) ) != FALSE
+            if( //$imdb != FALSE 
+            //&& 
+            ( $result = ident_detect_thetvdb( $imdb, $title, $debug ) ) != FALSE
             ){
                 //Convert URLs IMGs to Files On TMP Folder
                 foreach( $result AS $k => $v ){
@@ -212,14 +213,18 @@
             //$stype = 'episode';
         }
         
+        if( $imdbID == FALSE ){
+            $imdbID = '';
+        }
+        
         //$imdbID = 'tt2866360';
         $url = $THETVDB_URL . 'search/series?imdbId=' . $imdbID;
-        $url2 = $THETVDB_URL . 'search/series?name=' . $title;
+        $url2 = $THETVDB_URL . 'search/series?name=' . rawurlencode( $title );
         
         if( (
-            ( $data = ident_thetvdb_get_data( $url, $THETVDB_TOKEN, $debug ) ) != FALSE
+            ( strlen( $imdbID ) > 0 && ( $data = ident_thetvdb_get_data( $url, $THETVDB_TOKEN, $debug ) ) != FALSE )
             ||
-            ( $data = ident_thetvdb_get_data( $url, $THETVDB_TOKEN, $debug ) ) != FALSE
+            (  strlen( $title ) > 0 && ( $data = ident_thetvdb_get_data( $url2, $THETVDB_TOKEN, $debug ) ) != FALSE )
             )
         && is_array( $data )
         && array_key_exists( 'data', $data )

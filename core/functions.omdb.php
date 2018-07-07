@@ -29,7 +29,8 @@
         if( file_exists( $file )
         && mkdir( $TMP_FOLDER )
         ){
-            if( $imdb != FALSE 
+            if( $imdb != FALSE
+            && $imdb != ''
             && ( $result = ident_detect_omdb_id( $imdb, $movies ) ) != FALSE
             ){
                 //var_dump( $result );
@@ -88,9 +89,9 @@
             //$stype = 'episode';
         }
         
-        $url = $OMDB_URL . '&s=' . $title; 
+        $url = $OMDB_URL . '&s=' . urlencode( $title );
         //die( $url );
-        if( ( $data = json_decode( @file_get_contents_timed( $url ), TRUE ) ) != FALSE
+        if( ( $data = json_decode( @file_get_contents_timed( $url, '', FALSE ), TRUE ) ) != FALSE
         && is_array( $data )
         && array_key_exists( 'Search', $data )
         && is_array( $data[ 'Search' ] )
