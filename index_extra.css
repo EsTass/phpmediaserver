@@ -364,7 +364,9 @@
 	display: table-cell;
 	margin: 2px;
 	width: auto;
-    height: 152px;
+    height: auto;
+    max-width: 20vh;
+    max-height: 30vh;
 	overflow: none;
 	cursor: pointer;
 	overflow: hidden;
@@ -1047,6 +1049,11 @@ input[type=range].slider:focus::-ms-fill-upper {
     z-index: 1001;
     background-color: transparent;
     padding: 2px;
+}
+
+/* SEARCH IMAGES RESULTS */
+.tdSearchImgResult{
+    max-width: 20vh;
 }
 
 /* SCREEN SIZES */

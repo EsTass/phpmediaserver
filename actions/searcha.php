@@ -78,7 +78,7 @@
 	}
 	
     $TITLE = get_msg( 'LIST_SEARCH_RESULT', FALSE );
-    if( ( $edata = sqlite_media_getdata_filtered_ext( $G_SEARCH, $G_YEAR, $G_YEAR2, $G_RATING, $G_GENRES, $G_ORDERBY, 1000, $G_PAGE ) ) != FALSE 
+    if( ( $edata = sqlite_media_getdata_filtered_ext( $G_SEARCH, $G_YEAR, $G_YEAR2, $G_RATING, $G_GENRES, $G_ORDERBY, O_LIST_BIG_QUANTITY, $G_PAGE ) ) != FALSE 
     ){
         $TITLE = get_msg( 'LIST_SEARCH_RESULT', FALSE );
         echo get_html_list( $edata, $TITLE, $G_PAGE, FALSE );

@@ -67,7 +67,7 @@
         }
         
         //Get Data
-        echo "CMD: " . $cmd;
+        //echo "CMD: " . $cmd;
         $result = runExtCommand( $cmd );
 		
 		return $result;

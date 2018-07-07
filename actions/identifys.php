@@ -91,15 +91,22 @@
         </tr>
         <?php  
             $q = 0;
+            $inlist = array();
             foreach( $links AS $t => $href ){
-                if( ( $t_ext = getIMDB_ID( $href ) ) == FALSE ){
-                    $t_ext = $t;
-                }
+                if( ( $t_ext = getIMDB_ID( $href ) ) != FALSE 
+                && !in_array( $t_ext, $inlist )
+                ){
+                    //$t_ext = $t;
+                    $inlist[] = $t_ext;
+                    
         ?>
         <tr>
             <td><a class='aIdentSearchResult' href='#' onclick='ident_get_set_title( "<?php echo addslashes( $t ); ?>", "<?php echo $t_ext; ?>" )'><?php echo $t; ?></a></td>
         </tr>
-        <?php } ?>
+        <?php 
+                }
+            }
+        ?>
     </table>
 <?php
         }else{

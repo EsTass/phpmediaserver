@@ -8,6 +8,9 @@
 	//user
 	
 	$HTMLDATA = get_msg( 'DEF_EMPTYLIST', FALSE );
+	$search = '';
+	$msearch = '';
+	
 	if( !array_key_exists( 'idmediainfo', $G_DATA ) 
 	|| !is_numeric( $G_DATA[ 'idmediainfo' ] )
 	|| $G_DATA[ 'idmediainfo' ] <= 0
@@ -27,14 +30,44 @@
             if( is_string( $v ) 
             && $k != 'folder'
             && $k != 'fanart'
-            //&& $k == 'poster'
+            //&& $k == 'landscape'
             ){
                 $search = $k . ' ' . $MEDIAINFO[ 'title' ] . ' ' . $MEDIAINFO[ 'year' ];
+                $msearch = ' ' . $MEDIAINFO[ 'title' ] . ' ' . $MEDIAINFO[ 'year' ];
                 if( is_numeric( $MEDIAINFO[ 'season' ] ) ){
-                    $search .= ' serie';
+                    $search = 'serie ' . $search;
                 }else{
-                    $search .= ' movie';
+                    $search = 'movie ' . $search;
                 }
+                //Check valid IMDBid
+                if( array_key_exists( 'imdbid', $MEDIAINFO ) 
+                && strlen( $MEDIAINFO[ 'imdbid' ] ) > 0
+                ){
+                    $search .= ' ' . $MEDIAINFO[ 'imdbid' ] . ' related:imdb.com';
+                //Check valid IMDBid
+                }elseif( array_key_exists( 'imdb', $MEDIAINFO ) 
+                && strlen( $MEDIAINFO[ 'imdb' ] ) > 0
+                && ( $imdbid = getIMDB_ID( $MEDIAINFO[ 'imdb' ] ) ) != FALSE
+                ){
+                    $search .= ' ' . $imdbid . ' related:imdb.com';
+                //Check valid thetvdb.com
+                }elseif( array_key_exists( 'tvdb', $MEDIAINFO ) 
+                && strlen( $MEDIAINFO[ 'tvdb' ] ) > 0
+                && ( $thetvdb = getTHETVDB_ID( $MEDIAINFO[ 'tvdb' ] ) ) != FALSE
+                ){
+                    //not more accuracy
+                    //$search .= ' ' . $thetvdb . ' related:thetvdb.com';
+                //Check valid themoviedb.com
+                }elseif( array_key_exists( 'tmdb', $MEDIAINFO ) 
+                && strlen( $MEDIAINFO[ 'tmdb' ] ) > 0
+                && ( $themdb = getTHEMOVIEDB_ID( $MEDIAINFO[ 'tmdb' ] ) ) != FALSE
+                ){
+                    //not more accuracy
+                    //$search .= ' ' . $themdb . ' related:themoviedb.com';
+                }else{
+                
+                }
+                
                 //var_dump( $search );
                 $images_own = array();
                 if( ( $images = searchImages( $search, 8, TRUE ) ) != FALSE
@@ -64,6 +97,8 @@
 	if( is_string( $HTMLDATA ) ){
         echo $HTMLDATA;
     }else{
+        //URL manual search images
+        $url_searchimg = 'https://duckduckgo.com/?q=' . urlencode( $search ) . '&iax=images&ia=images';
         
 ?>
 
@@ -132,7 +167,7 @@ function mediainfo_url_add( idmediainfo, type, tfolder, ifield ){
     </tr>
 </table>
     
-    <h2><?php echo $MEDIAINFO[ 'title' ]; ?> (<?php echo $MEDIAINFO[ 'year' ]; ?>)</h2>
+    <h2><?php echo $MEDIAINFO[ 'title' ]; ?> (<?php echo $MEDIAINFO[ 'year' ]; ?>) - (<a rel='noreferrer' href="<?php echo O_ANON_LINK . $url_searchimg; ?>" target="_blank"><?php echo get_msg( 'MENU_SEARCH', FALSE ); ?></a>)</h2>
 <?php
         foreach( $HTMLDATA AS $title => $links ) {
             
@@ -146,7 +181,7 @@ function mediainfo_url_add( idmediainfo, type, tfolder, ifield ){
                     $css_extra = '';
                     foreach( $links AS $img ){
                 ?>
-            <td class='pointer' onclick='mediainfo_image_add( <?php echo $G_DATA[ 'idmediainfo' ]; ?>, "<?php echo $title; ?>", "<?php echo $fileimgpathrnd; ?>", "<?php echo basename( $img ); ?>" );'>
+            <td class='pointer tdSearchImgResult' onclick='mediainfo_image_add( <?php echo $G_DATA[ 'idmediainfo' ]; ?>, "<?php echo $title; ?>", "<?php echo $fileimgpathrnd; ?>", "<?php echo basename( $img ); ?>" );'>
                 <img rel='noreferrer' class='listElementPosterTinyFreeSize' src='<?php echo getURLImgTmp( $img ); ?>' />
             </td>
                 <?php

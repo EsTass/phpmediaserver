@@ -6,12 +6,35 @@
 	
     function scrap_all_nearest_title( $title, $type = TRUE, $filterurl = 'imdb.com/title/tt', $site = 'imdb.com' ){
         $result = FALSE;
+        $debug = FALSE;
         
-        $result = scrap_ddg_nearest_title( $title, $type, $filterurl, $site );
-        if( getIMDB_ID( $result ) != $result
+        //random select search prevent captchas
+        $searchers = array(
+            'scrap_ddg_nearest_title',
+            'scrap_bing_nearest_title',
+            'scrap_startpage_nearest_title',
+            'scrap_searchencrypt_nearest_title',
+            'scrap_searx_nearest_title',
+        );
+        
+        //serch 2 times, enought to know viable title
+        $rnd = mt_rand( 0, count( $searchers ) - 1 );
+        if( $debug ) echo "<br />SCRAPALLNEAREST-SEARCHER: " . $searchers[ $rnd ];
+        if( ( $rd = $searchers[ $rnd ]( $title, $type, $filterurl, $site ) ) != FALSE 
+        && getIMDB_ID( $rd ) != FALSE
         ){
-            $result = scrap_bing_nearest_title( $title, $type, $filterurl, $site );
+            $result = $rd;
+        }else{
+            while( ( $rnd2 = mt_rand( 0, count( $searchers ) - 1 ) ) == $rnd ){
+            }
+            if( $debug ) echo "<br />SCRAPALLNEAREST-SEARCHER2: " . $searchers[ $rnd2 ];
+            if( ( $rd = $searchers[ $rnd2 ]( $title, $type, $filterurl, $site ) ) != FALSE 
+            && getIMDB_ID( $rd ) != FALSE
+            ){
+                $result = $rd;
+            }
         }
+        if( $debug ) echo "<br />SCRAPALLNEAREST-RESULT: " . $result;
         
         return $result;
     }
@@ -19,20 +42,37 @@
     function scrap_all( $search, $filterurl = '', $site = '', $timed = FALSE ){
         $result = FALSE;
         $rd = array();
+        $debug = FALSE;
         
-        $rd[] = scrap_duckduckgo( $search, $filterurl, $site, $timed );
-        $rd[] = scrap_bing( $search, $filterurl, $site, $timed );
+        //random select search prevent captchas
+        $searchers = array(
+            'scrap_duckduckgo',
+            'scrap_bing',
+            'scrap_startpage',
+            'scrap_searchencrypt',
+            'scrap_searx',
+        );
         
-        foreach( $rd AS $d ){
-            if( is_array( $d ) 
-            && count( $d ) > 0
+        //serch 2 times, enought to know viable title
+        $rnd = mt_rand( 0, count( $searchers ) - 1 );
+        if( $debug ) echo "<br />SCRAPALL-SEARCHER: " . $searchers[ $rnd ];
+        if( ( $rd = $searchers[ $rnd ]( $search, $filterurl, $site, $timed ) ) != FALSE 
+        && is_array( $rd )
+        && count( $rd ) > 0
+        ){
+            $result = $rd;
+        }else{
+            while( ( $rnd2 = mt_rand( 0, count( $searchers ) - 1 ) ) == $rnd ){
+            }
+            if( $debug ) echo "<br />SCRAPALL-SEARCHER2: " . $searchers[ $rnd2 ];
+            if( ( $rd = $searchers[ $rnd2 ]( $search, $filterurl, $site, $timed ) ) != FALSE 
+            && is_array( $rd )
+            && count( $rd ) > 0
             ){
-                if( !is_array( $result ) ){
-                    $result = array();
-                }
-                $result = array_merge( $result, $d );
+                $result = $rd;
             }
         }
+        if( $debug ) echo "<br />SCRAPALL-RESULT: " . nl2br( print_r( $result, TRUE ) );
         
         return $result;
     }
@@ -42,7 +82,7 @@
     
     function scrap_duckduckgo( $search, $filterurl = '', $site = '', $timed = FALSE ){
         //SECURE TIME TO SPAM
-        if( $timed ) sleep( 30 );
+        if( $timed ) sleep( 5 );
         $result = array();
         $URL = 'https://duckduckgo.com/html/?';
         if( strlen( $site ) > 0 ){
@@ -101,7 +141,7 @@
         $now_k = 0;
         $now_k_sim = 0;
         foreach( $links AS $t => $href ){
-            if( similar_text( $title, $t, $pc ) > $now_k_sim ){
+            if( strSimilarity( $title, $t, $pc ) > $now_k_sim ){
                 $now_k_sim = $pc;
                 $now_k = $t;
             }
@@ -120,7 +160,7 @@
     
     function scrap_bing( $search, $filterurl = '', $site = '', $timed = FALSE ){
         //SECURE TIME TO SPAM
-        if( $timed ) sleep( 30 );
+        if( $timed ) sleep( 5 );
         $result = array();
         $URL = 'https://bing.com/search?';
         if( strlen( $site ) > 0 ){
@@ -184,7 +224,242 @@
         $now_k = 0;
         $now_k_sim = 0;
         foreach( $links AS $t => $href ){
-            if( similar_text( $title, $t, $pc ) > $now_k_sim ){
+            if( strSimilarity( $title, $t, $pc ) > $now_k_sim ){
+                $now_k_sim = $pc;
+                $now_k = $t;
+            }
+        }
+        if( array_key_exists( $now_k, $links ) 
+        && ( $result = getIMDB_ID( $links[ $now_k ] ) ) != FALSE
+        ){
+            
+        }else{
+            $result = '';
+        }
+        return $result;
+    }
+    
+    //STARTPAGE SEARCH SCRAPPING
+    
+    function scrap_startpage( $search, $filterurl = '', $site = '', $timed = FALSE ){
+        //SECURE TIME TO SPAM
+        if( $timed ) sleep( 5 );
+        $result = array();
+        $URL = 'https://www.startpage.com/do/dsearch?';
+        if( strlen( $site ) > 0 ){
+            $URL .= 'query=' . urlencode( $search. ' site:' . $site );
+        }else{
+            $URL .= 'query=' . urlencode( $search );
+        }
+        $URL .= '&s=0';
+        
+        $data = @file_get_contents_timed( $URL );
+        
+        // Create a new DOMDocument
+        $dom = new DOMDocument();
+        @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+        $xp = new DOMXPath($dom);
+        $nodes = $xp->query('//a[starts-with(@id, "title_")]');
+        foreach ( $nodes as $re ){
+            $href = $re->getAttribute( "href" );
+            $href = substr( $href, stripos( $href, 'http' ) );
+            $href = urldecode( $href );
+            $title = $re->nodeValue;
+            if( strlen( $filterurl ) == 0
+            || stripos( $href, $filterurl ) !== FALSE
+            ){
+                $result[ $title ] = $href;
+            }
+        }
+        
+        return $result;
+    }
+    
+    function scrap_startpage_nearest_title( $title, $type = TRUE, $filterurl = 'imdb.com/title/tt', $site = 'imdb.com' ){
+        $result = '';
+        if( $type ){
+            $STYPE = 'Movie';
+        }else{
+            $STYPE = 'TV';
+        }
+        $search = O_LANG . ' ' . $STYPE . ' ' . $title;
+        if( ( $links = scrap_startpage( $search, $filterurl, $site, TRUE ) ) != FALSE 
+        && count( $links ) > 0
+        ){
+            //Clean Title - imdb | imdb -
+            $l2 = array();
+            $CLEAN = array( '- imdb', 'imdb -' );
+            foreach( $links AS $t => $href ){
+                if( getIMDB_ID( $href ) ){
+                    foreach( $CLEAN AS $c ){
+                        $t = str_ireplace( $c, '', $t );
+                    }
+                    $l2[ trim( $t ) ] = $href;
+                }
+            }
+            $links = $l2;
+        }
+        $now_k = 0;
+        $now_k_sim = 0;
+        foreach( $links AS $t => $href ){
+            if( strSimilarity( $title, $t, $pc ) > $now_k_sim ){
+                $now_k_sim = $pc;
+                $now_k = $t;
+            }
+        }
+        if( array_key_exists( $now_k, $links ) 
+        && ( $result = getIMDB_ID( $links[ $now_k ] ) ) != FALSE
+        ){
+            
+        }else{
+            $result = '';
+        }
+        return $result;
+    }
+    
+    //searchencrypt SEARCH SCRAPPING
+    
+    function scrap_searchencrypt( $search, $filterurl = '', $site = '', $timed = FALSE ){
+        //SECURE TIME TO SPAM
+        if( $timed ) sleep( 5 );
+        $result = array();
+        $URL = 'https://www.searchencrypt.com/search?';
+        if( strlen( $site ) > 0 ){
+            $URL .= 'eq=' . urlencode( $search. ' site:' . $site );
+        }else{
+            $URL .= 'eq=' . urlencode( $search );
+        }
+        $URL .= '&s=0';
+        
+        $data = @file_get_contents_timed( $URL );
+        
+        // Create a new DOMDocument
+        $dom = new DOMDocument();
+        @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+        $xp = new DOMXPath($dom);
+        $nodes = $xp->query('//a[@class="result-link"]');
+        foreach ( $nodes as $re ){
+            $href = $re->getAttribute( "href" );
+            $href = substr( $href, stripos( $href, 'http' ) );
+            $href = urldecode( $href );
+            $title = $re->nodeValue;
+            if( strlen( $filterurl ) == 0
+            || stripos( $href, $filterurl ) !== FALSE
+            ){
+                $result[ $title ] = $href;
+            }
+        }
+        
+        return $result;
+    }
+    
+    function scrap_searchencrypt_nearest_title( $title, $type = TRUE, $filterurl = 'imdb.com/title/tt', $site = 'imdb.com' ){
+        $result = '';
+        if( $type ){
+            $STYPE = 'Movie';
+        }else{
+            $STYPE = 'TV';
+        }
+        $search = O_LANG . ' ' . $STYPE . ' ' . $title;
+        if( ( $links = scrap_searchencrypt( $search, $filterurl, $site, TRUE ) ) != FALSE 
+        && count( $links ) > 0
+        ){
+            //Clean Title - imdb | imdb -
+            $l2 = array();
+            $CLEAN = array( '- imdb', 'imdb -' );
+            foreach( $links AS $t => $href ){
+                if( getIMDB_ID( $href ) ){
+                    foreach( $CLEAN AS $c ){
+                        $t = str_ireplace( $c, '', $t );
+                    }
+                    $l2[ trim( $t ) ] = $href;
+                }
+            }
+            $links = $l2;
+        }
+        $now_k = 0;
+        $now_k_sim = 0;
+        foreach( $links AS $t => $href ){
+            if( strSimilarity( $title, $t, $pc ) > $now_k_sim ){
+                $now_k_sim = $pc;
+                $now_k = $t;
+            }
+        }
+        if( array_key_exists( $now_k, $links ) 
+        && ( $result = getIMDB_ID( $links[ $now_k ] ) ) != FALSE
+        ){
+            
+        }else{
+            $result = '';
+        }
+        return $result;
+    }
+    
+    //searx.me SEARCH SCRAPPING
+    
+    function scrap_searx( $search, $filterurl = '', $site = '', $timed = FALSE ){
+        //SECURE TIME TO SPAM
+        if( $timed ) sleep( 5 );
+        $result = array();
+        $URL = 'https://searx.me/?';
+        if( strlen( $site ) > 0 ){
+            $URL .= 'q=' . rawurlencode( $search. ' site:' . $site );
+        }else{
+            $URL .= 'q=' . rawurlencode( $search );
+        }
+        $URL .= '';
+        
+        $data = @file_get_contents_timed( $URL );
+        
+        // Create a new DOMDocument
+        $dom = new DOMDocument();
+        @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+        $xp = new DOMXPath($dom);
+        $nodes = $xp->query('//h4[@class="result_header"]/a');
+        //$nodes = $xp->query('//a[@rel="noreferrer"]');
+        foreach ( $nodes as $re ){
+            $href = $re->getAttribute( "href" );
+            $href = substr( $href, stripos( $href, 'http' ) );
+            $href = urldecode( $href );
+            $title = $re->nodeValue;
+            if( strlen( $filterurl ) == 0
+            || stripos( $href, $filterurl ) !== FALSE
+            ){
+                $result[ $title ] = $href;
+            }
+        }
+        
+        return $result;
+    }
+    
+    function scrap_searx_nearest_title( $title, $type = TRUE, $filterurl = 'imdb.com/title/tt', $site = 'imdb.com' ){
+        $result = '';
+        if( $type ){
+            $STYPE = 'Movie';
+        }else{
+            $STYPE = 'TV';
+        }
+        $search = O_LANG . ' ' . $STYPE . ' ' . $title;
+        if( ( $links = scrap_searx( $search, $filterurl, $site, TRUE ) ) != FALSE 
+        && count( $links ) > 0
+        ){
+            //Clean Title - imdb | imdb -
+            $l2 = array();
+            $CLEAN = array( '- imdb', 'imdb -' );
+            foreach( $links AS $t => $href ){
+                if( getIMDB_ID( $href ) ){
+                    foreach( $CLEAN AS $c ){
+                        $t = str_ireplace( $c, '', $t );
+                    }
+                    $l2[ trim( $t ) ] = $href;
+                }
+            }
+            $links = $l2;
+        }
+        $now_k = 0;
+        $now_k_sim = 0;
+        foreach( $links AS $t => $href ){
+            if( strSimilarity( $title, $t, $pc ) > $now_k_sim ){
                 $now_k_sim = $pc;
                 $now_k = $t;
             }
@@ -200,6 +475,8 @@
     }
     
     //IMGS DOWNLOADS
+    
+    //ACTOR FILE DIRECT DOWNLOAD
     
 	function getActorFile( $name ) {
 		$result = FALSE;
@@ -231,55 +508,37 @@
 		return $result;
 	}
 	
+	//GENERIC IN ALL SEARCH IMAGES
+	
 	function searchImages( $search, $max = 5, $getthumb = TRUE ) {
 		$result = array();
 		$debug = FALSE;
 		$in_list = array();
-		$list = array( 'searchImagesPyMI', 'searchImagesBing', 'searchImagesIXQick', 'searchImagesWebcrawler' );
-		$rnd = mt_rand( 0, ( count( $list ) - 1 ) );
-		if( array_key_exists( $rnd, $list ) 
-		&& function_exists( $list[ $rnd ] )
-		&& !in_array( $list[ $rnd ], $in_list )
-		){
-            $in_list[] = $list[ $rnd ];
-            if( ( $links = $list[ $rnd ]( $search, $max, $getthumb ) ) != FALSE ){
-                $result = array_merge( $result, $links );
-            }
-		}
 		
-		/*
-		if( ( $links = searchImagesBing( $search, $max, $getthumb ) ) != FALSE ){
-            $result = array_merge( $result, $links );
+		$list = array( 'searchImagesPyMI', 'searchImagesBing', 'searchImagesIXQick', 'searchImagesWebcrawler' );
+		
+		while( count( $result ) < $max 
+		&& count( $in_list ) < ( count( $list ) - 1 )
+		){
+            $rnd = mt_rand( 0, ( count( $list ) - 1 ) );
+            if( array_key_exists( $rnd, $list ) 
+            && function_exists( $list[ $rnd ] )
+            && !in_array( $list[ $rnd ], $in_list )
+            ){
+                if( $debug ) echo "<br />SEARCHIMAGES-SEARCHER: " . count( $list[ $rnd ] );
+                $in_list[] = $list[ $rnd ];
+                if( ( $links = $list[ $rnd ]( $search, $max, $getthumb ) ) != FALSE ){
+                    $result = array_merge( $result, $links );
+                }
+            }
         }
-        if( $debug ) echo "<br />Bing: " . count( $result );
-        if( count( $result ) < $max
-        && ( $links = searchImagesIXQick( $search, $max, $getthumb ) ) != FALSE ){
-            $result = array_merge( $result, $links );
-        }
-        if( $debug ) echo "<br />IXQick: " . count( $result );
-        
-        if( count( $result ) < $max
-        && ( $links = searchImagesWebcrawler( $search, $max, $getthumb ) ) != FALSE ){
-            $result = array_merge( $result, $links );
-        }
-        if( $debug ) echo "<br />WebCrawler: " . count( $result );
-		//fail, recheck
-		if( count( $result ) < $max
-		&& ( $links = searchImagesDuckDuckGo( $search, $max, $getthumb ) ) != FALSE ){
-            $result = array_merge( $result, $links );
-		}
-		if( $debug ) echo "<br />DuckDuckGo: " . count( $result );
-		//captchas and only thumb
-		if( count( $result ) < $max
-		&& ( $links = searchImagesYandex( $search, $max, $getthumb ) ) != FALSE ){
-            $result = array_merge( $result, $links );
-		}
-		if( $debug ) echo "<br />Yandex: " . count( $result );
-		*/
+		
 		$result = array_slice( $result, 0, $max );
 		
 		return $result;
 	}
+	
+	//WebCrawler SEARCH IMAGES
 	
 	function searchImagesWebcrawler( $search, $max = 5, $getthumb = TRUE ){
 		$result = array();
@@ -337,6 +596,8 @@
 		
 		return $result;
 	}
+	
+	//IXQick SEARCH IMAGES
 	
 	function searchImagesIXQick( $search, $max = 5, $getthumb = TRUE ){
 		$result = array();
@@ -431,6 +692,8 @@
 		return $result;
 	}
 	
+	//Yandex SEARCH IMAGES
+	
 	//captcha sometimes
 	function searchImagesYandex( $search, $max = 5, $getthumb = TRUE ){
 		$result = array();
@@ -493,6 +756,8 @@
 		
 		return $result;
 	}
+	
+	//Bing SEARCH IMAGES
 	
 	function searchImagesBing( $search, $max = 5, $getthumb = TRUE ){
 		$result = array();
@@ -574,6 +839,8 @@
 		return $result;
 	}
 	
+	//DuckDuckGo SEARCH IMAGES
+	
 	function searchImagesDuckDuckGo( $search, $max = 5, $getthumb = TRUE ){
 		$result = array();
 		
@@ -637,6 +904,8 @@
 		return $result;
 	}
 	
+	//DOWNLOAD IMG FILE
+	
 	function downloadPosterToFile( $url, $file ){
 		$result = @file_put_contents( $file, file_get_contents_timed( $url ) );
 		
@@ -664,6 +933,38 @@
         && strlen( $match[ 0 ] ) > 8
         ){
             $result = $match[ 0 ];
+        }
+        
+        return $result;
+	}
+	
+	//DETECT thetvdb ID &id=XXXXXX
+	
+	function getTHETVDB_ID( $url ){
+        $result = FALSE;
+        
+        if( preg_match( "/id=[0-9]{1,10}/", $url, $match ) 
+        && is_array( $match )
+        && count( $match ) > 0
+        && strlen( $match[ 0 ] ) > 8
+        ){
+            $result = str_ireplace( 'id=' , '', $match[ 0 ] );
+        }
+        
+        return $result;
+	}
+	
+	//DETECT themoviedb.com ID /movie/XXXXXX
+	
+	function getTHEMOVIEDB_ID( $url ){
+        $result = FALSE;
+        
+        if( preg_match( "/\/movie\/[0-9]{1,10}/", $url, $match ) 
+        && is_array( $match )
+        && count( $match ) > 0
+        && strlen( $match[ 0 ] ) > 8
+        ){
+            $result = str_ireplace( '/movie/' , '', $match[ 0 ] );
         }
         
         return $result;
