@@ -66,11 +66,17 @@
 	
 	function getIP()
 	{
-		if( !empty( $_SERVER[ 'HTTP_CLIENT_IP' ] ) 
+		if( array_key_exists( 'HTTP_CLIENT_IP', $_SERVER )
+		&& !empty( $_SERVER[ 'HTTP_CLIENT_IP' ] ) 
+		//TODO ip gateway
+		&& array_key_exists( 'HTTP_CLIENT_IP', $_SERVER )
 		&& $_SERVER[ 'HTTP_CLIENT_IP' ] != '192.168.1.1' 
 		){ //check ip from share internet
 			$ip = $_SERVER[ 'HTTP_CLIENT_IP' ];
-		}elseif( !empty( $_SERVER[ 'HTTP_X_FORWARDED_FOR' ] )
+		}elseif( array_key_exists( 'HTTP_X_FORWARDED_FOR', $_SERVER )
+		&& !empty( $_SERVER[ 'HTTP_X_FORWARDED_FOR' ] )
+		//TODO ip gateway
+		&& array_key_exists( 'HTTP_CLIENT_IP', $_SERVER )
 		&& $_SERVER[ 'HTTP_CLIENT_IP' ] != '192.168.1.1' 
 		){ //to check ip is pass from proxy
 			$ip = $_SERVER[ 'HTTP_X_FORWARDED_FOR' ];
