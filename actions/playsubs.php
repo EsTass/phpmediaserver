@@ -44,44 +44,46 @@
         $x = 1;
         $nexttime = FALSE;
         $nexttext = FALSE;
-        foreach( $data AS $row ){
-            $row = trim( $row );
-            if( $DEBUG ) echo "<br />-LINE: " . $row;
-            if( $DEBUG ) echo "<br />-LINEPOS: " . $x;
-            //Search $x pos
-            if( ctype_digit( $row )
-            && $x == (int)$row
-            ){
-                if( $DEBUG ) echo "<br />SETX: " . $row;
-                $nexttime = TRUE;
-                $nexttext = FALSE;
-                $x++;
-            }elseif( $nexttime ){
-                if( $DEBUG ) echo "<br />SETXNEXTTIME: " . $row;
-                //Get times and assign to result row
-                $timestart = subs_srt_convert_time( $row, 0, $DEBUG );
-                $timeend = subs_srt_convert_time( $row, 1, $DEBUG );
-                $result[ $x - 1 ][ 'timestart' ] = $timestart;
-                $result[ $x - 1 ][ 'timeend' ] = $timeend;
-                $nexttime = FALSE;
-                $nexttext = TRUE;
-            }elseif( $nexttext ){
-                if( $DEBUG ) echo "<br />SETXNEXTTEXT: " . $row;
-                //Get text and assign to result row
-                if( !array_key_exists( 'text', $result[ $x - 1 ] ) ){
-                    $result[ $x - 1 ][ 'text' ] = $row;
-                }else{
-                    $result[ $x - 1 ][ 'text' ] .= '<br>' . $row;
+        if( is_array( $data ) ){
+            foreach( $data AS $row ){
+                $row = trim( $row );
+                if( $DEBUG ) echo "<br />-LINE: " . $row;
+                if( $DEBUG ) echo "<br />-LINEPOS: " . $x;
+                //Search $x pos
+                if( ctype_digit( $row )
+                && $x == (int)$row
+                ){
+                    if( $DEBUG ) echo "<br />SETX: " . $row;
+                    $nexttime = TRUE;
+                    $nexttext = FALSE;
+                    $x++;
+                }elseif( $nexttime ){
+                    if( $DEBUG ) echo "<br />SETXNEXTTIME: " . $row;
+                    //Get times and assign to result row
+                    $timestart = subs_srt_convert_time( $row, 0, $DEBUG );
+                    $timeend = subs_srt_convert_time( $row, 1, $DEBUG );
+                    $result[ $x - 1 ][ 'timestart' ] = $timestart;
+                    $result[ $x - 1 ][ 'timeend' ] = $timeend;
+                    $nexttime = FALSE;
+                    $nexttext = TRUE;
+                }elseif( $nexttext ){
+                    if( $DEBUG ) echo "<br />SETXNEXTTEXT: " . $row;
+                    //Get text and assign to result row
+                    if( !array_key_exists( 'text', $result[ $x - 1 ] ) ){
+                        $result[ $x - 1 ][ 'text' ] = $row;
+                    }else{
+                        $result[ $x - 1 ][ 'text' ] .= '<br>' . $row;
+                    }
+                }elseif( strlen( $row ) == 0 ){
+                    if( $DEBUG ) echo "<br />SETXEXMPTY: " . $row;
+                    $nexttime = FALSE;
+                    $nexttext = FALSE;
                 }
-            }elseif( strlen( $row ) == 0 ){
-                if( $DEBUG ) echo "<br />SETXEXMPTY: " . $row;
-                $nexttime = FALSE;
-                $nexttext = FALSE;
-            }
-            if( $DEBUG 
-            && $x > 10
-            ){
-                break;
+                if( $DEBUG 
+                && $x > 10
+                ){
+                    break;
+                }
             }
         }
         
@@ -153,7 +155,8 @@
             if( $DEBUG ) echo "<br />FILELINES: " . count( $data );
             
             //STR FORMAT
-            if( endsWith( strtolower( $filesubs ), '.srt' ) 
+            if( is_array( $data )
+            && endsWith( strtolower( $filesubs ), '.srt' ) 
             && ( $result = subs_import_srt( $data, $DEBUG ) ) != FALSE
             ){
                 
