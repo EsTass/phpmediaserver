@@ -983,7 +983,7 @@
 		return $result;
 	}
 	
-	function sqlite_media_getdata_filtered( $search, $limit = 1000, $page = 0 ){
+	function sqlite_media_getdata_filtered( $search, $limit = 1000, $page = 0, $onlygenre = FALSE ){
 		//Vars
 		$result = FALSE;
 		
@@ -993,15 +993,33 @@
 			$sql .= ' INNER JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
 			$sql .= ' WHERE media.idmediainfo > 0 ';
 			if( strlen( $search ) > 0 ){
-				$sql .= ' AND ( mediainfo.title LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR media.file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.year LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.actor LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.titleepisode LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ')';
+                if( $onlygenre == FALSE ){
+                    $sql .= ' AND ( mediainfo.title LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR media.file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.year LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.actor LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.titleepisode LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ')';
+                }else{
+                    $sql .= ' AND ( mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    //Add genres search O_MENU_GENRES
+                    $lan_genres = O_MENU_GENRES;
+                    if( array_key_exists( $search, $lan_genres ) 
+                    && strlen( $lan_genres[ $search ] ) > 0
+                    ){
+                        $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $lan_genres[ $search ] ) . '%\' ';
+                    }
+                    if( ( $tk = array_search( $search, $lan_genres ) ) !== FALSE
+                    && strlen( $lan_genres[ $tk ] ) > 0
+                    && strlen( $tk ) > 0
+                    ){
+                        $sql .= ' OR mediainfo.genre LIKE \'%' . $tk . '%\' ';
+                    }
+                    $sql .= ')';
+                }
 			}
 			$sql .= ' GROUP BY media.idmediainfo ORDER BY media.idmedia DESC LIMIT ' . $limit;
 			if( $page !== FALSE ){
@@ -1122,7 +1140,7 @@
 		return $result;
 	}
 	
-	function sqlite_media_getdata_filtered_grouped_pages_total( $search, $limit = 1000, $force_series = FALSE ){
+	function sqlite_media_getdata_filtered_grouped_pages_total( $search, $limit = 1000, $force_series = FALSE, $onlygenre = FALSE ){
 		//Vars
 		$result = FALSE;
 		
@@ -1132,27 +1150,31 @@
 			$sql .= ' INNER JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
 			$sql .= ' WHERE media.idmediainfo > 0 ';
 			if( strlen( $search ) > 0 ){
-				$sql .= ' AND ( mediainfo.title LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR media.file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.year LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.actor LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				$sql .= ' OR mediainfo.titleepisode LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
-				//Add genres search O_MENU_GENRES
-				$lan_genres = O_MENU_GENRES;
-				if( array_key_exists( $search, $lan_genres ) 
-				&& strlen( $lan_genres[ $search ] ) > 0
-				){
-                    $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $lan_genres[ $search ] ) . '%\' ';
-				}
-				if( ( $tk = array_search( $search, $lan_genres ) ) !== FALSE
-				&& strlen( $lan_genres[ $tk ] ) > 0
-				&& strlen( $tk ) > 0
-				){
-                    $sql .= ' OR mediainfo.genre LIKE \'%' . $tk . '%\' ';
-				}
+                if( $onlygenre == FALSE ){
+                    $sql .= ' AND ( mediainfo.title LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR media.file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.year LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.actor LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.titleepisode LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                }else{
+                    $sql .= ' AND ( mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    //Add genres search O_MENU_GENRES
+                    $lan_genres = O_MENU_GENRES;
+                    if( array_key_exists( $search, $lan_genres ) 
+                    && strlen( $lan_genres[ $search ] ) > 0
+                    ){
+                        $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $lan_genres[ $search ] ) . '%\' ';
+                    }
+                    if( ( $tk = array_search( $search, $lan_genres ) ) !== FALSE
+                    && strlen( $lan_genres[ $tk ] ) > 0
+                    && strlen( $tk ) > 0
+                    ){
+                        $sql .= ' OR mediainfo.genre LIKE \'%' . $tk . '%\' ';
+                    }
+                }
 				$sql .= ')';
 			}
 			if( $force_series ){
