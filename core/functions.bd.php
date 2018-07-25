@@ -1025,7 +1025,7 @@
 			if( $page !== FALSE ){
                 $sql .= ' OFFSET ' . ( $page * $limit );
             }
-			//die( $sql );
+			//if( check_user_admin() ) var_dump( $sql );
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
 			sqlite_db_close();
 		}

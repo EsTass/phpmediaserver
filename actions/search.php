@@ -41,6 +41,8 @@ function ident_search_list(){
 
 <form id='fSearchExt'>
 <div class='boxInfo'>
+    <br />
+    <br />
     <table class='widthFull'>
         <tr class='trSearch'>
             <td>
