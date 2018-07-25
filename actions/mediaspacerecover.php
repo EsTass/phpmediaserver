@@ -87,6 +87,9 @@ function action_spacerecover(){
                 </select>
             </td>
             <td>
+                <input type="checkbox" name="seriesonly" id="seriesonly" value="1" />Series Only
+            </td>
+            <td>
                 <input type="checkbox" name="remove" id="remove" value="1" />Remove 
             </td>
             <td>

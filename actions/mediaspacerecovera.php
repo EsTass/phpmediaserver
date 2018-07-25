@@ -13,6 +13,7 @@
 	//year2
 	//rating
 	//minutes
+	//seriesonly
 	
 	if( array_key_exists( 'search', $G_DATA ) ){
         $G_SEARCH = $G_DATA[ 'search' ];
@@ -74,6 +75,14 @@
         $G_MAXTIME = 0;
 	}
 	
+	if( array_key_exists( 'seriesonly', $G_DATA ) 
+	&& (int)$G_DATA[ 'seriesonly' ] > 0
+	){
+        $G_SERIESONLY = TRUE;
+	}else{
+        $G_SERIESONLY = FALSE;
+	}
+	
 	//Clean Top size for file search
 	echo "<br />SEARCH: " . $G_SEARCH;
 	echo "<br />MAX FILESIZE: " . formatSizeUnits( $CUTSIZE );
@@ -82,6 +91,9 @@
     echo "<br />MIN YEAR1: " . $G_YEAR1;
     echo "<br />MAX YEAR2: " . $G_YEAR2;
     echo "<br />MIN DURATION: " . $G_MAXTIME;
+    if( $G_SERIESONLY ){
+        echo "<br />SERIES ONLY ";
+    }
 	if( $G_REMOVE ){
         echo "<br />!!!!!!!REMOVE!!!!!!!!!!!: " . $MAXFILES;
     }
@@ -117,6 +129,11 @@
             && (
                     strlen( $G_SEARCH ) == 0
                     || inString( $lrow[ 'file' ], $G_SEARCH )
+                )
+            && 
+                (
+                $G_SERIESONLY == FALSE
+                || $mediainfodata[ 0 ][ 'season' ] > 0
                 )
             ){
                 $file = $lrow[ 'file' ];
