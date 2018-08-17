@@ -88,6 +88,7 @@
         return $PID;
     }
     
+    //clean space X times Y files forced passed, no space check
 	function cleanLowDiskSpace( $preview = TRUE, $maxpass = 10, $fileseachpass = 10 ){
         $G_SEARCH = '';
         
@@ -100,7 +101,7 @@
         ){
             $G_REMOVE = !$preview; //PREVIEW MODE
             $CLEANSIZE = ( O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN * 1024 * 1024 * 1024 );
-            $MAXFILES = $fileseachpass; //delete 5 each time
+            $MAXFILES = $fileseachpass; //delete X each time
             $MAXTIMES = $maxpass;
             while( ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
             && $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 ) 
@@ -152,6 +153,52 @@
                 echo "<br />Clean Inexistents Downloads: ";
                 echo "<br />";
                 media_clean_downloads( 500, TRUE );
+            }
+        }
+	}
+	
+    //clean space forced to min space needed from old to new files
+	function cleanLowDiskSpaceOldFiles( $preview = TRUE, $maxfiles = 25 ){
+        $G_SEARCH = '';
+        
+        //Autoclean Space on Low
+        if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
+        && defined( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN' )
+        && O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN != FALSE
+        ){
+            $filenum = 0;
+            $LOWSPACE = O_WEBSCRAP_LIMIT_FREESPACE;
+            $LOWSPACE = 1500;
+            while( $filenum < $maxfiles
+            && ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
+            && $freespace  < ( $LOWSPACE * 1024 * 1024 * 1024 )
+            ){
+                echo "<br />LOW DISK FREE SPACE: " . formatSizeUnits( $freespace );
+                if( ( $file = sqlite_media_getdata_old_file( 1 ) ) != FALSE ){
+                    //Get last file
+                    if( array_key_exists( 0, $file ) ){
+                        $file = $file[ 0 ];
+                    }
+                    if( array_key_exists( 'file', $file ) 
+                    && file_exists( $file[ 'file' ] )
+                    ){
+                        echo "<br />FILE(" . $filenum . '/' . $maxfiles . "): " . $file[ 'file' ];
+                        echo "<br />SIZE: " . formatSizeUnits( filesize( $file[ 'file' ] ) );
+                        if( $preview ){
+                            echo "<br />PREVIEW DELETE: " . $file[ 'file' ];
+                        }else{
+                            if( @unlink( $file[ 'file' ] ) ){
+                                sqlite_media_delete( $file[ 'idmedia' ] );
+                                echo "<br />DELETED: " . $file[ 'file' ];
+                            }else{
+                                echo "<br />ERROR DELETING: " . $file[ 'file' ];
+                            }
+                        }
+                    }else{
+                        echo "<br />FILE NOT EXIST: " . $file[ 'file' ];
+                    }
+                }
+                $filenum++;
             }
         }
 	}

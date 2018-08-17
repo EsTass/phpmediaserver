@@ -1462,6 +1462,22 @@
 		return $result;
 	}
 	
+	function sqlite_media_getdata_old_file( $limit = 1 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM media ';
+			$sql .= ' ORDER BY idmedia ASC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
 	//MEDIAINFO ELEMENTS
 	//functions.media.php::$G_MEDIAINFO array
 	

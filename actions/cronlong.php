@@ -158,6 +158,18 @@
         cleanLowDiskSpace( FALSE, 10, 10 );
 	}
 	
+	//AUTOCLEAN SPACE ON LOW (OLDFILES)
+	
+	if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
+	&& defined( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN_OLD' )
+	&& O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN_OLD != FALSE
+	&& ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
+	&& $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
+	){
+        //delete files while free space < O_WEBSCRAP_LIMIT_FREESPACE, with max of 50 files
+        cleanLowDiskSpaceOldFiles( FALSE, 50 );
+	}
+	
 	//LIVE TV CHECK
 	
     $cronid = 'cron_7d';
