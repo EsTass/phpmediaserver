@@ -17,7 +17,8 @@
 	if( array_key_exists( 'search', $G_DATA ) 
 	&& strlen( $G_DATA[ 'search' ] ) > 3
 	){
-        $SEARCH = $G_DATA[ 'search' ];
+        //TODO can be needed urlencoderaw or urlencode on multiword
+        $SEARCH = urlencode( $G_DATA[ 'search' ] );
 	}else{
         $SEARCH = '';
 	}
