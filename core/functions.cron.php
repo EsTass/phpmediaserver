@@ -163,12 +163,11 @@
         
         //Autoclean Space on Low
         if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
-        && defined( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN' )
-        && O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN != FALSE
+        && defined( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN_OLD' )
+        && O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN_OLD != FALSE
         ){
             $filenum = 0;
             $LOWSPACE = O_WEBSCRAP_LIMIT_FREESPACE;
-            $LOWSPACE = 1500;
             while( $filenum < $maxfiles
             && ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
             && $freespace  < ( $LOWSPACE * 1024 * 1024 * 1024 )
