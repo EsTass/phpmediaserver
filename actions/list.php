@@ -25,8 +25,18 @@
 	&& $G_PAGE === FALSE
 	){
         
+        //premierer mode
+        $premierfuncts = array(
+            //'sqlite_media_getdata_premiere',
+            'sqlite_media_getdata_premiere_ex',
+            'sqlite_media_getdata_premiere_ex2',
+            'sqlite_media_getdata_premiere_ex3',
+            'sqlite_media_getdata_premiere_ex4',
+        );
+        
+        $premierefunct = $premierfuncts[ mt_rand( 0, ( count( $premierfuncts ) - 1 ) ) ];
         //Premiere
-        if( ( $edata = sqlite_media_getdata_premiere_ex( O_LIST_MINI_QUANTITY ) ) != FALSE 
+        if( ( $edata = $premierefunct( O_LIST_MINI_QUANTITY ) ) != FALSE
         && count( $edata ) > 0
         ){
             $TITLE = get_msg( 'LIST_TITLE_PREMIERE', FALSE );
