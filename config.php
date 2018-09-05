@@ -206,6 +206,16 @@
 	define( 'O_CRON_EXTRACTFILES', TRUE );
 	//CRON extracted compressed files deleted after X days, 0 disabled (seeding safe)
 	define( 'O_CRON_EXTRACTFILES_CLEAN', 14 );
+	//CRON cmd file extract with extension (TODO passwords)
+	define( 'O_CRON_EXTRACTFILES_CMD', array(
+        	//extension => CMD ( %FILE% %FOLDER% %PASS% )
+        	'rar' => 'mkdir "%FOLDER%" && unrar e -y -o+ "%FILE%" "%FOLDER%" ',
+        	'r01' => 'mkdir "%FOLDER%" && unrar e -y -o+ "%FILE%" "%FOLDER%" ',
+        	'7z' => '7z e "%FILE%" -o"%FOLDER%" -aou -y ',
+        	'zip' => '7z e "%FILE%" -o"%FOLDER%" -aou -y ',
+	));
+	//Clean folders in download folder with size < O_CRON_FOLDERS_CLEAN_LOWSIZE in Mb (1 day created)
+	define( 'O_CRON_FOLDERS_CLEAN_LOWSIZE', 5 );
 	//Clean BIG files if freespace<O_WEBSCRAP_LIMIT_FREESPACE (try with this value in GB and decrements of -0,1) OR FALSE
 	define( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN', FALSE ); //INT Gb or FALSE
 	//Clean OLD files if freespace<O_WEBSCRAP_LIMIT_FREESPACE (delete files to min free space) BOOL
