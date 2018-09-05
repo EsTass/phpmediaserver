@@ -99,14 +99,14 @@
 	echo "<br />";
 	media_clean_imgs( 1000, TRUE, TRUE );
 	
-	//SCAN DOWNLOADED EXTRACK FILES
+	//SCAN DOWNLOADED EXTRAC FILES
 	if( defined( 'O_CRON_EXTRACTFILES' ) 
 	&& O_CRON_EXTRACTFILES == TRUE
 	){
         echo "<br />" . date( 'Y-m-d H:i:s' );
         echo "<br />Scan And Extract Media Downloads: ";
         echo "<br />";
-        media_extract_files( 20, TRUE );
+        media_extract_files( 20, TRUE, TRUE );
     }
 	
 	//CLEAN MEDIAINFO DUPLICATES
@@ -117,32 +117,6 @@
         echo "<br />Clean and assing duplicates mediainfo: ";
         echo "<br />";
         mediainfo_clean_duplicates( TRUE );
-    }
-	
-	//Search New Elements WebScrapp
-	if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
-	&& ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
-	&& $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
-	){
-        echo "<br />Search New Downloads Canceled, free space: " . formatSizeUnits( $freespace );
-	}elseif( is_array( O_WEBSCRAP_CRON ) 
-	&& count( O_WEBSCRAP_CRON ) > 0
-	&& isset( $G_WEBSCRAPPER )
-	&& is_array( $G_WEBSCRAPPER )
-	){
-        $num = 1;
-        foreach( O_WEBSCRAP_CRON AS $ws_cron ){
-            echo "<br />" . date( 'Y-m-d H:i:s' ) . ' ' . $num . '/' . count( O_WEBSCRAP_CRON );
-            if( array_key_exists( $ws_cron, $G_WEBSCRAPPER ) ){
-                echo "<br />Search New Download: " . $ws_cron;
-                echo "<br />";
-                webscrap_search_updated( $ws_cron, TRUE );
-            }else{
-                echo "<br />WebScrapper Not Found: " . $ws_cron;
-                echo "<br />";
-            }
-            $num++;
-        }
     }
 	
 	//AUTOCLEAN SPACE ON LOW (BIGFILES)
@@ -169,6 +143,42 @@
         //delete files while free space < O_WEBSCRAP_LIMIT_FREESPACE, with max of 50 files
         cleanLowDiskSpaceOldFiles( FALSE, 50 );
 	}
+	
+	//CLEAN DOWNLOADS FOLDERS size < Mb
+	if( defined( 'O_CRON_FOLDERS_CLEAN_LOWSIZE' ) 
+	&& O_CRON_FOLDERS_CLEAN_LOWSIZE != FALSE
+	){
+        echo "<br />" . date( 'Y-m-d H:i:s' );
+        echo "<br />Clean downloads folders lower: " . formatSizeUnits( ( O_CRON_FOLDERS_CLEAN_LOWSIZE * 1024 * 1024 ) );
+        echo "<br />";
+        cleanDownloadsFolders( TRUE, 1 );//1 day
+    }
+    
+	//Search New Elements WebScrapp
+	if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
+	&& ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
+	&& $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
+	){
+        echo "<br />Search New Downloads Canceled, free space: " . formatSizeUnits( $freespace );
+	}elseif( is_array( O_WEBSCRAP_CRON ) 
+	&& count( O_WEBSCRAP_CRON ) > 0
+	&& isset( $G_WEBSCRAPPER )
+	&& is_array( $G_WEBSCRAPPER )
+	){
+        $num = 1;
+        foreach( O_WEBSCRAP_CRON AS $ws_cron ){
+            echo "<br />" . date( 'Y-m-d H:i:s' ) . ' ' . $num . '/' . count( O_WEBSCRAP_CRON );
+            if( array_key_exists( $ws_cron, $G_WEBSCRAPPER ) ){
+                echo "<br />Search New Download: " . $ws_cron;
+                echo "<br />";
+                webscrap_search_updated( $ws_cron, TRUE );
+            }else{
+                echo "<br />WebScrapper Not Found: " . $ws_cron;
+                echo "<br />";
+            }
+            $num++;
+        }
+    }
 	
 	//LIVE TV CHECK
 	

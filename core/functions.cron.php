@@ -322,4 +322,37 @@
         }
     }
 	
+	function cleanDownloadsFolders( $echo = FALSE, $days = 1 ){
+        $result = FALSE;
+        
+        //Clean folders with size below O_CRON_FOLDERS_CLEAN_LOWSIZE Mb and created more than $days
+        if( defined( 'O_CRON_FOLDERS_CLEAN_LOWSIZE' ) 
+        && O_CRON_FOLDERS_CLEAN_LOWSIZE != FALSE
+        ){
+            //( O_CRON_FOLDERS_CLEAN_LOWSIZE * 1024 * 1024 )
+            $size = O_CRON_FOLDERS_CLEAN_LOWSIZE;
+            $path = PPATH_DOWNLOADS;
+            
+            if( ( $folders = getFolders( $path ) ) != FALSE 
+            ){
+                foreach( $folders AS $folder ){
+                    //if( $echo ) echo "<br />F:" . $folder;
+                    //if( $echo ) echo "<br />FS:" . formatSizeUnits( get_dir_size( $folder ) );
+                    if( file_exists( $folder ) 
+                    && ( $fsize = get_dir_size( $folder ) ) != FALSE
+                    && $fsize < $size
+                    && ( time() - filemtime( $folder ) ) > ( $days * 60 * 60 * 24 )
+                    && delTree( $folder )
+                    ){
+                        if( $echo ) echo "<br />DEL: " . $folder;
+                    }
+                }
+            }
+            
+            $result = TRUE;
+        }
+        
+        return $result;
+	}
+	
 ?>

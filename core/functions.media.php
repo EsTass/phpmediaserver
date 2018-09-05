@@ -278,9 +278,20 @@
         ){
             foreach( $elements AS $file ){
                 //var_dump( $file );
-                if( (
+                
+                //Generic extractor CMDs
+                if( ( $cmde = checkCompressesCMDValid( $file ) ) != FALSE
+                && !file_exists( $file . '_' )
+                ){
+                    //echo "<br />" . $cmde;
+                    if( $echo ) echo "+";
+                    runExtCommandNoRedirect( $cmde );
+                    $quantity--;
+                //Extension extractors
+                }elseif( (
                     endsWith( $file, '.zip' )
-                    || stripos( getFileMimeType( $file ), 'zip' ) !== FALSE
+                    //slow
+                    //|| stripos( getFileMimeType( $file ), 'zip' ) !== FALSE
                     )
                 && !file_exists( $file . '_' )
                 ){
@@ -289,7 +300,8 @@
                     if( $echo ) echo "+";
                 }elseif( (
                     endsWith( $file, '.rar' )
-                    || stripos( getFileMimeType( $file ), 'rar' ) !== FALSE
+                    //slow
+                    //|| stripos( getFileMimeType( $file ), 'rar' ) !== FALSE
                     )
                 && !file_exists( $file . '_' )
                 ){
@@ -298,14 +310,17 @@
                     if( $echo ) echo "+";
                 }elseif( (
                     endsWith( $file, '.7z' )
-                    || stripos( getFileMimeType( $file ), '7z' ) !== FALSE
+                    //slow
+                    //|| stripos( getFileMimeType( $file ), '7z' ) !== FALSE
                     )
                 && !file_exists( $file . '_' )
                 ){
+                    //TODO
                     extract7z( $file );
                     $quantity--;
                     if( $echo ) echo "+";
                 }
+                
                 if( defined( 'O_CRON_EXTRACTFILES_CLEAN' ) 
                 && O_CRON_EXTRACTFILES_CLEAN > 0
                 && file_exists( $file . '_' )
@@ -315,6 +330,33 @@
                     @unlink( $file );
                 }
                 if( $quantity <= 0 ){
+                    break;
+                }
+            }
+        }
+        
+        return $result;
+	}
+	
+	function checkCompressesCMDValid( $file ){
+        $result = FALSE;
+        
+        if( defined( 'O_CRON_EXTRACTFILES_CMD' ) 
+        && is_array( O_CRON_EXTRACTFILES_CMD )
+        && count( O_CRON_EXTRACTFILES_CMD ) > 0
+        && file_exists( $file )
+        && is_file( $file )
+        ){
+            $cmds = O_CRON_EXTRACTFILES_CMD;
+            foreach( $cmds AS $ext => $cmd ){
+                if( endsWith( $file, $ext ) ){
+                    //%FILE% %FOLDER% %PASS%
+                    $cmd = str_replace( '%FILE%', $file, $cmd );
+                    $foldere = dirname( $file ) . DS . basename( $file ) . '_';
+                    $cmd = str_replace( '%FOLDER%', $foldere, $cmd );
+                    //TODO
+                    //$cmd = str_replace( '%PASS%', $file, $cmd );
+                    $result = $cmd;
                     break;
                 }
             }
@@ -1134,6 +1176,7 @@
         return $result;
     }
     
+    //TODO
     function get_media_chapter_aggresive( $title ){
         $result = array();
         $result[] = 1;
