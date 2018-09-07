@@ -130,15 +130,18 @@
                             }
                             //copy file to format idmediainfo.poster|landscape|...
                             $imgfile = PPATH_MEDIAINFO . DS . $idmediainfo . '.' . $kif;
-                            if( file_exists( $imgfile ) ){
-                                @unlink( $imgfile );
-                            }
-                            if( @link( $vif, $imgfile ) 
-                            || @copy( $vif, $imgfile )
-                            ){
-                                echo get_msg( 'DEF_COPYOK' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
-                            }else{
-                                echo get_msg( 'DEF_COPYKO' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
+                            //check same
+                            if( $imgfile != $vif ){
+                                if( file_exists( $imgfile ) ){
+                                    @unlink( $imgfile );
+                                }
+                                if( @link( $vif, $imgfile ) 
+                                || @copy( $vif, $imgfile )
+                                ){
+                                    echo get_msg( 'DEF_COPYOK' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
+                                }else{
+                                    echo get_msg( 'DEF_COPYKO' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $kif;
+                                }
                             }
                         }
                     }
