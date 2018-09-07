@@ -34,6 +34,16 @@
                 'linksappend' => '',
                 //html object have links: a
                 'linksobject' => 'a',
+                //alternative mode to get title
+                'linkstitle' => array( 'mode', param1, param2, ... ),
+                    //Modes
+                    'linkstitle' => array( 'inhtml', (-/+)sizetosearch, pre-text, posttext ),
+                    'linkstitle' => array( 'inurl', pre-text, posttext )
+                //Extract image from search and use on list
+                'linksimage' => array( 'mode', param1, param2, ... ),
+                    //Modes
+                    'linksimage' => array( 'inhtml', (-/+)sizetosearch, pre-text, posttext ),
+                    'linksimage' => array( 'near' ),
                 //String needed in linkTitle to be valid
                 'linktitleneeded' => array(),
                 //String needed in linkURL to be valid
@@ -100,10 +110,11 @@
 	
 	//SCRAPP SEARCH
 	
-	function webscrapp_search( $wscrapper, $search = '', $debug = PPATH_WEBSCRAP_DEBUG ){
+	function webscrapp_search( $wscrapper, $search = '', $debug = PPATH_WEBSCRAP_DEBUG, $getimages = FALSE ){
         global $G_WEBSCRAPPER;
         $scrapper = FALSE;
         $result = FALSE;
+        $resultimgs = array();
         
         $exturl = '';
         //searchfunction
@@ -154,14 +165,25 @@
             $excludeurl = $scrapperdata[ 'searchdata' ][ 'linkurlexclude' ];
             foreach ( $dom->getElementsByTagName( $scrapperdata[ 'searchdata' ][ 'linksobject' ] ) as $link ){
 				$href = $link->getAttribute( "href" );
-				$title = $link->nodeValue;
-				$title = trim( $title );
-				if( strlen( $title ) == 0 ){
-                    $title = $link->textContent;
-                }
-                $title = trim( $title );
-				if( strlen( $title ) == 0 ){
-                    $title = $link->getAttribute( 'title' );
+				
+				//Title
+				if( array_key_exists( 'linkstitle', $scrapperdata[ 'searchdata' ] ) 
+				&& is_array( $scrapperdata[ 'searchdata' ][ 'linkstitle' ] )
+				&& count( $scrapperdata[ 'searchdata' ][ 'linkstitle' ] ) > 0
+				&& ( $ftitle = webscrap_get_title( $htmldata, $scrapperdata[ 'searchdata' ][ 'linkstitle' ], $href ) ) != FALSE
+				){
+                    $title = $ftitle;
+                    if( $debug ) echo '<br />TITLE-ALTERNATIVE: ' . $title . ' => ' . $href;
+				}else{
+                    $title = $link->nodeValue;
+                    $title = trim( $title );
+                    if( strlen( $title ) == 0 ){
+                        $title = $link->textContent;
+                    }
+                    $title = trim( $title );
+                    if( strlen( $title ) == 0 ){
+                        $title = $link->getAttribute( 'title' );
+                    }
                 }
                 $title = trim( $title );
 				
@@ -298,6 +320,32 @@
                 }
             }
             
+        }
+        
+        //get images
+        if( $getimages
+        && is_array( $result )
+        && count( $result ) > 0
+        ){
+            foreach( $result AS $title => $href ){
+                //basepath
+                if( array_key_exists( 'linksappend', $scrapperdata[ 'searchdata' ] ) 
+                && strlen( $scrapperdata[ 'searchdata' ][ 'linksappend' ] ) > 0 
+                ){
+                    $basepath = $scrapperdata[ 'searchdata' ][ 'linksappend' ];
+                }else{
+                    $basepath = FALSE;
+                }
+                if( array_key_exists( 'linksimage', $scrapperdata[ 'searchdata' ] ) 
+				&& is_array( $scrapperdata[ 'searchdata' ][ 'linksimage' ] )
+				&& count( $scrapperdata[ 'searchdata' ][ 'linksimage' ] ) > 0
+				&& ( $ftitle = webscrap_get_image( $htmldata, $scrapperdata[ 'searchdata' ][ 'linksimage' ], $href, $basepath, $debug ) ) != FALSE
+				){
+                    $resultimgs[ $title ] = $ftitle;
+                    if( $debug ) echo '<br />IMGURL: ' . $title . ' => ' . $ftitle;
+				}
+            }
+            $result = array( $result, $resultimgs );
         }
         
         return $result;
@@ -1245,6 +1293,199 @@
             }
         }
         if( $debug ) echo "<br />externallinks_downloader: " . $wsResult;
+        
+        return $result;
+	}
+	
+	//TITLE EXTRACTION
+	
+	//Get title from html with selected method (inhtml, inurl)
+	function webscrap_get_title( $html, $stdata, $href, $DEBUG = FALSE ){
+        $result = FALSE;
+        
+        switch( $stdata[ 0 ] ){
+            case 'inurl':
+                //PARAMS: 1=>pretext, 2=>postext
+                if( count( $stdata ) >= 2 
+                && is_string( $stdata[ 1 ] )
+                && is_string( $stdata[ 2 ] )
+                ){
+                    if( $DEBUG ) echo "<br />TITLEEXTRACT_INURL: " . $href;
+                    //extract from url last part
+                    if( strlen( $stdata[ 1 ] ) == 0 
+                    && strlen( $stdata[ 2 ] ) == 0 
+                    ){
+                        if( $DEBUG ) echo "<br />TITLEEXTRACT_INURL: " . $href;
+                        $hrefd = explode( '/', trim( $href, '/' ) );
+                        if( $DEBUG ) echo "<br />TITLEEXTRACT_INURL-D: ";var_dump( $hrefd );
+                        $hrefd = $hrefd[ ( count( $hrefd ) - 1 ) ];
+                    }else{
+                        $hrefd = $href;
+                        //pre text
+                        if( strlen( $stdata[ 1 ] ) > 0 ){
+                            $hrefd = explode( $stdata[ 1 ], $hrefd );
+                            $hrefd = $hrefd[ ( count( $hrefd ) - 1 ) ];
+                        }
+                        //pos text
+                        if( strlen( $stdata[ 2 ] ) > 0 ){
+                            $hrefd = explode( $stdata[ 2 ], $hrefd );
+                            $hrefd = $hrefd[ 0 ];
+                        }
+                    }
+                    if( strlen( $hrefd ) > 0 ){
+                        $result = $hrefd;
+                    }
+                }
+                break;
+            case 'inhtml':
+                //PARAMS: 1=>(+-)sizetosearch,2=>pretext, 3=>postext
+                if( count( $stdata ) >= 3 ){
+                    if( $DEBUG ) echo "<br />TITLEEXTRACT_INHTML: " . $href;
+                    //get in html in substring with size of param1 (- before link, + after link) from link, the text between param2 and param3
+                    $size = $stdata[ 1 ];
+                    $pretext = $stdata[ 2 ];
+                    $postext = $stdata[ 3 ];
+                    if( ( $bpos = stripos( $html, $href ) ) !== FALSE ){
+                        //get text $size
+                        if( $size > 0 ){
+                            $search = substr( $html, $bpos, $size );
+                        }elseif( $size < 0 ){
+                            $search = substr( $html, ( $bpos + $size ), ( $bpos - $size ) );
+                        }else{
+                            $search = $html;
+                        }
+                        if( $DEBUG ) echo "<br />TITLEEXTRACT_INHTML_SEARCH: " . htmlspecialchars( $search ) . "";
+                        //search
+                        if( strlen( $search ) > 0 ){
+                            $hrefd = '';
+                            //pre text
+                            if( strlen( $pretext ) > 0 ){
+                                $hrefd = explode( $pretext, $search );
+                                $hrefd = $hrefd[ ( count( $hrefd ) - 1 ) ];
+                            }
+                            if( $DEBUG ) echo "<br />TITLEEXTRACT_INHTML_SEARCH1: " . htmlspecialchars( $hrefd ) . "";
+                            //pos text
+                            if( strlen( $postext ) > 0 
+                            && strlen( $hrefd ) > 0
+                            ){
+                                $hrefd = explode( $postext, $hrefd );
+                                $hrefd = $hrefd[ 0 ];
+                            }
+                            if( $DEBUG ) echo "<br />TITLEEXTRACT_INHTML_SEARCH2: " . htmlspecialchars( $hrefd ) . "";
+                            if( strlen( $hrefd ) > 0 ){
+                                $result = $hrefd;
+                            }
+                        }
+                    }
+                }
+                break;
+        }
+        
+        if( $DEBUG ) echo "<br />TITLEEXTRACT_RESULT: " . $result;
+        
+        return $result;
+	}
+	
+	//IMAGE EXTRACTION
+	
+	//Get img from html with selected method (inhtml, near )
+	function webscrap_get_image( $html, $stdata, $href, $basepath = FALSE, $DEBUG = TRUE ){
+        $result = FALSE;
+        
+        switch( $stdata[ 0 ] ){
+            case 'inhtml':
+                //PARAMS: 1=>(+-)sizetosearch,2=>pretext, 3=>postext
+                if( count( $stdata ) >= 3 ){
+                    if( $DEBUG ) echo "<br />IMGEXTRACT_INHTML: " . $href;
+                    //get in html in substring with size of param1 (- before link, + after link) from link, the text between param2 and param3
+                    $size = $stdata[ 1 ];
+                    $pretext = $stdata[ 2 ];
+                    $postext = $stdata[ 3 ];
+                    if( ( $bpos = stripos( $html, $href ) ) !== FALSE ){
+                        //get text $size
+                        if( $size > 0 ){
+                            $search = substr( $html, $bpos, $size );
+                        }elseif( $size < 0 ){
+                            $search = substr( $html, ( $bpos + $size ), ( $size * -1 ) );
+                        }else{
+                            //base +500
+                            $search = substr( $html, $bpos, 500 );
+                        }
+                        if( $DEBUG ) echo "<br />IMGEXTRACT_INHTML_SEARCH: <pre><code>" . htmlspecialchars( $search ) . "</code></pre>";
+                        //search
+                        if( strlen( $search ) > 0 ){
+                            $hrefd = '';
+                            //pre text
+                            if( strlen( $pretext ) > 0 ){
+                                $hrefd = explode( $pretext, $search );
+                                $hrefd = $hrefd[ ( count( $hrefd ) - 1 ) ];
+                            }
+                            if( $DEBUG ) echo "<br />IMGEXTRACT_INHTML_SEARCH1: <pre><code>" . htmlspecialchars( $hrefd ) . "</code></pre>";
+                            //pos text
+                            if( strlen( $postext ) > 0 
+                            && strlen( $hrefd ) > 0
+                            ){
+                                $hrefd = explode( $postext, $hrefd );
+                                $hrefd = $hrefd[ 0 ];
+                            }
+                            if( $DEBUG ) echo "<br />IMGEXTRACT_INHTML_SEARCH2: <pre><code>" . htmlspecialchars( $hrefd ) . "</code></pre>";
+                            if( strlen( $hrefd ) > 0 
+                            ){
+                                $result = $hrefd;
+                            }
+                        }
+                    }
+                }
+                break;
+            case 'near':
+                //PARAMS: 
+                if( $DEBUG ) echo "<br />IMGEXTRACT_NEAR: " . $href;
+                $posl = array();
+                //get all images links in page and get near
+                if( ( $alllinks = webscrap_extract_links_all_html( $html, 'IMAGES' ) ) != FALSE 
+                && ( $posbase = stripos( $html, $href ) ) !== FALSE
+                ){
+                    if( $DEBUG ) echo "<br />IMGEXTRACT_NEAR_POSBASE: " . $posbase;
+                    $nearest = 0;
+                    foreach( $alllinks AS $t => $l ){
+                        if( 
+                        (
+                            endsWith( $l, 'jpg' )
+                            || endsWith( $l, 'gif' )
+                            || endsWith( $l, 'png' )
+                            || endsWith( $l, 'jpeg' )
+                        )
+                        && ( $pos = stripos( $html, $l ) ) !== FALSE 
+                        ){
+                            $dist = abs( $posbase - $pos );
+                            if( $DEBUG ) echo "<br />IMGEXTRACT_NEAR_IMGADD: " . $dist . ' -> ' . $l . '';
+                            if( $nearest == 0 
+                            || $nearest > $dist
+                            ){
+                                $nearest = $dist;
+                                $result = $l;
+                            }
+                        }
+                    }
+                    if( $DEBUG ) echo "<br />IMGEXTRACT_NEAR_SELECTED: " . $nearest . ' -> ' . $result . '';
+                }
+                break;
+        }
+        
+        //add basepath if needed
+        if( is_string( $result ) 
+        && !startsWith( $result, 'http' )
+        && is_string( $basepath )
+        && filter_var( $basepath . $result, FILTER_VALIDATE_URL )
+        ){
+            $result = $basepath . $result;
+        }
+        
+        if( !filter_var( $result, FILTER_VALIDATE_URL ) ){
+            $result = FALSE;
+        }
+        
+        if( $DEBUG ) echo "<br />IMGEXTRACT_RESULT: <pre><code>" . $result . "</code></pre>";
         
         return $result;
 	}

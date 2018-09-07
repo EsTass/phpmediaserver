@@ -642,6 +642,37 @@
 		return $result;
 	}
 	
+	function getDataMimeType( $data ){
+        $finfo = new finfo( FILEINFO_MIME_TYPE );
+        return $finfo->buffer( $data );
+    }
+    
+    
+	function getDataMimeTypeVideo( $data ) {
+		$result = FALSE;
+		if( ( $type = getDataMimeType( $data ) ) != FALSE
+		&& stripos( $type, 'video' ) !== FALSE 
+		){
+            $result = TRUE;
+		}
+		return $result;
+	}
+	
+	function getDataMimeTypeImg( $data ) {
+		$result = FALSE;
+		if( ( $type = getDataMimeType( $data ) ) != FALSE
+		&& ( 
+            stripos( $type, 'image' ) !== FALSE 
+            || stripos( $type, 'img' ) !== FALSE 
+            )
+        ){
+         
+            $result = TRUE;
+		}
+		return $result;
+	}
+	
+    
 	//FILE EXTENSION
 	
 	function get_file_extension( $file ){

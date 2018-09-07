@@ -35,9 +35,13 @@
 	echo "<br />";
 	echo get_msg( 'MENU_SEARCH', FALSE ) . ': ' . $SCRAPPER . ' => ' . $SEARCH;
 	
-	if( ( $links = webscrapp_search( $SCRAPPER, $SEARCH ) ) != FALSE 
+	if( ( $links = webscrapp_search( $SCRAPPER, $SEARCH, PPATH_WEBSCRAP_DEBUG, TRUE ) ) != FALSE 
 	&& count( $links ) > 0
 	){
+	
+	//separate links and images
+	$linksimgs = $links[ 1 ];
+	$links = $links[ 0 ];
 	
 	//CLEAN VALUES
 	$SCRAPPER = str_replace( "\t", '', $SCRAPPER );
@@ -49,19 +53,31 @@
         <tr>
             <th colspan='100' class='tCenter'><?php echo get_msg( 'IDENT_DETECTED' ); ?></th>
         </tr>
-        <?php  
+        <?php
+            $inlist = array();
             foreach( $links AS $t => $href ){
-                $t = str_replace( "\t", '', $t );
-                $t = str_replace( "\n", '', $t );
-                $t = str_replace( "\r", '', $t );
+                if( !in_array( $href, $inlist ) ){
+                    $inlist[] = $href;
+                    $t = str_replace( "\t", '', $t );
+                    $t = str_replace( "\n", '', $t );
+                    $t = str_replace( "\r", '', $t );
+                    //img
+                    if( array_key_exists( $t, $linksimgs ) ){
+                        $urli = getURLBase() . '?r=r&action=webscrapi&url=' . urlencode( $linksimgs[ $t ] );
+                        $img = '<br /><img src="' . $urli . '" alt="' . $t . '" style="max-width: 20vh;" />';
+                    }else{
+                        $img = '';
+                    }
         ?>
         <tr>
             <td class='tCenter'>
                 <a class='aIdentSearchResult' href='#' onclick='webscrap_add( "<?php echo addslashes( $SCRAPPER ); ?>", "<?php echo addslashes( $href ); ?>", "<?php echo addslashes( $t ); ?>" )'><?php echo $t; ?>
+                <?php echo $img; ?>
                 </a>
             </td>
         </tr>
         <?php  
+                }
             }
         ?>
     </table>
