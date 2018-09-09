@@ -13,7 +13,7 @@
 	define( 'HPATH_MEDIA', getURLBase() . '/imgs' );
 	
 	//Force HTTPS connection
-	define( 'O_FORCE_HTTPS', TRUE );
+	define( 'O_FORCE_HTTPS', FALSE );
 	
 	//List Quantity
 	define( 'O_LIST_QUANTITY', 32 );
@@ -28,7 +28,7 @@
 	define( 'O_ACTIONDEFAULT', 'list' );
 	
 	//LANGUAJE
-	define( 'O_LANG', 'es' );
+	define( 'O_LANG', 'def' );
 	
 	//LANGUAJE AUDIO TRACK select channel on play
 	define( 'O_LANG_AUDIO_TRACK', array( 'eng', 'en' ) );
