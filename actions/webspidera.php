@@ -30,11 +30,11 @@
 	
 	if( array_key_exists( 'url', $G_DATA ) 
 	&& strlen( $G_DATA[ 'url' ] ) > 3
-	&& filter_var( $G_DATA[ 'url' ], FILTER_VALIDATE_URL )
+	//&& filter_var( $G_DATA[ 'url' ], FILTER_VALIDATE_URL )
 	){
         $URL = $G_DATA[ 'url' ];
 	}else{
-        echo "Invalid url: ";
+        echo "Invalid url: " . $G_DATA[ 'url' ];
         die();
 	}
 	
@@ -303,6 +303,24 @@
         $TIMES = (int)$SPIDER;
 	}
 	$scrapped = array();
-	webspider_search( $URL, $TIMES, $TIMES, $SPIDER, $scrapped );
+	//check url or search on web
+	if( filter_var( $URL, FILTER_VALIDATE_URL ) ){
+        //url
+        webspider_search( $URL, $TIMES, $TIMES, $SPIDER, $scrapped );
+    }else{
+        //search and spider, search on search-result and next but some searchs need to be 3 because searchs links a own link
+        $TIMES = 3;
+        $SPIDER = 'all';
+        $SPIDERS_URLs = array(
+            'https://www.searchencrypt.com/search?eq=%SEARCH%',
+            //'https://searx.me/?q=%SEARCH%&categories=general',
+            'https://ask.com/web?q=%SEARCH%&qsrc=0&o=0&l=dir&qo=homepageSearchBox',
+            'https://search.yahoo.com/search/?fr2=sb-top-search&p=%SEARCH%&fr=sfp&iscqry=',
+            'https://www.bing.com/search?q=%SEARCH%',
+        );
+        $r = mt_rand( 0, ( count( $SPIDERS_URLs ) - 1 ) );
+        $URL = str_replace( '%SEARCH%', urlencode( $URL ), $SPIDERS_URLs[ $r ] );
+        webspider_search( $URL, $TIMES, $TIMES, $SPIDER, $scrapped );
+    }
 	
 ?>

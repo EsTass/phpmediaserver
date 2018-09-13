@@ -73,7 +73,11 @@
 	echo "<br />" . date( 'Y-m-d H:i:s' );
 	echo "<br />Scan Duplicated Media Downloads (" . O_CRON_CLEAN_DUPLICATES_MEDIAINFO . " Days Old): ";
 	echo "<br />";
-	mediainfo_clean_duplicated_files( 100, TRUE );
+	if( defined( 'O_CRON_CLEAN_DUPLICATES_MEDIAINFO' ) 
+	&& O_CRON_CLEAN_DUPLICATES_MEDIAINFO > 0
+	){
+        mediainfo_clean_duplicated_files( O_CRON_CLEAN_DUPLICATES_MEDIAINFO, 100, TRUE );
+    }
 	
 	//SCAN DOWNLOADED NOT IDENTIFIED MEDIA OLD
 	echo "<br />" . date( 'Y-m-d H:i:s' );
@@ -99,7 +103,7 @@
 	echo "<br />";
 	media_clean_imgs( 1000, TRUE, TRUE );
 	
-	//SCAN DOWNLOADED EXTRAC FILES
+	//SCAN DOWNLOADED EXTRACT FILES
 	if( defined( 'O_CRON_EXTRACTFILES' ) 
 	&& O_CRON_EXTRACTFILES == TRUE
 	){
@@ -132,39 +136,60 @@
         cleanLowDiskSpace( FALSE, 10, 10 );
 	}
 	
-	//AUTOCLEAN SPACE ON LOW (OLDFILES)
-	
+	//AUTOCLEAN SPACE ON LOW
 	if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
-	&& defined( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN_OLD' )
-	&& O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN_OLD != FALSE
-	&& ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
-	&& $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
+    && ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
+    && $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
 	){
-        //delete files while free space < O_WEBSCRAP_LIMIT_FREESPACE, with max of 50 files
-        cleanLowDiskSpaceOldFiles( FALSE, 50 );
-	}
+        
+        echo "<br />" . date( 'Y-m-d H:i:s' );
+        echo "<br /> WARNING LOW FREE SPACE: " . formatSizeUnits( $freespace );
+        echo "<br />";
+        
+        //RETRY LOWER VALUES DUPLICATES
+        
+        //SCAN DUPLICATES MEDIAINFO (only scrapped files)
+        echo "<br />" . date( 'Y-m-d H:i:s' );
+        echo "<br />RE-Scan Duplicated Media Downloads ( 1 Days Old for low free space): ";
+        echo "<br />";
+        mediainfo_clean_duplicated_files( 1, 100, TRUE );
+        
+        //AUTOCLEAN SPACE ON LOW (OLDFILES)
+        
+        if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
+        && defined( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN_OLD' )
+        && ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
+        && $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
+        && O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN_OLD != FALSE
+        ){
+            //delete files while free space < O_WEBSCRAP_LIMIT_FREESPACE, with max of 50 files
+            cleanLowDiskSpaceOldFiles( FALSE, 50 );
+        }
+    }
 	
 	//CLEAN DOWNLOADS FOLDERS size < Mb
+	
 	if( defined( 'O_CRON_FOLDERS_CLEAN_LOWSIZE' ) 
 	&& O_CRON_FOLDERS_CLEAN_LOWSIZE != FALSE
 	){
         echo "<br />" . date( 'Y-m-d H:i:s' );
         echo "<br />Clean downloads folders lower: " . formatSizeUnits( ( O_CRON_FOLDERS_CLEAN_LOWSIZE * 1024 * 1024 ) );
         echo "<br />";
-        cleanDownloadsFolders( TRUE, 1 );//1 day
+        cleanDownloadsFolders( TRUE, O_CRON_CLEAN_DUPLICATES_MEDIAINFO );//O_CRON_CLEAN_DUPLICATES_MEDIAINFO day
     }
     
-	//Search New Elements WebScrapp
-	if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
-	&& ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
-	&& $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
-	){
+    //Search New Elements WebScrapp
+    
+    if( defined( 'O_WEBSCRAP_LIMIT_FREESPACE' ) 
+    && ( $freespace = disk_free_space( PPATH_DOWNLOADS ) ) != FALSE
+    && $freespace  < ( O_WEBSCRAP_LIMIT_FREESPACE * 1024 * 1024 * 1024 )
+    ){
         echo "<br />Search New Downloads Canceled, free space: " . formatSizeUnits( $freespace );
-	}elseif( is_array( O_WEBSCRAP_CRON ) 
-	&& count( O_WEBSCRAP_CRON ) > 0
-	&& isset( $G_WEBSCRAPPER )
-	&& is_array( $G_WEBSCRAPPER )
-	){
+    }elseif( is_array( O_WEBSCRAP_CRON ) 
+    && count( O_WEBSCRAP_CRON ) > 0
+    && isset( $G_WEBSCRAPPER )
+    && is_array( $G_WEBSCRAPPER )
+    ){
         $num = 1;
         foreach( O_WEBSCRAP_CRON AS $ws_cron ){
             echo "<br />" . date( 'Y-m-d H:i:s' ) . ' ' . $num . '/' . count( O_WEBSCRAP_CRON );
@@ -179,8 +204,8 @@
             $num++;
         }
     }
-	
-	//LIVE TV CHECK
+    
+	//LIVE TV CHECK (slow)
 	
     $cronid = 'cron_7d';
     if( defined( 'O_CRON_VLONG_TIME' ) ){

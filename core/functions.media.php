@@ -141,11 +141,10 @@
 	
 	//SCAN FILES IN DOWNLOAD
 	
-	function mediainfo_clean_duplicated_files( $quantity = 10, $echo = FALSE, $debug = FALSE ){
+	function mediainfo_clean_duplicated_files( $days = 5, $quantity = 10, $echo = FALSE, $debug = FALSE ){
         $result = TRUE;
         
-        if( defined( 'O_CRON_CLEAN_DUPLICATES_MEDIAINFO' )
-        && O_CRON_CLEAN_DUPLICATES_MEDIAINFO > 0
+        if( $days > 0
         && ( $mdata = sqlite_media_getdata_order_mediainfo( FALSE, 100000 ) ) != FALSE 
         && is_array( $mdata )
         && count( $mdata ) > 0
@@ -166,9 +165,8 @@
                     if( $debug ) echo "<br />Q: " . $quantity;
                     $ffiles = array();
                     foreach( $files AS $file ){
-                        if( defined( 'O_CRON_CLEAN_DUPLICATES_MEDIAINFO' )
-                        && O_CRON_CLEAN_DUPLICATES_MEDIAINFO > 0
-                        && ( time() - filemtime( $file[ 'file' ] ) ) > ( O_CRON_CLEAN_DUPLICATES_MEDIAINFO * 86400 ) ){
+                        if( $days > 0
+                        && ( time() - filemtime( $file[ 'file' ] ) ) > ( $days * 86400 ) ){
                             $ffiles[] = $file;
                         }
                     }
