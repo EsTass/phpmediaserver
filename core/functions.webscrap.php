@@ -60,6 +60,8 @@
                 //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
                 'filtersizetextpre' => 'Size: ',
                 'filtersizetextpos' => '</span> ',
+                //FILTER SIZE: preg_match on html, rewrite filtersizetextpre && filtersizetextpos
+                'filtersizetextpreg' => '/(<td>)[0-9]+ *MB(<\/td>)/i',
                 //FILTER SIZE: max chars distance from link (-before,+after)
                 'filtersizetextdistance' => 1000,
                 //FILTER SIZE: especific size(MB)=function( $webscrapperdata, $html, $link )
@@ -93,6 +95,8 @@
                     //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
                     'filtersizetextpre' => 'Size: ',
                     'filtersizetextpos' => '</span> ',
+                    //FILTER SIZE: preg_match on html, rewrite filtersizetextpre && filtersizetextpos
+                    'filtersizetextpreg' => '/(<td>)[0-9]+ *MB(<\/td>)/i',
                     //FILTER SIZE: especific size(MB)=function( $html )
                     'filtersizefunction' => '',
                     //DOWNLOAD MULTIPLE
@@ -661,8 +665,11 @@
 		//$url = 'ed2K....';
 		$result = FALSE;
 		
+		$rnd_str = '' . getRandomString( 4 );
 		if( !endsWith( $file, '.torrent' ) ){
-            $file .= '.torrent';
+            $file .= '.' . $rnd_str . '.torrent';
+		}else{
+            $file = str_ireplace( '.torrent' , '.' . $rnd_str . '.torrent', $file );
 		}
 		
 		if( file_exists( $file ) 
@@ -726,6 +733,8 @@
         $posa = 0;
         $posb = 0;
         $linkpos = 0;
+        $start = 0;
+        $end = 0;
         
         if( $debug ) echo "<br />CHECKING SIZE: " . $link . ' ' . strlen( $html );
         
@@ -737,11 +746,24 @@
             }
             $pre = $webscrapperdata[ $pass ][ 'filtersizetextpre' ];
             $pos = $webscrapperdata[ $pass ][ 'filtersizetextpos' ];
+            
             if( array_key_exists( 'filtersizetextdistance', $webscrapperdata[ $pass ] ) 
-            && $webscrapperdata[ $pass ][ 'filtersizetextdistance' ] != 0
+            && (int)$webscrapperdata[ $pass ][ 'filtersizetextdistance' ] > 0
             && ( $linkpos = stripos( $html, $link ) ) !== FALSE
             ){
-                $html = substr( $html, $linkpos, $webscrapperdata[ $pass ][ 'filtersizetextdistance' ] );
+                $start = $linkpos;
+                $end = (int)$webscrapperdata[ $pass ][ 'filtersizetextdistance' ];
+                $html = substr( $html, $start, $end );
+            }elseif( array_key_exists( 'filtersizetextdistance', $webscrapperdata[ $pass ] ) 
+            && (int)$webscrapperdata[ $pass ][ 'filtersizetextdistance' ] < 0
+            && ( $linkpos = stripos( $html, $link ) ) !== FALSE
+            ){
+                $start = $linkpos + (int)$webscrapperdata[ $pass ][ 'filtersizetextdistance' ];
+                if( $start <= 0 ){
+                    $start = 0;
+                }
+                $end = (int)$webscrapperdata[ $pass ][ 'filtersizetextdistance' ] * -1;
+                $html = substr( $html, $start, $end );
             }
         }elseif( array_key_exists( 'passdata', $webscrapperdata ) 
         && array_key_exists( $pass, $webscrapperdata[ 'passdata' ] ) 
@@ -753,11 +775,24 @@
             }
             $pre = $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpre' ];
             $pos = $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpos' ];
+            
             if( array_key_exists( 'filtersizetextdistance', $webscrapperdata[ 'passdata' ][ $pass ] ) 
-            && $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextdistance' ] != 0
+            && (int)$webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextdistance' ] > 0
             && ( $linkpos = stripos( $html, $link ) ) !== FALSE
             ){
-                $html = substr( $html, $linkpos, $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextdistance' ] );
+                $start = $linkpos;
+                $end = (int)$webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextdistance' ];
+                $html = substr( $html, $start, $end );
+            }elseif( array_key_exists( 'filtersizetextdistance', $webscrapperdata[ 'passdata' ][ $pass ] ) 
+            && (int)$webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextdistance' ] < 0
+            && ( $linkpos = stripos( $html, $link ) ) !== FALSE
+            ){
+                $start = $linkpos + (int)$webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextdistance' ];
+                if( $start <= 0 ){
+                    $start = 0;
+                }
+                $end = (int)$webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextdistance' ] * -1;
+                $html = substr( $html, $start, $end );
             }
         }else{
             //$html = '--NO DISTANCE--';
@@ -766,51 +801,108 @@
         if( $debug ) echo "<br />GET pretag: " . htmlspecialchars( $pre );
         if( $debug ) echo "<br />GET postag: " . htmlspecialchars( $pos );
         if( $debug ) echo "<br />GET linkpos: " . $linkpos;
+        if( $debug ) echo "<br />GET linkpos start: " . $start;
+        if( $debug ) echo "<br />GET linkpos end: " . $end;
         if( $debug ) echo "<br />GET posA: " . $posa;
         if( $debug ) echo "<br />GET posB: " . $posb;
         if( $debug ) echo "<br />GET html: " . htmlspecialchars( $html );
         
-        if( strlen( $html ) > 20 )
-        while( $posa !== FALSE
-        && ( $posa = stripos( $html, $pre, $posa ) ) !== FALSE
-        && ( $posb = stripos( $html, $pos, $posa ) ) !== FALSE
-        && ( $stext = substr( $html, ( $posa + strlen( $pre ) ), ( $posb - $posa ) ) ) !== FALSE
-        && strlen( $stext ) > 0
-        ){
-            if( $debug ) echo "<br />GET TRY: " . htmlspecialchars( $stext );
-            if( $debug ) echo "<br />GET posA: " . $posa;
-            if( $debug ) echo "<br />GET posB: " . $posb;
-            preg_match_all('!\d+(?:\.\d+)?!', $stext, $matches);
-            $floats = array_map('floatval', $matches[0]);
-            foreach( $floats AS $f ){
-                if( $f > 0 ){
-                    $result = $f;
-                    break;
+        if( strlen( $html ) > 20 ){
+            while( $posa !== FALSE
+            && ( $posa = stripos( $html, $pre, $posa ) ) !== FALSE
+            && ( $posb = stripos( $html, $pos, $posa ) ) !== FALSE
+            && ( $stext = substr( $html, ( $posa + strlen( $pre ) ), ( $posb - $posa ) ) ) !== FALSE
+            && strlen( $stext ) > 0
+            ){
+                if( $debug ) echo "<br />GET TRY: " . htmlspecialchars( $stext );
+                if( $debug ) echo "<br />GET posA: " . $posa;
+                if( $debug ) echo "<br />GET posB: " . $posb;
+                preg_match_all('!\d+(?:\.\d+)?!', $stext, $matches);
+                $floats = array_map('floatval', $matches[0]);
+                foreach( $floats AS $f ){
+                    if( $f > 0 ){
+                        $result = $f;
+                        break;
+                    }
+                }
+                
+                //Type
+                if( stripos( 'mb', $stext ) != FALSE 
+                || stripos( 'mib', $stext ) != FALSE
+                ){
+                    //$result *= ( 1024 * 1024 );
+                }elseif( stripos( 'gb', $stext ) != FALSE 
+                || stripos( 'gib', $stext ) != FALSE
+                ){
+                    $result *= 1024;
+                }elseif( stripos( 'tb', $stext ) != FALSE 
+                || stripos( 'tib', $stext ) != FALSE
+                ){
+                    $result *= 1024 * 1024;
+                }elseif( $result < 100 ){
+                    $result *= 1024;
+                }
+                if( $debug ) echo "<br />TRY SIZE: " . $result;
+                if( $result > 0 ){
+                    $posa = FALSE;
+                }else{
+                    $posa++;
                 }
             }
             
-            //Type
-            if( stripos( 'mb', $stext ) != FALSE 
-            || stripos( 'mib', $stext ) != FALSE
+            //filtersizetextpreg if exist
+            $preg = FALSE;
+            if( $pass == 'searchdata' 
+            && array_key_exists( 'filtersizetextpreg', $webscrapperdata[ $pass ] )
+            && $webscrapperdata[ $pass ][ 'filtersizetextpreg' ] != FALSE
+            && strlen( $webscrapperdata[ $pass ][ 'filtersizetextpreg' ] ) > 0
             ){
-                //$result *= ( 1024 * 1024 );
-            }elseif( stripos( 'gb', $stext ) != FALSE 
-            || stripos( 'gib', $stext ) != FALSE
+                $preg = $webscrapperdata[ $pass ][ 'filtersizetextpreg' ];
+            }elseif( is_numeric( $pass )
+            && array_key_exists( 'passdata', $webscrapperdata )
+            && array_key_exists( $pass, $webscrapperdata[ 'passdata' ] )
+            && array_key_exists( 'filtersizetextpreg', $webscrapperdata[ 'passdata' ][ $pass ] )
+            && $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpreg' ] != FALSE
+            && strlen( $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpreg' ] ) > 0
             ){
-                $result *= 1024;
-            }elseif( stripos( 'tb', $stext ) != FALSE 
-            || stripos( 'tib', $stext ) != FALSE
-            ){
-                $result *= 1024 * 1024;
-            }elseif( $result < 100 ){
-                $result *= 1024;
+                $preg = $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpreg' ];
             }
-            if( $debug ) echo "<br />TRY SIZE: " . $result;
-            if( $result > 0 ){
-                $posa = FALSE;
-            }else{
-                $posa++;
+            if( $debug ) echo "<br />CHECK SIZE (REGEXP): " . htmlspecialchars( $preg );
+            if( $preg != FALSE 
+            && ( $data = preg_match( $preg, $html, $matcheds ) ) != FALSE
+            && is_array( $matcheds )
+            && array_key_exists( 0, $matcheds )
+            ){
+                $stext = $matcheds[ 0 ];
+                preg_match_all('!\d+(?:\.\d+)?!', $stext, $matches);
+                $floats = array_map('floatval', $matches[0]);
+                foreach( $floats AS $f ){
+                    if( $f > 0 ){
+                        $result = $f;
+                        break;
+                    }
+                }
+                
+                if( $debug ) echo "<br />GET SIZE (REGEXP): " . $stext;
+                //Type
+                if( stripos( 'mb', $stext ) != FALSE 
+                || stripos( 'mib', $stext ) != FALSE
+                ){
+                    //$result *= ( 1024 * 1024 );
+                }elseif( stripos( 'gb', $stext ) != FALSE 
+                || stripos( 'gib', $stext ) != FALSE
+                ){
+                    $result *= 1024;
+                }elseif( stripos( 'tb', $stext ) != FALSE 
+                || stripos( 'tib', $stext ) != FALSE
+                ){
+                    $result *= 1024 * 1024;
+                }elseif( $result < 100 ){
+                    $result *= 1024;
+                }
+                if( $debug ) echo "<br />TRY SIZE (REGEXP): " . $result;
             }
+            if( $debug ) echo "<br />TRY SIZE (REGEXP) RESULT: " . nl2br( print_r( $result, TRUE ) );
         }
         
         return $result;
