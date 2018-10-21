@@ -1273,6 +1273,8 @@
         $result = $G_MEDIADATA;
         $bfile = basename( $file );
         $debug = FALSE;
+        $MIN_SIMILARITY_TITLE = 90;
+        $MIN_SIMILARITY_FILE = 90;
         
         if( $debug ){
             if( $debug ) echo "<br />File: ";
@@ -1318,87 +1320,56 @@
         $title = '%' . $title . '%';
         if( $debug ) echo "<br />TITLE CLEAN 3: " . $title;
         
-        //BASE MODE: string similarity by search
-        if( ( $mediainfo = sqlite_mediainfo_search_title( $title ) ) != FALSE
-        && is_array( $mediainfo )
-        && count( $mediainfo ) > 0
-        ){
-            if( $debug ) echo "<br />MEDIAINFO FINDED: " . count( $mediainfo );
-            $similars = array();
-            $midata = array();
-            foreach( $mediainfo AS $mi ){
-                if( $debug ) echo "<br />MEDIAINFO FINDED TITLE: " . $mi[ 'title' ];
-                
-                //Similarity check
-                $pc = strSimilarity( $title, $mi[ 'title' ], $debug );
-                if( ( $pc2 = strSimilarity( $titlebase, $mi[ 'title' ], $debug ) ) > $pc ){
-                    $pc = $pc2;
-                }
-                
-                if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
-                $similars[ $pc ] = $mi;
+        //testing removing words from title
+        $titles = array();
+        if( ( $e = explode( '%', $title ) ) != FALSE ){
+            foreach( $e AS $ea ){
+                //$lt = ' ' . $ea;
+                $lt = str_replace( $ea . '', '', $title );
+                $titles[] = $lt;
+                if( $debug ) echo "<br />TITLE CLEAN TITLES-EACH: " . $lt;
             }
-            krsort( $similars );
-            if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
-            foreach( $similars AS $pc => $mi ){
-                if( $pc > 50 ){
-                    if( $debug ) echo "<br />MEDIAINFO FINDED: " . $mi[ 'title' ];
-                    $midata = $mi;
-                }
-                break;
-            }
-            if( array_key_exists( 'idmediainfo', $midata ) ){
-                foreach( $result AS $rkey => $rvalue ){
-                    if( is_string( $rvalue ) ){
-                        $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
-                    }
-                }
-                $midata[ 'idmediainfo' ] = 'NULL';
-                $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
-                $midata[ 'season' ] = $season;
-                $midata[ 'episode' ] = $episode;
-                $midata[ 'titleepisode' ] = '';
-                $result[ 'data' ] = $midata;
-            }
-        }elseif( $season !== FALSE ){
-            //SERIES MODE SIMILARITY
-            $FINDED = FALSE;
-            //Check by title similarity ONLY SERIES
-            if( ( $mediadata = sqlite_media_getdata_file_search( $title ) ) != FALSE
-            && is_array( $mediadata )
-            && count( $mediadata ) > 0
+            //add base title and sort -
+            $titles[] = $title;
+            $titles = array_reverse( $titles );
+        }
+        //var_dump( $titles );
+        
+        foreach( $titles AS $title ){
+            //BASE MODE: string similarity by search
+            if( ( $mediainfo = sqlite_mediainfo_search_title( $title, 5 ) ) != FALSE
+            && is_array( $mediainfo )
+            && count( $mediainfo ) > 0
             ){
-                if( $debug ) echo "<br />MEDIA FINDED (TITLE): " . count( $mediadata );
+                if( $debug ) echo "<br />MEDIAINFO FINDED: " . count( $mediainfo );
                 $similars = array();
                 $midata = array();
-                foreach( $mediadata AS $mi ){
-                    if( $debug ) echo "<br />MEDIA FINDED FILE: " . $mi[ 'title' ];
-                    
-                    //Similarity check
-                    $pc = strSimilarity( $title, $mi[ 'title' ], $debug );
-                    if( ( $pc2 = strSimilarity( $titlebase, $mi[ 'title' ], $debug ) ) > $pc ){
-                        $pc = $pc2;
+                foreach( $mediainfo AS $mi ){
+                    if( array_key_exists( 'idmediainfo', $mi ) 
+                    && (int)$mi[ 'idmediainfo' ] > 0
+                    ){
+                        if( $debug ) echo "<br />MEDIAINFO FINDED TITLE: " . $mi[ 'title' ];
+                        
+                        //Similarity check
+                        $pc = strSimilarity( $title, $mi[ 'title' ], $debug );
+                        if( ( $pc2 = strSimilarity( $titlebase, $mi[ 'title' ], $debug ) ) > $pc ){
+                            $pc = $pc2;
+                        }
+                        
+                        if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
+                        $similars[ $pc ] = $mi;
                     }
-                    
-                    if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
-                    $similars[ $pc ] = $mi;
                 }
                 krsort( $similars );
                 if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
-                $pcmin = ( 10 * ( ( strlen( $title ) ) + 1 ) );
-                if( $pcmin > 50 ) $pcmin = 50;
-                if( $debug ) echo "<br />MEDIA PC NEEDED: " . $pcmin;
                 foreach( $similars AS $pc => $mi ){
-                    if( $pc > $pcmin 
-                    && $pc < 100
-                    ){
-                        if( $debug ) echo "<br />MEDIA FINDED: " . $mi[ 'title' ];
+                    if( $pc > $MIN_SIMILARITY_TITLE ){
+                        if( $debug ) echo "<br />MEDIAINFO FINDED: " . $mi[ 'title' ];
                         $midata = $mi;
-                        break;
                     }
+                    break;
                 }
-                if( array_key_exists( 'idmediainfo', $midata ) 
-                ){
+                if( array_key_exists( 'idmediainfo', $midata ) ){
                     foreach( $result AS $rkey => $rvalue ){
                         if( is_string( $rvalue ) ){
                             $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
@@ -1410,73 +1381,132 @@
                     $midata[ 'episode' ] = $episode;
                     $midata[ 'titleepisode' ] = '';
                     $result[ 'data' ] = $midata;
-                    $FINDED = TRUE;
                 }
-            }
-            
-            //Check by file similarity SERIES MODE
-            if( $FINDED == FALSE
-            && ( $betterword = get_word_better( basename( $file ) ) ) != FALSE
-            && ( $mediadata = sqlite_media_getdata_file_search( $betterword ) ) != FALSE
-            && is_array( $mediadata )
-            && count( $mediadata ) > 0
-            ){
-                if( $debug ) echo "<br />MEDIA BETTERWORD (FILE2): " . $betterword;
-                if( $debug ) echo "<br />MEDIA FINDED (FILE2): " . count( $mediadata );
-                $similars = array();
-                $midata = array();
-                $f1 = clean_filename( basename( $file ) );
-                foreach( $mediadata AS $mi ){
-                    $f2 = clean_filename( basename( $mi[ 'file' ] ) );
-                    if( $debug ) echo "<br />MEDIA FINDED FILE1: " . $f1;
-                    if( $debug ) echo "<br />MEDIA FINDED FILE2: " . $f2;
-                    
-                    //Similarity check
-                    $pc = strSimilarity( $f1, $f2, $debug );
-                    if( ( $pc2 = strSimilarity( $titlebase, $f2, $debug ) ) > $pc ){
-                        $pc = $pc2;
-                    }
-                    
-                    if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
-                    
-                    if( $pc > 60 ){
-                        if( $debug ) echo "<br />MEDIA FINDED FILE: " . basename( $mi[ 'file' ] );
-                        if( $debug ) echo "<br />MEDIA SIMILARITY STRINGA: " . $f1;
-                        if( $debug ) echo "<br />MEDIA SIMILARITY STRINGB: " . $f2;
-                        if( $debug ) echo "<br />MEDIA SIMILARITY: " . $pc;
-                    }
-                    $similars[ $pc ] = $mi;
-                }
-                krsort( $similars );
-                if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
-                $pcmin = 50;
-                if( $debug ) echo "<br />MEDIA PC NEEDED: " . $pcmin;
-                foreach( $similars AS $pc => $mi ){
-                    if( $pc > $pcmin 
-                    && $pc < 100
-                    ){
-                        if( $debug ) echo "<br />MEDIA FINDED: " . $mi[ 'title' ];
-                        $midata = $mi;
-                        break;
-                    }
-                }
-                if( array_key_exists( 'idmediainfo', $midata ) 
-                && ( $midata = sqlite_mediainfo_getdata( $midata[ 'idmediainfo' ] )) != FALSE
-                && is_array( $midata )
-                && count( $midata ) > 0
+            }elseif( $season !== FALSE ){
+                //SERIES MODE SIMILARITY
+                $FINDED = FALSE;
+                //Check by title similarity ONLY SERIES
+                if( ( $mediadata = sqlite_media_getdata_file_search( $title ) ) != FALSE
+                && is_array( $mediadata )
+                && count( $mediadata ) > 0
                 ){
-                    $midata = $midata[ 0 ];
-                    foreach( $result AS $rkey => $rvalue ){
-                        if( is_string( $rvalue ) ){
-                            $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
+                    if( $debug ) echo "<br />MEDIA FINDED (TITLE): " . count( $mediadata );
+                    $similars = array();
+                    $midata = array();
+                    foreach( $mediadata AS $mi ){
+                        if( array_key_exists( 'idmediainfo', $mi ) 
+                        && (int)$mi[ 'idmediainfo' ] > 0
+                        ){
+                            if( $debug ) echo "<br />MEDIA FINDED FILE: " . $mi[ 'title' ];
+                            
+                            //Similarity check
+                            $pc = strSimilarity( $title, $mi[ 'title' ], $debug );
+                            if( ( $pc2 = strSimilarity( $titlebase, $mi[ 'title' ], $debug ) ) > $pc ){
+                                $pc = $pc2;
+                            }
+                            
+                            if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
+                            $similars[ $pc ] = $mi;
                         }
                     }
-                    $midata[ 'idmediainfo' ] = 'NULL';
-                    $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
-                    $midata[ 'season' ] = $season;
-                    $midata[ 'episode' ] = $episode;
-                    $midata[ 'titleepisode' ] = '';
-                    $result[ 'data' ] = $midata;
+                    krsort( $similars );
+                    if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
+                    //$pcmin = ( 10 * ( ( strlen( $title ) ) + 1 ) );
+                    $pcmin = $MIN_SIMILARITY_TITLE;
+                    if( $debug ) echo "<br />MEDIA PC NEEDED: " . $pcmin;
+                    foreach( $similars AS $pc => $mi ){
+                        if( $pc > $pcmin 
+                        //&& $pc < 100
+                        ){
+                            if( $debug ) echo "<br />MEDIA FINDED: " . $mi[ 'title' ];
+                            $midata = $mi;
+                            break;
+                        }
+                    }
+                    if( array_key_exists( 'idmediainfo', $midata ) 
+                    ){
+                        foreach( $result AS $rkey => $rvalue ){
+                            if( is_string( $rvalue ) ){
+                                $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
+                            }
+                        }
+                        $midata[ 'idmediainfo' ] = 'NULL';
+                        $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
+                        $midata[ 'season' ] = $season;
+                        $midata[ 'episode' ] = $episode;
+                        $midata[ 'titleepisode' ] = '';
+                        $result[ 'data' ] = $midata;
+                        $FINDED = TRUE;
+                    }
+                }
+                
+                //Check by file similarity SERIES MODE
+                if( $FINDED == FALSE
+                && ( $betterword = get_word_better( basename( $file ) ) ) != FALSE
+                && ( $mediadata = sqlite_media_getdata_file_search( $betterword ) ) != FALSE
+                && is_array( $mediadata )
+                && count( $mediadata ) > 0
+                ){
+                    if( $debug ) echo "<br />MEDIA BETTERWORD (FILE2): " . $betterword;
+                    if( $debug ) echo "<br />MEDIA FINDED (FILE2): " . count( $mediadata );
+                    $similars = array();
+                    $midata = array();
+                    $f1 = clean_filename( basename( $file ) );
+                    foreach( $mediadata AS $mi ){
+                        if( array_key_exists( 'idmediainfo', $mi ) 
+                        && (int)$mi[ 'idmediainfo' ] > 0
+                        ){
+                            $f2 = clean_filename( basename( $mi[ 'file' ] ) );
+                            if( $debug ) echo "<br />MEDIA FINDED FILE1: " . $f1;
+                            if( $debug ) echo "<br />MEDIA FINDED FILE2: " . $f2;
+                            
+                            //Similarity check
+                            $pc = strSimilarity( $f1, $f2, $debug );
+                            if( ( $pc2 = strSimilarity( $titlebase, $f2, $debug ) ) > $pc ){
+                                $pc = $pc2;
+                            }
+                            
+                            if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
+                            
+                            if( $pc > $MIN_SIMILARITY_FILE ){
+                                if( $debug ) echo "<br />MEDIA FINDED FILE: " . basename( $mi[ 'file' ] );
+                                if( $debug ) echo "<br />MEDIA SIMILARITY STRINGA: " . $f1;
+                                if( $debug ) echo "<br />MEDIA SIMILARITY STRINGB: " . $f2;
+                                if( $debug ) echo "<br />MEDIA SIMILARITY: " . $pc;
+                            }
+                            $similars[ $pc ] = $mi;
+                        }
+                    }
+                    krsort( $similars );
+                    if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
+                    $pcmin = $MIN_SIMILARITY_FILE;
+                    if( $debug ) echo "<br />MEDIA PC NEEDED: " . $pcmin;
+                    foreach( $similars AS $pc => $mi ){
+                        if( $pc > $pcmin 
+                        ){
+                            if( $debug ) echo "<br />MEDIA FINDED: " . $mi[ 'title' ];
+                            $midata = $mi;
+                            break;
+                        }
+                    }
+                    if( array_key_exists( 'idmediainfo', $midata ) 
+                    && ( $midata = sqlite_mediainfo_getdata( $midata[ 'idmediainfo' ] )) != FALSE
+                    && is_array( $midata )
+                    && count( $midata ) > 0
+                    ){
+                        $midata = $midata[ 0 ];
+                        foreach( $result AS $rkey => $rvalue ){
+                            if( is_string( $rvalue ) ){
+                                $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
+                            }
+                        }
+                        $midata[ 'idmediainfo' ] = 'NULL';
+                        $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
+                        $midata[ 'season' ] = $season;
+                        $midata[ 'episode' ] = $episode;
+                        $midata[ 'titleepisode' ] = '';
+                        $result[ 'data' ] = $midata;
+                    }
                 }
             }
         }

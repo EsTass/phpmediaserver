@@ -15,12 +15,12 @@
 	
 	$SHOW_IDENTIFY_DATA = TRUE;
 	
-	//ADDING FOR DATA
+	//ADDING FOR DATA media_scrap_idmedia
 	
 	if( media_scrap_idmedia( $IDMEDIA, $SHOW_IDENTIFY_DATA )
 	&& ( $info_data = sqlite_media_getdata_order_mediainfo( $IDMEDIA, 1 ) ) != FALSE
 	&& is_array( $info_data )
-	&& count( $info_data )
+	&& count( $info_data ) > 0
 	&& array_key_exists( 0, $info_data )
 	&& is_array( $info_data[ 0 ] )
 	&& array_key_exists( 'title', $info_data[ 0 ] )
@@ -32,4 +32,5 @@
     }else{
         echo get_msg( 'IDENT_NOTDETECTED' );
     }
+    
 ?>
