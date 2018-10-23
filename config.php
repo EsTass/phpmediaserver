@@ -240,6 +240,10 @@
     	//BIND IP for internal lan
 	define( 'DLNA_BINDIP', '192.168.1.50' );
 	
+	//KODI
+	//kodi default playmode: direct, fast, mp4, webm, webm2
+	define( 'KODI_PLAYMODE', 'direct' );
+	
 	//TIMEZONE
 	@date_default_timezone_set( 'Europe/Madrid' );
 	@setlocale( LC_ALL, 'es_ES.utf8' );
