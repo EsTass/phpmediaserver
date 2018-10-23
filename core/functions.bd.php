@@ -1610,21 +1610,22 @@
             $data[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
 		}
 		
-		$data2 = array();
-		foreach( $data AS $dk => $dv ){
-            if( array_key_exists( $dk, $G_MEDIAINFO ) ){
-                $data2[ $dk ] = $dv;
+        $midata = array();
+        foreach( $G_MEDIAINFO AS $k => $v ){
+            if( array_key_exists( $k, $data ) 
+            ){
+                $midata[ $k ] = $data[ $k ];
             }
-		}
-		
-		if( count( $data2 ) == count( $G_MEDIAINFO )
+        }
+        
+		if( count( $midata ) == count( $G_MEDIAINFO )
 		&& ( $dbhandle = sqlite_init() ) != FALSE 
 		){
 			$sql = 'INSERT INTO mediainfo VALUES(';
 			$sql .= '';
 			//$sql .= ' NULL ';
 			$first = TRUE;
-			foreach( $data2 As $k => $v ){
+			foreach( $midata As $k => $v ){
                 if( $first ){
                     $first = FALSE;
                 }else{
@@ -1664,21 +1665,22 @@
 		){
             $data[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
 		}
-		
-		$data2 = array();
-		foreach( $data AS $dk => $dv ){
-            if( array_key_exists( $dk, $G_MEDIAINFO ) ){
-                $data2[ $dk ] = $dv;
+        
+        $midata = array();
+        foreach( $G_MEDIAINFO AS $k => $v ){
+            if( array_key_exists( $k, $data ) 
+            ){
+                $midata[ $k ] = $data[ $k ];
             }
-		}
-		
-		if(  count( $data2 ) == count( $G_MEDIAINFO )
+        }
+        
+		if(  count( $midata ) == count( $G_MEDIAINFO )
 		&& ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'UPDATE mediainfo SET ';
 			$sql .= '';
 			
 			$first = TRUE;
-			foreach( $data2 As $k => $v ){
+			foreach( $midata As $k => $v ){
                 if( $first ){
                     $first = FALSE;
                 }else{
@@ -1686,8 +1688,9 @@
                 }
                 $sql .= ' ' . $k . ' = \'' . $dbhandle->escapeString( $v ) . '\' ';
 			}
-			$sql .= ' WHERE idmediainfo = ' . $data2[ 'idmediainfo' ] . ' ';
+			$sql .= ' WHERE idmediainfo = ' . $midata[ 'idmediainfo' ] . ' ';
 			//die( $sql );
+			echo "<br />SQL: " . $sql;
 			$result = $dbhandle->exec( $sql );
 			sqlite_db_close();
 		}
@@ -1809,13 +1812,13 @@
             }
 			$sql .= ' ORDER BY idmediainfo ASC';
 			//var_dump( $sql );die();
-			$result2 = sqlite_getarray( $dbhandle->query( $sql ) );
-			if( is_array( $result2 ) 
-			&& count( $result2 ) > 0
-			&& is_array( $result2[ 0 ] )
-			&& array_key_exists( 'idmediainfo', $result2[ 0 ] )
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			if( is_array( $result ) 
+			&& count( $result ) > 0
+			&& is_array( $result[ 0 ] )
+			&& array_key_exists( 'idmediainfo', $result[ 0 ] )
 			){
-                $result = $result2[ 0 ][ 'idmediainfo' ];
+                $result = $result[ 0 ][ 'idmediainfo' ];
 			}
 			sqlite_db_close();
 		}
