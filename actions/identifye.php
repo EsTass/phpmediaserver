@@ -20,8 +20,10 @@
 	&& ( $media = sqlite_media_getdata( $IDMEDIA ) ) != FALSE 
 	&& count( $media ) > 0
 	){
-        $TITLE = clean_filename( $media[ 0 ][ 'file' ] );
         $FILENAME = basename( $media[ 0 ][ 'file' ] );
+        $FOLDERNAME = basename( dirname( $media[ 0 ][ 'file' ] ) );
+        $TITLE = clean_filename( $FILENAME );
+        $TITLEFOLDER = clean_filename( $FOLDERNAME );
         $FILE = $media[ 0 ][ 'file' ];
         //CLEAN INEXISTENT
         if( !file_exists( $FILE ) ){
@@ -34,13 +36,35 @@
             //echo reloadJS();
             //header("Refresh: 2");
         }else{
-            if( ( $d = get_media_chapter( $FILENAME ) ) != FALSE
+            //Check folder and title for owndb ident and select more valid
+            $imdb = FALSE;
+            $movies = TRUE;
+            if( ( $d = get_media_chapter( $FOLDERNAME ) ) == FALSE ){
+                $d[ 0 ] = FALSE;
+                $d[ 1 ] = FALSE;
+                $movies = FALSE;
+            }
+            if( $FOLDERNAME != basename( PPATH_DOWNLOADS ) 
+            && ( $dorw = ident_detect_file_db( $FILE, $TITLEFOLDER, $movies, $imdb, $d[ 0 ], $d[ 1 ] ) ) != FALSE
+            && is_array( $dorw )
+            && array_key_exists( 'data', $dorw )
+            && array_key_exists( 'idmediainfo', $dorw[ 'data' ] )
+            ){
+                $TITLE = $TITLEFOLDER;
+                if( $d[ 0 ] != FALSE ){
+                    $SEASON = (int)$d[ 0 ];
+                    $EPISODE = (int)$d[ 1 ];
+                    $TITLE = clean_media_chapter( $TITLE, $SEASON . 'x' . sprintf( '%02d', $EPISODE ) );
+                }
+                //$TITLE .= ' ' . $SEASON . 'x' . sprintf( '%02d', $EPISODE );
+            }elseif( ( $d = get_media_chapter( $FILENAME ) ) != FALSE
             ){
                 $SEASON = (int)$d[ 0 ];
                 $EPISODE = (int)$d[ 1 ];
                 $TITLE = clean_media_chapter( $TITLE, $SEASON . 'x' . sprintf( '%02d', $EPISODE ) );
                 //$TITLE .= ' ' . $SEASON . 'x' . sprintf( '%02d', $EPISODE );
             }
+            
 ?>
 <script type="text/javascript">
 $(function () {

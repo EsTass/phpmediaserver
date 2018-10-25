@@ -1234,9 +1234,10 @@
         
         if( $debug ) echo "<br />MEDIAINFO FINDED TITLE: " . $str1;
         if( $debug ) echo "<br />MEDIAINFO FINDED TITLE: " . $str2;
-        $modifs = similar_text( $str1, $str2, $result );
+        similar_text( $str1, $str2, $pc_st );
         if( $debug ) echo "<br />MEDIAINFO SIMILARITY: " . $result;
-        if( $debug ) echo "<br />MEDIAINFO SIMILARITY(L): " . levenshtein( $str1, $str2 );
+        $pc_l = levenshtein( $str1, $str2 );
+        if( $debug ) echo "<br />MEDIAINFO SIMILARITY(L): " . $pc_l;
         similar_text( soundex( $str1 ), soundex( $str2 ), $pc_sd );
         if( $debug ) echo "<br />MEDIAINFO SIMILARITY(SD): " . $pc_sd;
         if( $debug ) echo "<br />MEDIAINFO SIMILARITY(SD1): " . soundex( $str1 );
@@ -1246,7 +1247,19 @@
         if( $debug ) echo "<br />MEDIAINFO SIMILARITY(MP1): " . metaphone( $str1 );
         if( $debug ) echo "<br />MEDIAINFO SIMILARITY(MP2): " . metaphone( $str2 );
         
-        //Better similarity
+        //Sum Similarity / options to compare with 80/90
+        $result = ( $pc_sd / 4 ) + ( $pc_mp / 4 ) + ( $pc_st / 4 );
+        $result += ( 100 / 4 ) - $pc_l;
+        //diff size -similarity
+        if( strlen( $str1 ) > strlen( $str2 ) ){
+            $result -= strlen( $str1 ) - strlen( $str2 );
+        }elseif( strlen( $str1 ) < strlen( $str2 ) ){
+            $result -= strlen( $str2 ) - strlen( $str2 );
+        }
+        
+        //Better similarity to compare with 80/90
+        /*
+        //SOUNDEX too many errors on filename size
         if( $result < $pc_sd 
         && $pc_sd >= 100 //soundex test min % needed (4 letters at least 4)
         ){
@@ -1263,6 +1276,7 @@
         }elseif( strlen( $str1 ) < strlen( $str2 ) ){
             $result -= strlen( $str2 ) - strlen( $str2 );
         }
+        */
         
         return $result;
 	}
@@ -1279,9 +1293,9 @@
         $result = $G_MEDIADATA;
         $bfile = basename( $file );
         $debug = FALSE;
-        $MIN_SIMILARITY_TITLE = 90;
-        $MIN_SIMILARITY_FILE = 90;
-        $MIN_SIMILARITY_BWORD = 90;
+        $MIN_SIMILARITY_TITLE = 80;
+        $MIN_SIMILARITY_FILE = 80;
+        $MIN_SIMILARITY_BWORD = 80;
         
         if( $debug ){
             if( $debug ) echo "<br />File: ";
@@ -1300,6 +1314,7 @@
         
         if( $debug ) echo "<br />TITLE CLEAN 1: " . $title;
         
+        $titlebaseall = $title;
         $title = clean_media_chapter( $title );
         $titlebase = $title;
         $title = clean_filename( $title, TRUE );
@@ -1334,13 +1349,51 @@
                 //$lt = ' ' . $ea;
                 $lt = str_replace( $ea . '', '', $title );
                 $titles[] = $lt;
-                if( $debug ) echo "<br />TITLE CLEAN TITLES-EACH: " . $lt;
+                if( $debug ) echo "<br />TITLE CLEAN TITLES-RWORDS: " . $lt;
             }
-            //add base title and sort -
-            $titles[] = $title;
-            $titles = array_reverse( $titles );
+            
         }
-        //var_dump( $titles );
+        //Add cut on seasonXepisode
+        $sepsc = '-!-';
+        $titlesc = clean_media_chapter( $titlebaseall, $sepsc );
+        if( $debug ) echo "<br />TITLE CLEAN PRETITLES-SXECUT: " . $titlesc;
+        if( ( $e = explode( $sepsc, $titlesc ) ) != FALSE 
+        && is_array( $e )
+        && count( $e ) > 1
+        && array_key_exists( 0, $e )
+        && strlen( $e[ 0 ] ) > 3
+        ){
+            $lt = $e[ 0 ];
+            $lt = clean_filename( $lt, TRUE );
+            //Clean non standar chars
+            $lt = preg_replace( '/[^\x20-\x7E]/','_', $lt );
+            $lt = str_ireplace( '__', '_', $lt );
+            if( $debug ) echo "<br />TITLE CLEAN-SXECUT 2b: " . $lt;
+            //remove 1 letter words
+            $lt = preg_replace('/(^| )[a-z0-9]{1}( |$)/i', ' ', $lt);
+            if( $debug ) echo "<br />TITLE CLEAN-SXECUT 2c: " . $lt;
+            //remove 1 number between letters (2 time double numbers TODO)
+            $lt = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d|[a-z]| |$)/i', '$1_$2', $lt);
+            $lt = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d|[a-z]| |$)/i', '$1_$2', $lt);
+            if( $debug ) echo "<br />TITLE CLEAN-SXECUT 2d: " . $lt;
+            $lt = str_ireplace( ' ', '%', $lt );
+            $lt = trim( $lt, '_' );
+            $lt = trim( $lt, '%' );
+            $lt = trim( $lt, '_' );
+            $lt = trim( $lt, '%' );
+            //add full search variants title
+            $lt = '%' . $lt . '%';
+            if( $debug ) echo "<br />TITLE CLEAN-SXECUT 3: " . $lt;
+            
+            $titles[] = $lt;
+            if( $debug ) echo "<br />TITLE CLEAN TITLES-SXECUT: " . $lt;
+        }
+        
+        //add base title and sort -
+        $titles[] = $title;
+        $titles = array_reverse( $titles );
+        
+        if( $debug ) echo "<br />TITLES LIST: " . nl2br( print_r( $titles, TRUE ) );
         
         foreach( $titles AS $title ){
             //BASE MODE: string similarity by search
@@ -1369,13 +1422,41 @@
                 }
                 krsort( $similars );
                 if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
+                $midatafirst = FALSE;
                 foreach( $similars AS $pc => $mi ){
                     if( $pc > $MIN_SIMILARITY_TITLE ){
                         if( $debug ) echo "<br />MEDIAINFO FINDED: " . $mi[ 'title' ];
-                        $midata = $mi;
+                        
+                        //check year if exist $titlebase
+                        $year = get_year( $titlebase );
+                        if( is_numeric( $year )
+                        && $mi[ 'year' ] > 0
+                        ){
+                            if( $mi[ 'year' ] == $year 
+                            //sometimes file published after
+                            || (int)$mi[ 'year' ] - 1 == $year 
+                            ){
+                                if( $debug ) echo "<br />MEDIAINFO FINDED YEAR CONFIRM: " . $mi[ 'year' ];
+                                $midata = $mi;
+                                break;
+                            }else{
+                                if( $debug ) echo "<br />MEDIAINFO FINDED YEAR NO-CONFIRM: " . $mi[ 'year' ] . ' ' . $year;
+                            }
+                        }else{
+                            //set first on worst case
+                            if( $midatafirst == FALSE ){
+                                $midatafirst = $mi;
+                            }
+                        }
                     }
-                    break;
                 }
+                //Set first on no year confirm
+                if( $midatafirst != FALSE
+                && !array_key_exists( 'idmediainfo', $midata ) 
+                ){
+                    $midata = $midatafirst;
+                }
+                
                 if( array_key_exists( 'idmediainfo', $midata ) ){
                     foreach( $result AS $rkey => $rvalue ){
                         if( is_string( $rvalue ) ){

@@ -619,8 +619,8 @@
 		if( !file_exists( $file ) ){
             $result = @file_put_contents( $file, @file_get_contents_timed( $url ) );
             
-            if( file_exists( $file )
-            && filesize( $file ) == 0 
+            if( !@file_exists( $file )
+            || @filesize( $file ) == 0 
             ){
                 @unlink( $file );
                 $result = FALSE;
