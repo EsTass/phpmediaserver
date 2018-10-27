@@ -63,7 +63,7 @@
             $cmd = O_PYMEDIAIDENT . ' -s imdb -l ' . O_LANG . ' -fs "' . $title . '" ' . $force_ident . ' --json ';
         }else{
             $force_ident = '';
-            $cmd = O_PYMEDIAIDENT . ' -s filmaffinity -l ' . O_LANG . ' -fs "' . $title . '" ' . $force_ident . ' --json ';
+            $cmd = O_PYMEDIAIDENT . ' -s imdb -l ' . O_LANG . ' -fs "' . $title . '" ' . $force_ident . ' --json ';
         }
         
         //Get Data
