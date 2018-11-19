@@ -146,7 +146,8 @@
             && count( $data[ 'data' ] ) > 0
             ){
                 foreach( $data[ 'data' ] AS $row ){
-                    if( array_key_exists( 'name', $row ) 
+                    if( is_array( $row )
+                    && array_key_exists( 'name', $row ) 
                     && array_key_exists( 'image', $row ) 
                     ){
                         if( strlen( $result[ 'actors' ] ) > 0 ) $result[ 'actors' ] .= ',';
@@ -173,13 +174,15 @@
             ){
                 foreach( $data[ 'data' ] AS $row ){
                     //POSTER
-                    if( array_key_exists( 'poster', $row ) 
+                    if( is_array( $row )
+                    && array_key_exists( 'poster', $row ) 
                     && filter_var( $row[ 'poster' ], FILTER_VALIDATE_URL )
                     ){
                         $result[ 'images' ][ 'poster' ] = $row[ 'poster' ];
                     }
                     //LANDSCAPE
-                    if( array_key_exists( 'fanart', $row ) 
+                    if( is_array( $row )
+                    && array_key_exists( 'fanart', $row ) 
                     && filter_var( $row[ 'fanart' ], FILTER_VALIDATE_URL )
                     ){
                         $result[ 'images' ][ 'landscape' ] = $row[ 'fanart' ];
@@ -233,7 +236,8 @@
         ){
             $result = array();
             foreach( $data[ 'data' ] AS $row ){
-                if( array_key_exists( 'seriesName', $row )
+                if( is_array( $row )
+                && array_key_exists( 'seriesName', $row )
                 && array_key_exists( 'id', $row ) 
                 ){
                     $result[ $row[ 'id' ] ] = $row[ 'seriesName' ];
