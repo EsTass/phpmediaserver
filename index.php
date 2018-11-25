@@ -299,6 +299,26 @@ function menus_ms_show(){
     }
 }
 
+//AUTOCOMPLETE SEARCH
+
+function autocomplete_search( element, dlist ){
+    var search = $( element ).val();
+    var id = $( element ).attr( "id" );
+    if( search.length > 2
+    ){
+        var url = '?r=r&action=autocomplete&field=' + id +'&search=' + search;
+        $.getJSON( url, function( data ){
+            //clean data
+            $( "#" + dlist ).empty();
+            //add new data
+            $.each( data, function(index, value){
+                $( "#" + dlist ).append( "<option value=\'" + value + "\'></option>" );
+            });
+        });
+    }
+}
+
+
 </script>
 
 <?php

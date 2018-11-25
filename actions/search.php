@@ -39,7 +39,7 @@ function ident_search_list(){
 }
 </script>
 
-<form id='fSearchExt'>
+<form id='fSearchExt' autocomplete="off" onsubmit="return false;">
 <div class='boxInfo'>
     <br />
     <br />
@@ -47,7 +47,10 @@ function ident_search_list(){
         <tr class='trSearch'>
             <td>
                 <?php echo get_msg( 'MENU_SEARCH', FALSE ) ?>
-                <input name='search' id='search' value='' />
+                <input name='search' id='search' value='' 
+                list="search-dlist2" onkeyup="autocomplete_search( this, 'search-dlist2' );return false;" autocomplete="off"
+                />
+                <datalist id="search-dlist2"></datalist>
             </td>
             <td>
                 <?php echo get_msg( 'MENU_YEAR', FALSE ) ?>: 

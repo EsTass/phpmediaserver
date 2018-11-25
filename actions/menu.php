@@ -36,10 +36,12 @@
                 <a href='?action=search'><?php echo get_msg( 'MENU_SEARCH', FALSE ) ?></a>
             </div>
             <div class='listMenuElement'>
-                <form methog='get'>
+                <form method='get' autocomplete="off">
                 <input type='text' id='search' name='search' placeholder='<?php echo get_msg( 'MENU_SEARCH', FALSE ); ?>'
+                list="search-dlist" onkeyup="autocomplete_search( this, 'search-dlist' );return false;" autocomplete="off"
                 value='<?php echo $G_DATA[ 'search' ]; ?>'
                 />
+                <datalist id="search-dlist"></datalist>
                 <input type='hidden' id='action' name='action' value='<?php echo $G_DATA[ 'action' ]; ?>'>
                 <input type='hidden' id='page' name='page' value='0'>
                 </form>
