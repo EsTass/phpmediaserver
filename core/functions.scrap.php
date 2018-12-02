@@ -517,18 +517,24 @@
 		
 		$list = array( 'searchImagesPyMI', 'searchImagesBing', 'searchImagesIXQick', 'searchImagesWebcrawler' );
 		
+		if( $debug ) echo "<br />SEARCHIMAGES: " . $search;
+		
 		while( count( $result ) < $max 
 		&& count( $in_list ) < ( count( $list ) - 1 )
 		){
             $rnd = mt_rand( 0, ( count( $list ) - 1 ) );
             if( array_key_exists( $rnd, $list ) 
             && function_exists( $list[ $rnd ] )
-            && !in_array( $list[ $rnd ], $in_list )
+            && !in_array( $rnd, $in_list )
             ){
-                if( $debug ) echo "<br />SEARCHIMAGES-SEARCHER: " . count( $list[ $rnd ] );
-                $in_list[] = $list[ $rnd ];
-                if( ( $links = $list[ $rnd ]( $search, $max, $getthumb ) ) != FALSE ){
+                if( $debug ) echo "<br />SEARCHIMAGES-SEARCHER: " . $list[ $rnd ];
+                $in_list[] = $rnd;
+                if( ( $links = $list[ $rnd ]( $search, $max, $getthumb ) ) != FALSE 
+                && is_array( $links )
+                && count( $links ) > 0
+                ){
                     $result = array_merge( $result, $links );
+                    if( $debug ) echo "<br />SEARCHIMAGES-SEARCHER-FINDED: " . count( $links );
                 }
             }
         }
@@ -550,11 +556,13 @@
 			$doc = new DOMDocument();
 			@$doc->loadHTML($html);
             
+            //file_put_contents( PPATH_CACHE . DS . 'Webcrawler-html-' . date( 'd-m-y-H-i-s' ), $html );
+            
             if( $getthumb ){
                 $divs = $doc->getElementsByTagName( 'img' );
                 $n = 0;
                 foreach( $divs AS $div ){
-                    if( $div->getAttribute('class') == 'resultThumbnail' ){
+                    if( $div->getAttribute('class') == '' ){
                         $turl = $div->getAttribute('src');
                         //var_dump( $turl );
                         if( startsWith( $turl, '//' ) ){
@@ -574,7 +582,7 @@
                 $divs = $doc->getElementsByTagName('a');
                 $n = 0;
                 foreach( $divs AS $div ){
-                    if( $div->getAttribute('class') == 'resultThumbnailLink' ){
+                    if( $div->getAttribute('class') == 'link' ){
                         $turl = $div->getAttribute('href');
                         //var_dump( $turl );
                         if( startsWith( $turl, '//' ) ){
@@ -609,11 +617,41 @@
 			$doc = new DOMDocument();
 			@$doc->loadHTML($html);
             
+            //file_put_contents( PPATH_CACHE . DS . 'IXQick-html-' . date( 'd-m-y-H-i-s' ), $html );
+            
             if( $getthumb ){
-                $divs = $doc->getElementsByTagName('div');
+                $divs = $doc->getElementsByTagName('ul');
                 $n = 0;
                 foreach( $divs AS $div ){
-                    if( $div->getAttribute('class') == 'img_box' ){
+                    if( $div->getAttribute('class') == 'image-results' ){
+                        //THUMB IMG
+                        $tags = $div->getElementsByTagName('img');
+                        $n = 0;
+                        
+                        foreach ($tags as $tag) {
+                            //url thumb
+                            $turl = $tag->getAttribute('data-src');
+                            //var_dump( $turl );
+                            //duckduckgoim
+                            if( startsWith( $turl, '//' ) ){
+                                $turl = 'https:' . $turl;
+                            }
+                            if( filter_var( $turl, FILTER_VALIDATE_URL )
+                            ){
+                                $result[] = $turl;
+                                $n++;
+                                if( $n > $max ) break;
+                            }
+                        }
+                    }
+                    if( $n > $max ) break;
+                }
+            }else{
+                //TARGET IMG
+                $divs = $doc->getElementsByTagName('ul');
+                $n = 0;
+                foreach( $divs AS $div ){
+                    if( $div->getAttribute('class') == 'image-results' ){
                         //THUMB IMG
                         $tags = $div->getElementsByTagName('img');
                         $n = 0;
@@ -636,54 +674,6 @@
                     }
                     if( $n > $max ) break;
                 }
-            }else{
-                //TARGET IMG
-                //$pattern = '/\"murl\"\:\"(.*?)\"\,/';
-                $pattern = '/cgi\-bin\/serveimage\?url\=(.*?)\\\'\>/';
-                if( preg_match_all( $pattern, $html, $match)
-                && array_key_exists( 1, $match )
-                && count( $match[ 1 ] ) > 0
-                ){
-                    $n = 0;
-                    foreach( $match[ 1 ] AS $turl ){
-                        $turl = urldecode( $turl );
-                        if( $turl 
-                        && filter_var( $turl, FILTER_VALIDATE_URL )
-                        ){
-                            $result[] = $turl;
-                        }
-                        if( $n > $max ) break;
-                        $n++;
-                    }
-                }else{
-                    //THUMB IMG
-                    $divs = $doc->getElementsByTagName('div');
-                    $n = 0;
-                    foreach( $divs AS $div ){
-                        if( $div->getAttribute('class') == 'img_box' ){
-                            //THUMB IMG
-                            $tags = $div->getElementsByTagName('img');
-                            $n = 0;
-                            
-                            foreach ($tags as $tag) {
-                                //url thumb
-                                $turl = $tag->getAttribute('src');
-                                //var_dump( $turl );
-                                //duckduckgoim
-                                if( startsWith( $turl, '//' ) ){
-                                    $turl = 'https:' . $turl;
-                                }
-                                if( filter_var( $turl, FILTER_VALIDATE_URL )
-                                ){
-                                    $result[] = $turl;
-                                    $n++;
-                                    if( $n > $max ) break;
-                                }
-                            }
-                        }
-                        if( $n > $max ) break;
-                    }
-                }
                 //echo htmlspecialchars( $html );
                 //var_dump( $result );die();
             }
@@ -704,6 +694,8 @@
 
 			$doc = new DOMDocument();
 			@$doc->loadHTML($html);
+            
+            //file_put_contents( PPATH_CACHE . DS . 'Yandex-html-' . date( 'd-m-y-H-i-s' ), $html );
             
             if( $getthumb ){
                 //THUMB IMG
@@ -762,14 +754,19 @@
 	function searchImagesBing( $search, $max = 5, $getthumb = TRUE ){
 		$result = array();
 		
+		//force thumbs because dd img not found
+		//$getthumb = TRUE;
+		
 		//image resulution+wide: &qft=+filterui:imagesize-large+filterui:aspect-tall
 		$url = "https://www.bing.com/images/search?q=" . urlencode( $search ) . "&FORM=HDRSC2";
 		//$url = "https://duckduckgo.com/?q=" . urlencode( $search ) . "&iax=1&ia=images";
 		if( ( $html = @file_get_contents_timed( $url ) ) != FALSE ){
 			$result = array();
-
+            
 			$doc = new DOMDocument();
 			@$doc->loadHTML($html);
+            
+            //file_put_contents( PPATH_CACHE . DS . 'bing-html-' . date( 'd-m-y-H-i-s' ), $html );
             
             if( $getthumb ){
                 //THUMB IMG
@@ -777,51 +774,15 @@
                 $n = 0;
                 
                 foreach ($tags as $tag) {
-                    //url thumb
-                    $turl = $tag->getAttribute('src');
-                    //var_dump( $turl );
-                    //duckduckgoim
-                    if( startsWith( $turl, '//' ) ){
-                        $turl = 'https:' . $turl;
-                    }
-                    if( filter_var( $turl, FILTER_VALIDATE_URL )
-                    ){
-                        $result[] = $turl;
-                    }
-                    if( $n > $max ) break;
-                    $n++;
-                }
-            }else{
-                //TARGET IMG
-                //$pattern = '/\"murl\"\:\"(.*?)\"\,/';
-                $pattern = '/\<a\ class\=\"thumb\"\ target\=\"\_blank\"\ href\=\"(.*?)\"/';
-                if( preg_match_all( $pattern, $html, $match)
-                && array_key_exists( 1, $match )
-                && count( $match[ 1 ] ) > 0
-                ){
-                    $n = 0;
-                    foreach( $match[ 1 ] AS $turl ){
-                        if( $turl ){
-                            if( filter_var( $turl, FILTER_VALIDATE_URL )
-                            ){
-                                $result[] = $turl;
-                            }
-                        }
-                        if( $n > $max ) break;
-                        $n++;
-                    }
-                }else{
-                    //THUMB IMG
-                    $tags = $doc->getElementsByTagName('img');
-                    $n = 0;
-                    
-                    foreach ($tags as $tag) {
+                    if( $tag->getAttribute('class') == 'mimg' ){
                         //url thumb
                         $turl = $tag->getAttribute('src');
                         //var_dump( $turl );
-                        //duckduckgoim
                         if( startsWith( $turl, '//' ) ){
                             $turl = 'https:' . $turl;
+                        }
+                        if( startsWith( $turl, '/th' ) ){
+                            $turl = 'https://www.bing.com' . $turl;
                         }
                         if( filter_var( $turl, FILTER_VALIDATE_URL )
                         ){
@@ -829,6 +790,34 @@
                         }
                         if( $n > $max ) break;
                         $n++;
+                    }
+                }
+            }else{
+                //TARGET IMG
+                $tags = $doc->getElementsByTagName('a');
+                $n = 0;
+                
+                foreach ($tags as $tag) {
+                    if( strlen( ( $html2 = $tag->getAttribute('m') ) ) > 0 ){
+                        //var_dump( $html2 );
+                        $pattern = '/\"murl\"\:\"(.*?)\"\,/';
+                        //$pattern = '/\<a\ class\=\"thumb\"\ target\=\"\_blank\"\ href\=\"(.*?)\"/';
+                        if( preg_match_all( $pattern, $html2, $match)
+                        && array_key_exists( 1, $match )
+                        && count( $match[ 1 ] ) > 0
+                        ){
+                            $n = 0;
+                            foreach( $match[ 1 ] AS $turl ){
+                                if( $turl ){
+                                    if( filter_var( $turl, FILTER_VALIDATE_URL )
+                                    ){
+                                        $result[] = $turl;
+                                    }
+                                }
+                                if( $n > $max ) break;
+                                $n++;
+                            }
+                        }
                     }
                 }
                 //echo htmlspecialchars( $html );
@@ -850,6 +839,8 @@
 
 			$doc = new DOMDocument();
 			@$doc->loadHTML($html);
+            
+            //file_put_contents( PPATH_CACHE . DS . 'DuckDuckGo-html-' . date( 'd-m-y-H-i-s' ), $html );
             
             if( $getthumb ){
                 //THUMB IMG

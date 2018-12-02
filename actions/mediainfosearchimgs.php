@@ -26,11 +26,18 @@
         @mkdir( $fileimgpath );
         $in_list = array();
         $filenum = 1;
+        $HTMLDATA2 = array();
         foreach( $G_MEDIADATA AS $k => $v ){
+            if( is_string( $v ) ){
+                $HTMLDATA2[ $k ] = array();
+            }
+            
             if( is_string( $v ) 
             && $k != 'folder'
             && $k != 'fanart'
-            //&& $k == 'landscape'
+            && $k != 'landscape'
+            && $k != 'logo'
+            && $k != 'banner'
             ){
                 $search = $k . ' ' . $MEDIAINFO[ 'title' ] . ' ' . $MEDIAINFO[ 'year' ];
                 $msearch = ' ' . $MEDIAINFO[ 'title' ] . ' ' . $MEDIAINFO[ 'year' ];
@@ -43,13 +50,15 @@
                 if( array_key_exists( 'imdbid', $MEDIAINFO ) 
                 && strlen( $MEDIAINFO[ 'imdbid' ] ) > 0
                 ){
-                    $search .= ' ' . $MEDIAINFO[ 'imdbid' ] . ' related:imdb.com';
+                    //not more accuracy
+                    //$search .= ' ' . $MEDIAINFO[ 'imdbid' ] . ' related:imdb.com';
                 //Check valid IMDBid
                 }elseif( array_key_exists( 'imdb', $MEDIAINFO ) 
                 && strlen( $MEDIAINFO[ 'imdb' ] ) > 0
                 && ( $imdbid = getIMDB_ID( $MEDIAINFO[ 'imdb' ] ) ) != FALSE
                 ){
-                    $search .= ' ' . $imdbid . ' related:imdb.com';
+                    //not more accuracy
+                    //$search .= ' ' . $imdbid . ' related:imdb.com';
                 //Check valid thetvdb.com
                 }elseif( array_key_exists( 'tvdb', $MEDIAINFO ) 
                 && strlen( $MEDIAINFO[ 'tvdb' ] ) > 0
@@ -70,7 +79,8 @@
                 
                 //var_dump( $search );
                 $images_own = array();
-                if( ( $images = searchImages( $search, 8, TRUE ) ) != FALSE
+                $thumbsonly = FALSE;
+                if( ( $images = searchImages( $search, 8, $thumbsonly ) ) != FALSE
                 && is_array( $images ) 
                 && count( $images ) > 0
                 ){
@@ -138,7 +148,7 @@ function mediainfo_url_add( idmediainfo, type, tfolder, ifield ){
 <table class='tList'>
     <tr>
 <?php
-    foreach( $HTMLDATA AS $title => $links ) {
+    foreach( $HTMLDATA2 AS $title => $links ) {
 ?>
         <th colspan='2'>URL Img <?php echo $title; ?></th>
 <?php
@@ -147,7 +157,7 @@ function mediainfo_url_add( idmediainfo, type, tfolder, ifield ){
     </tr>
     <tr>
 <?php
-    foreach( $HTMLDATA AS $title => $links ) {
+    foreach( $HTMLDATA2 AS $title => $links ) {
 ?>
         <td>
             <input type='text' id="url<?php echo $title; ?>" name="url<?php echo $title; ?>" value='' />
