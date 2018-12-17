@@ -70,6 +70,19 @@ function ident_autoset_idmedia( idmedia ){
     
     return false;
 }
+function ident_preview_media( idmedia, starttime ){
+    var url = '<?php getURL(); ?>';
+    url += '?r=r&action=mediapreview&idmedia=' + idmedia + '&starttime=' + starttime;
+    loading_show();
+    $.get( url )
+    .done( function( data ){
+        scrolltop();
+        $( '#dResultIdent' ).html( data );
+        loading_hide();
+    });
+    
+    return false;
+}
 </script>
 
 <div id='dResultIdent'></div>
@@ -113,6 +126,7 @@ function ident_autoset_idmedia( idmedia ){
                 ?>
             <td>
                 <input onclick='ident_identify_media( <?php echo $lrow[ 'idmedia' ]; ?> );' type='button' id='bIdentify' name='bIdentify' value='<?php echo get_msg( 'MENU_IDENTIFY', FALSE ); ?>' />
+                <input onclick='ident_preview_media( <?php echo $lrow[ 'idmedia' ]; ?>, 0 );' type='button' id='bIdentifyP' name='bIdentifyP' value='Preview' />
                 <input onclick='ident_autoset_idmedia( <?php echo $lrow[ 'idmedia' ]; ?> );' type='button' id='bSetAutoIdMedia' name='bSetAutoIdMedia' value='<?php echo get_msg( 'MENU_IDENTIFY_AUTO', FALSE ); ?>' />
                 <input onclick='log_delete_media( <?php echo $lrow[ 'idmedia' ]; ?> );' type='button' id='bLogDelete' name='bLogDelete' value='<?php echo get_msg( 'MENU_DELETE', FALSE ); ?>' />
                 <input onclick='log_delete_media_file( <?php echo $lrow[ 'idmedia' ]; ?> );' type='button' id='bLogDeleteFile' name='bLogDeleteFile' value='<?php echo get_msg( 'MENU_DELETE_FILE', FALSE ); ?>' />

@@ -273,4 +273,22 @@
         return $result;
 	}
 	
+	//make apng preview
+	
+	function ffmpeg_preview_apng( $filevideo, $filepreview, $starttime = 30, $duration = 10, $debug = FALSE ){
+        $result = FALSE;
+        
+        //preview size: 480x270, 240x135
+        //fps:  -vf fps=fps=12
+        //each second: -vf fps=1
+        //keyframes: -vsync vfr
+        $cmd = O_FFMPEG . " -i " . escapeshellarg( $filevideo ) . " -ss " . $starttime . " -t " . $duration . " -vf fps=1 -s 240x135  -f apng " . escapeshellarg( $filepreview );
+        if( $debug ) echo "<br />" . $cmd;
+        if( ( $data = runExtCommand( $cmd ) ) != FALSE ){
+            $result = TRUE;
+        }
+        
+        return $result;
+	}
+	
 ?>
