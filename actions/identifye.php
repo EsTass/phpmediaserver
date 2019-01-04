@@ -44,6 +44,11 @@
                 $d[ 1 ] = FALSE;
                 $movies = FALSE;
             }
+            if( ( $d2 = get_media_chapter( $FILENAME ) ) != FALSE ){
+                $d[ 0 ] = $d2[ 0 ];
+                $d[ 1 ] = $d2[ 1 ];
+                $movies = FALSE;
+            }
             if( $FOLDERNAME != basename( PPATH_DOWNLOADS ) 
             && ( $dorw = ident_detect_file_db( $FILE, $TITLEFOLDER, $movies, $imdb, $d[ 0 ], $d[ 1 ] ) ) != FALSE
             && is_array( $dorw )
