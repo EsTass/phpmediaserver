@@ -2,7 +2,7 @@
 
 	defined( 'ACCESS' ) or die( 'HTTP/1.0 401 Unauthorized.<br />' );
 	//admin
-	check_mod_admin();
+	//check_mod_admin();
 	
 	//idmedia
 	//idmediainfo

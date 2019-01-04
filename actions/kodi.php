@@ -275,7 +275,9 @@
                 ){
                     $x = 1;
                     foreach( $edata2 AS $e ){
-                        if( $e[ 'season' ] > 0 || $e[ 'episode' ] > 0 ){
+                        if( ( $e[ 'season' ] > 0 || $e[ 'episode' ] > 0 )
+                        && !in_array( $e[ 'title' ], $RESULT )
+                        ){
                             $RESULT[] = " " . $e[ 'title' ];
                             $x++;
                         }
