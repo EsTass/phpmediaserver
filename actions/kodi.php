@@ -98,7 +98,7 @@
         break;
         case 'category':
             if( $G_CAT == ' ' . get_msg( 'LIVETV_TITLE', FALSE ) ){
-                //Last Added
+                //Live TV
                 if( ( $edata = sqlite_medialive_getdata_filter( $G_SEARCH, O_LIST_BIG_QUANTITY ) ) != FALSE 
                 && count( $edata ) > 0
                 ){
@@ -217,7 +217,7 @@
                     $RESULT = array( $e );
                 }
             
-            }elseif( ( $edata = sqlite_media_getdata_filtered( $G_CAT, 1000 ) ) != FALSE 
+            }elseif( ( $edata = sqlite_media_getdata_filtered( trim( $G_CAT ), 1000 ) ) != FALSE 
             && is_array( $edata )
             && count( $edata ) > 0
             ){
@@ -269,9 +269,24 @@
             && is_array( $edata )
             && count( $edata ) > 0
             ){
+                //add showed series first in list
+                if( ( $edata2 = sqlite_played_getdata_ext( FALSE, '', TRUE, O_LIST_BIG_QUANTITY, TRUE ) ) != FALSE 
+                && count( $edata2 ) > 0
+                ){
+                    $x = 1;
+                    foreach( $edata2 AS $e ){
+                        if( $e[ 'season' ] > 0 || $e[ 'episode' ] > 0 ){
+                            $RESULT[] = " " . $e[ 'title' ];
+                            $x++;
+                        }
+                    }
+                }
+                
                 $TITLE = 'LIST';
                 foreach( $edata AS $e ){
-                    $RESULT[] = $e[ 'title' ];
+                    if( !in_array( $e[ 'title' ], $RESULT ) ){
+                        $RESULT[] = $e[ 'title' ];
+                    }
                 }
             }else{
                 $RESULT = array( get_msg( 'DEF_EMPTYLIST', FALSE ) );
