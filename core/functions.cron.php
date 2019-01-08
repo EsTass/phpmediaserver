@@ -47,7 +47,8 @@
             ){
                 run_in_background( O_CRON_JOB, 0 );
             }
-        }elseif( ( $data = sqlite_log_check_cron( $cronid, ( O_CRON_SHORT_TIME + 5 ) ) ) !== FALSE 
+        }elseif( O_CRON 
+        && ( $data = sqlite_log_check_cron( $cronid, ( O_CRON_SHORT_TIME + 5 ) ) ) !== FALSE 
         && is_array( $data )
         && count( $data ) <= 0
         && sqlite_log_insert( $cronid, 'Cron ' . O_CRON_LONG_TIME .'mins launched: ' . date( 'Y-m-d H:s:i' ) ) !== FALSE 
@@ -353,6 +354,87 @@
         }
         
         return $result;
+	}
+	
+	//DOWNLOAD SEARCHED ITEMS WITH DEFINED WEBSCRAPPERS
+	
+	function cron_searchs_downloads( $minutesback, $echo = TRUE ){
+        global $G_WEBSCRAPPER;
+        
+        if( ( $logs = sqlite_log_getsearchs( $minutesback ) ) != FALSE 
+        && is_array( $logs )
+        && count( $logs ) > 0
+        ){
+            //var_dump( $logs );
+            $searchs = array();
+            $searched = array();
+            foreach( $logs AS $log ){
+                if( array_key_exists( 'url', $log ) 
+                && strlen( $log[ 'url' ] ) > 0
+                && ( $parts = parse_url( $log[ 'url' ] ) ) != FALSE
+                && is_array( $parts )
+                && array_key_exists( 'query', $parts )
+                && strlen( $parts[ 'query' ] ) > 0
+                ){
+                    parse_str( $parts[ 'query' ], $query );
+                    if( array_key_exists( 'search', $query )
+                    && strlen( $query[ 'search' ] ) > 0
+                    && ( $bword = get_word_better( $query[ 'search' ] ) ) != FALSE
+                    && !in_array( $bword, $searched )
+                    ){
+                        $searchs[] = $query[ 'search' ];
+                        $searched[] = $bword;
+                    }
+                }
+            }
+            //search terms on base for results
+            $iadded = array();
+            if( defined( 'O_CRON_WEBSCRAP_SEARCH' ) 
+            && is_array( O_CRON_WEBSCRAP_SEARCH )
+            ){
+                $s = O_CRON_WEBSCRAP_SEARCH;
+                $links = array();
+                $searched = array();
+                $PASS = 0;
+                foreach( $searchs AS $search ){
+                    $bword = get_word_better( $search );
+                    $sin = $s[ mt_rand( 0, ( count( $s ) - 1 ) ) ];
+                    if( $echo ) echo "<br />SEARCH: " . $search;
+                    if( $echo ) echo "<br />WEBSEARCH: " . $sin;
+                    //send search on server
+                    if( isset( $G_WEBSCRAPPER )
+                    && $sin
+                    && !in_array( $bword, $searched )
+                    && array_key_exists( $sin, $G_WEBSCRAPPER )
+                    && strlen( $search ) > 0
+                    && ( $links = webscrapp_search( $sin, $search, FALSE ) ) != FALSE 
+                    && count( $links ) > 0
+                    ){
+                        //TODO CHECK DUPLYS
+                        //add each title => link
+                        foreach( $links AS $ltitle => $lurl ){
+                            if( !inString( $ltitle, $bword ) ){
+                                if( $echo ) echo "<br />";
+                                if( $echo ) echo 'TITLE DIFFER: ' . $ltitle . ' => ' . $bword;
+                            }elseif( in_array( $lurl, $iadded ) ){
+                                if( $echo ) echo "<br />";
+                                if( $echo ) echo 'ADDED BEFORE: ' . $ltitle;
+                            }elseif( webscrapp_pass( $sin, $PASS, $lurl, $ltitle, FALSE ) ){
+                                if( $echo ) echo "<br />";
+                                //if( $echo ) echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ': ' . $sin . ' => ' . $ltitle . ' => ' . $lurl;
+                                if( $echo ) echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ': ' . $ltitle;
+                                $iadded[] = $lurl;
+                            }else{
+                                if( $echo ) echo "<br />";
+                                //if( $echo ) echo get_msg( 'WEBSCRAP_ADDKO', FALSE ) . ': ' . $sin . ' => ' . $ltitle . ' => ' . $lurl;
+                                if( $echo ) echo get_msg( 'WEBSCRAP_ADDKO', FALSE ) . ': ' . $ltitle;
+                            }
+                        }
+                    }
+                    $searched[] = $bword;
+                }
+            }
+        }
 	}
 	
 ?>

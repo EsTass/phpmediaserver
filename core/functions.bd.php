@@ -482,6 +482,23 @@
 		return $result;
 	}
 	
+	function sqlite_log_getsearchs( $minutes = 60 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$date = date('Y-m-d H:i:s',strtotime('-' . $minutes . ' minutes',strtotime(date('Y-m-d H:i:s'))));
+			$sql = 'SELECT * FROM logs ';
+			$sql .= ' WHERE date > "' . $date . '" ';
+			$sql .= ' AND url LIKE "%search=%" ';
+			$sql .= ' ORDER BY date DESC LIMIT 1000';
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		//var_dump( $result );
+		return $result;
+	}
+	
 	//SQLITE USERS
 	
 	function sqlite_users_insert( $user, $pass, $admin = '' ){

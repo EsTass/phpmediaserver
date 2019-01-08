@@ -104,6 +104,16 @@
         require PPATH_ACTIONS . DS . 'importfoldera.php';
 	}
 	
+	//GET SEARCHS DATA AND DOWNLOAD MEDIA
+	if( defined( 'O_CRON_WEBSCRAP_SEARCH' ) 
+	&& O_CRON_WEBSCRAP_SEARCH != FALSE
+	){
+        echo "<br />" . date( 'Y-m-d H:i:s' );
+        echo "<br />Get Searchs data and download files: ";
+        echo "<br />";
+        cron_searchs_downloads( O_CRON_SHORT_TIME );
+    }
+	
 	//AUTODETECT MEDIA (ALWAYS LAST, TOO MUCH TIME (1min*file aprox of wait))
 	echo "<br />" . date( 'Y-m-d H:i:s' );
 	echo "<br />Scrap Downloads: ";
