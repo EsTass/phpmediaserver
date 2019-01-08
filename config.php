@@ -86,7 +86,7 @@
 	//FILE SCRAPPERS
 	
 	//function.[scrapper].php to include
-	define( 'O_SCRAPPERS_INCLUDES', array( 'pymi', 'filebot', 'omdb', 'thetvdb' ) );
+	define( 'O_SCRAPPERS_INCLUDES', array( 'pymi', 'filebot', 'omdb', 'thetvdb', 'phpimdb' ) );
 	//Scrapper List ( title => array( function_search, function_add ) ) filled in each scrapper
 	$G_SCRAPPERS = array();
 	//SCRAPPERS API KEY ( title => function ) filled in each scrapper
@@ -220,6 +220,8 @@
 	define( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN', FALSE ); //INT Gb or FALSE
 	//Clean OLD files if freespace<O_WEBSCRAP_LIMIT_FREESPACE (delete files to min free space) BOOL
 	define( 'O_WEBSCRAP_LIMIT_FREESPACE_AUTOCLEAN_OLD', TRUE ); //BOOL
+	//Web Scrapper for 'search' action to  cron, false = disabled | array( websearch1, websearch2, ... )
+	define( 'O_CRON_WEBSCRAP_SEARCH', FALSE );
 	
 	//DLNA CONFIG
 	
