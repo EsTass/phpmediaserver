@@ -17,7 +17,7 @@ A bunch of utilities for:
  - Easy configuration with config.php and config.ws.php
  - Admins and player users
  - Realtime ffmpeg transcoding of any type of video supported by ffmpeg, not needed to reencode before play or create temp files
- - Identify media files thanks to: [pymediaident](https://github.com/EsTass/pymediaident), www.filebot.net, www.omdbapi.com, www.thetvdb.com (cron, manual and helped).
+ - Identify media files thanks to: [pymediaident](https://github.com/EsTass/pymediaident), www.filebot.net, www.omdbapi.com, www.thetvdb.com, [PHP-IMDB-Grabber](https://github.com/FabianBeiner/PHP-IMDB-Grabber) (cron, manual and helped).
  - Search and download new media from web adding scrappers with config.ws.php (youtube, elinks, magnets, torrents and dd supported, cron or manual with any external program like transmission, jdownloader, amule, qbittorent, etc).
  - Clean duplicates by quality with safe seeding (min days to seed) and max filesize to maintanin
  - Country IP block thanks to www.geoplugin.net.
@@ -115,6 +115,7 @@ Restart apache, and login with default user/pass.
  - [wget](https://www.gnu.org/software/wget/)
  - [omdbapi APIKEY](https://www.omdbapi.com)
  - [www.thetvdb.com APIKEY](https://www.thetvdb.com)
+ - [PHP-IMDB-Grabber](https://github.com/FabianBeiner/PHP-IMDB-Grabber)
 
 ## Admin SQLite DB
 
