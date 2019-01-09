@@ -200,8 +200,13 @@
             $fi = $f;
             if( array_key_exists( $f, $xml ) 
             && is_string( $xml[ $f ] ) 
+            && strlen( $xml[ $f ] ) > 0
+            && is_numeric( $xml[ $f ] ) 
+            && (int)$xml[ $f ] > 1900
             ){
                 $rtesult[ $fi ] = $xml[ $f ];
+            }else{
+                $rtesult[ $fi ] = date( 'Y' );
             }
             //rating
             $f = 'rating';

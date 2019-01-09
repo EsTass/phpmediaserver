@@ -213,7 +213,7 @@
             $fi = $f;
             if( is_string( $data->getUrl() ) 
             ){
-                $rtesult[ $fi ] = getIMDB_ID( $data->getUrl() );
+                $rtesult[ $fi ] = $data->getUrl();
             }
             
             //tmdbid -- NO EXIST
@@ -237,7 +237,7 @@
             $fi = $f;
             if( is_string( $data->getRuntime() ) 
             ){
-                $rtesult[ $fi ] = getIMDB_ID( $data->getRuntime() );
+                $rtesult[ $fi ] = $data->getRuntime();
             }
             //re runtime to ffmpeg
             if( ( !is_numeric( $rtesult[ $fi ] ) 
@@ -257,7 +257,7 @@
             $fi = 'genre';
             if( is_string( $data->getGenre() ) 
             ){
-                $rtesult[ $fi ] = getIMDB_ID( $data->getGenre() );
+                $rtesult[ $fi ] = $data->getGenre();
             }
             
             //ACTORS getCast
