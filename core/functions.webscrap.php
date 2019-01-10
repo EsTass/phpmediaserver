@@ -667,13 +667,17 @@
 		
 		$rnd_str = '' . getRandomString( 4 );
 		if( !endsWith( $file, '.torrent' ) ){
+            $prefile = $file . '.*.torrent';
             $file .= '.' . $rnd_str . '.torrent';
 		}else{
+            $prefile = str_ireplace( '.torrent' , '.*.torrent', $file );
             $file = str_ireplace( '.torrent' , '.' . $rnd_str . '.torrent', $file );
 		}
-		
+		//TODO random name added check exist
 		if( file_exists( $file ) 
 		|| file_exists( $file . '.added' ) 
+		|| webscrap_search_file( $prefile )
+		|| webscrap_search_file( $prefile . '.added' )
 		){
             if( $debug ) echo "<br />Torrent File Exist: " . $file . ' => ' . $url;
             $result = TRUE;
@@ -691,6 +695,18 @@
 		return $result;
 		
 	}
+	
+	function webscrap_search_file( $file ){
+        $result = FALSE;
+        $files = count( glob( $file ) );
+        if( $files == 0 ){ 
+            $result = FALSE;
+        }else{ 
+            $result = TRUE;
+        }
+        
+        return $result;
+    }
 	
 	function webscrap_search_updated( $wscrapper, $echo = FALSE, $debug = PPATH_WEBSCRAP_DEBUG ){
 		$result = FALSE;
