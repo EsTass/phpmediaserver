@@ -149,7 +149,7 @@
 		
 		$cmd = O_FFMPEG . " -nostdin " . $extra_params . " -t " . $TIMEBLOCK . " -i '" . $FMEDIA . "' " . $subtrack . " " . $audiotrack . " -codec:0 " . $encoder . " -codec:1 ac3 -map_metadata -1 -map_chapters -1 -threads 0 -codec:v:0 libx264 -pix_fmt yuv420p -preset ultrafast -crf 23 -maxrate 1498981 -bufsize 2997962 -profile:v baseline -level " . $G_FFMPEGLVL . " -x264opts:0 subme=0:me_range=4:rc_lookahead=10:me=dia:no_chroma_me:8x8dct=0:partitions=none -force_key_frames 'expr:gte(t,n_forced*3)' -vf 'scale=trunc(min(max(iw\,ih*dar)\," . $G_FFMPEGVIDEWIDTH . ")/2)*2:trunc(ow/dar/2)*2' -copyts -vsync -1 -codec:a:0 " . $audiocodec . " -strict experimental -ac 2 -ab 128000 -f " . $encoder_outformat . " - ";
 		
-		@apache_setenv('no-gzip', 1);
+		if( function_exists( 'apache_setenv' ) ) @apache_setenv('no-gzip', 1);
 		@ini_set('zlib.output_compression', 'Off');
 		//header( 'Accept-Ranges:bytes' );
 		//header( 'Connection:Keep-Alive' );
