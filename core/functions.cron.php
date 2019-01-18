@@ -413,7 +413,11 @@
                         //TODO CHECK DUPLYS
                         //add each title => link
                         foreach( $links AS $ltitle => $lurl ){
-                            if( !inString( $ltitle, $bword ) ){
+                            if( !inString( $ltitle, $bword ) 
+                            //check its O_MENU_GENRES and exclude search
+                            && !array_key_exists( $bword, O_MENU_GENRES )
+                            && !in_array( $bword, O_MENU_GENRES )
+                            ){
                                 if( $echo ) echo "<br />";
                                 if( $echo ) echo 'TITLE DIFFER: ' . $ltitle . ' => ' . $bword;
                             }elseif( in_array( $lurl, $iadded ) ){
