@@ -39,6 +39,7 @@ A bunch of utilities for:
 ## Install
 
 [Full Install on Linux(arch/apache)](https://github.com/EsTass/phpmediaserver/wiki/Install-In-linux-(arch-apache))
+
 [Full Install on Linux(arch/nginx)](https://github.com/EsTass/phpmediaserver/wiki/Install-in-Linux-(arch-nginx))
 
 Copy all files to your server folder and edit:
