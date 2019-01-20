@@ -4,6 +4,7 @@
 	//ADD SCRAPPER
 	$G_SCRAPPERS[ 'thetvdb' ] = array( '', 'ident_detect_file_thetvdb' );
 	//$G_SCRAPPERS_KEY[ 'thetvdb' ] = '--YOURKEY--';
+	$G_SCRAPPERS_SEARCH[ 'thetvdb' ] = array( 'imdb.com/title/tt', 'imdb.com', 'getIMDB_ID' );
 	$THETVDB_URL = 'https://api.thetvdb.com/';
 	$THETVBD_FILE = PPATH_TEMP . DS . 'thetvbd';
 	

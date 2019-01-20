@@ -4,6 +4,7 @@
 	//ADD SCRAPPER
 	$G_SCRAPPERS[ 'omdb' ] = array( '', 'ident_detect_file_omdb' );
 	//$G_SCRAPPERS_KEY[ 'omdb' ] = '--YOURKEY--';
+	$G_SCRAPPERS_SEARCH[ 'omdb' ] = array( 'imdb.com/title/tt', 'imdb.com', 'getIMDB_ID' );
 	$OMDB_URL = 'http://www.omdbapi.com/?apikey=' . $G_SCRAPPERS_KEY[ 'omdb' ];
 	
 	//BASE

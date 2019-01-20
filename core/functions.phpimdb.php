@@ -4,6 +4,7 @@
 	//ADD SCRAPPER
 	$G_SCRAPPERS[ 'phpimdb' ] = array( '', 'ident_detect_file_phpimdb' );
 	$G_SCRAPPERS_KEY[ 'phpimdb' ] = '';
+	$G_SCRAPPERS_SEARCH[ 'phpimdb' ] = array( 'imdb.com/title/tt', 'imdb.com', 'getIMDB_ID' );
 	
 	//BASE
 	function ident_detect_file_phpimdb( $file, $title, $movies = TRUE, $imdb = FALSE, $season = FALSE, $episode = FALSE ){
@@ -134,7 +135,8 @@
             //SEASON
             $f = 'season';
             $fi = $f;
-            if( is_string( $data->getSeasons() ) 
+            if( is_string( $data->getSeasons() )
+            && is_numeric( $data->getSeasons() ) 
             ){
                 $rtesult[ $fi ] = $data->getSeasons();
             }
@@ -148,6 +150,7 @@
             $f = 'year';
             $fi = $f;
             if( is_string( $data->getYear() ) 
+            && is_numeric( $data->getYear() ) 
             ){
                 $rtesult[ $fi ] = $data->getYear();
             }
@@ -156,6 +159,7 @@
             $f = 'rating';
             $fi = $f;
             if( is_string( $data->getRating() ) 
+            && is_numeric( $data->getRating() ) 
             ){
                 $rtesult[ $fi ] = $data->getRating();
             }
@@ -164,6 +168,7 @@
             $f = 'votes';
             $fi = $f;
             if( is_string( $data->getVotes() ) 
+            && is_numeric( $data->getVotes() ) 
             ){
                 $rtesult[ $fi ] = $data->getVotes();
             }
@@ -188,6 +193,7 @@
             $f = 'runtime';
             $fi = $f;
             if( is_string( $data->getRuntime() ) 
+            && is_numeric( $data->getRuntime() ) 
             ){
                 $rtesult[ $fi ] = $data->getRuntime();
             }
@@ -236,6 +242,7 @@
             $f = 'runtime';
             $fi = $f;
             if( is_string( $data->getRuntime() ) 
+            && is_numeric( $data->getRuntime() ) 
             ){
                 $rtesult[ $fi ] = $data->getRuntime();
             }

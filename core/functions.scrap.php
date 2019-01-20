@@ -961,6 +961,22 @@
         return $result;
 	}
 	
+	//DETECT filmaffinity.com ID /filmXXXXXX.html
+	
+	function getFILMAFFINITY_ID( $url ){
+        $result = FALSE;
+        
+        if( preg_match( "/\/film([0-9]{5,10})\.html/", $url, $match ) 
+        && is_array( $match )
+        && array_key_exists( 1, $match )
+        && strlen( $match[ 1 ] ) > 0
+        ){
+            $result = $match[ 1 ];
+        }
+        
+        return $result;
+	}
+	
 	//GET URL WITH MAX TIME
 	
 	function file_get_contents_timed_basic( $url, $time = 5, $sessionid = '' ){

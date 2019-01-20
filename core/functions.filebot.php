@@ -8,6 +8,7 @@
 	//ADD SCRAPPER
 	$G_SCRAPPERS[ 'filebot' ] = array( '', 'ident_detect_file_filebot' );
 	$G_SCRAPPERS_KEY[ 'filebot' ] = '';
+	$G_SCRAPPERS_SEARCH[ 'filebot' ] = array( 'imdb.com/title/tt', 'imdb.com', 'getIMDB_ID' );
 	
 	//BASE
 	function ident_detect_file_filebot( $file, $title, $movies = TRUE, $imdb = FALSE, $season = FALSE, $episode = FALSE ){

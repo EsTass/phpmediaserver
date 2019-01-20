@@ -4,6 +4,7 @@
 	//ADD SCRAPPER
 	$G_SCRAPPERS[ 'pymi' ] = array( '', 'ident_detect_file_pymi' );
 	$G_SCRAPPERS_KEY[ 'pymi' ] = '';
+	$G_SCRAPPERS_SEARCH[ 'pymi' ] = array( 'imdb.com/title/tt', 'imdb.com', 'getIMDB_ID' );
 	
 	//BASE
 	function ident_detect_file_pymi( $file, $title, $movies = TRUE, $imdb = FALSE, $season = FALSE, $episode = FALSE ){

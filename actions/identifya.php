@@ -65,7 +65,8 @@
 	if( array_key_exists( 'imdb', $G_DATA )
 	&& strlen( $G_DATA[ 'imdb' ] ) > 5
 	){
-        $IMDB = getIMDB_ID( $G_DATA[ 'imdb' ] );
+        //$IMDB = getIMDB_ID( $G_DATA[ 'imdb' ] );
+        $IMDB = $G_DATA[ 'imdb' ];
 	}else{
         $IMDB = FALSE;
 	}
