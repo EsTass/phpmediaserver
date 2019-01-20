@@ -38,9 +38,10 @@ A bunch of utilities for:
  
 ## Install
 
-[Full Install on Linux(arch)](https://github.com/EsTass/phpmediaserver/wiki/Install-In-linux-(arch))
+[Full Install on Linux(arch/apache)](https://github.com/EsTass/phpmediaserver/wiki/Install-In-linux-(arch-apache))
+[Full Install on Linux(arch/nginx)](https://github.com/EsTass/phpmediaserver/wiki/Install-in-Linux-(arch-nginx))
 
-Copy files to your server folder and edit:
+Copy all files to your server folder and edit:
  - `config.php`: basic configuration, read comments and edit needed
  - `config.ws.php`: only if want to add more web searchs for media (examples provided)
 
