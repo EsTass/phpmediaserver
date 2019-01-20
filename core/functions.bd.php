@@ -1199,9 +1199,11 @@
                 $sql .= ' AND mediainfo.episode != \'\' ';
                 $sql .= ' AND mediainfo.season > 0 ';
                 $sql .= ' AND mediainfo.episode > 0 ';
+                //GROUP BY mediainfo.title 
+                //$sql .= ' GROUP BY mediainfo.title ';
 			}
-			//GROUP BY mediainfo.title 
 			$sql .= ' ORDER BY media.idmedia DESC'; 
+			
 			// LIMIT ' . $limit;
 			//die( $sql );
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
@@ -1213,6 +1215,68 @@
 			&& $result[ 0 ][ 'quantity' ] > 0
 			){
                 $result = (int)$result[ 0 ][ 'quantity' ];
+			}else{
+                $result = FALSE;
+			}
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_media_getdata_filtered_grouped_pages_total_g( $search, $limit = 1000, $force_series = FALSE, $onlygenre = FALSE ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT idmedia AS quantity FROM media ';
+			$sql .= ' INNER JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
+			$sql .= ' WHERE media.idmediainfo > 0 ';
+			if( strlen( $search ) > 0 ){
+                if( $onlygenre == FALSE ){
+                    $sql .= ' AND ( mediainfo.title LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR media.file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.year LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.actor LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.plot LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    $sql .= ' OR mediainfo.titleepisode LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                }else{
+                    $sql .= ' AND ( mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $search ) . '%\' ';
+                    //Add genres search O_MENU_GENRES
+                    $lan_genres = O_MENU_GENRES;
+                    if( array_key_exists( $search, $lan_genres ) 
+                    && strlen( $lan_genres[ $search ] ) > 0
+                    ){
+                        $sql .= ' OR mediainfo.genre LIKE \'%' . $dbhandle->escapeString( $lan_genres[ $search ] ) . '%\' ';
+                    }
+                    if( ( $tk = array_search( $search, $lan_genres ) ) !== FALSE
+                    && strlen( $lan_genres[ $tk ] ) > 0
+                    && strlen( $tk ) > 0
+                    ){
+                        $sql .= ' OR mediainfo.genre LIKE \'%' . $tk . '%\' ';
+                    }
+                }
+				$sql .= ')';
+			}
+			if( $force_series ){
+                $sql .= ' AND mediainfo.season != \'\' ';
+                $sql .= ' AND mediainfo.episode != \'\' ';
+                $sql .= ' AND mediainfo.season > 0 ';
+                $sql .= ' AND mediainfo.episode > 0 ';
+                //GROUP BY mediainfo.title 
+                $sql .= ' GROUP BY mediainfo.title ';
+			}
+			$sql .= ' ORDER BY media.idmedia DESC'; 
+			
+			// LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+			if( is_array( $result ) 
+			){
+                $result = (int)count( $result );
 			}else{
                 $result = FALSE;
 			}

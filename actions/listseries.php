@@ -25,13 +25,13 @@
         $G_PAGE = 0;
     }
     $TITLE = get_msg( 'LIST_SEARCH_RESULT', FALSE );
-    if( ( $edata_pages = sqlite_media_getdata_filtered_grouped_pages_total( $G_SEARCH, O_LIST_BIG_QUANTITY, TRUE ) ) != FALSE 
+    if( ( $edata_pages = sqlite_media_getdata_filtered_grouped_pages_total_g( $G_SEARCH, O_LIST_BIG_QUANTITY, TRUE ) ) != FALSE 
     && ( $edata = sqlite_media_getdata_filtered_grouped( $G_SEARCH, O_LIST_BIG_QUANTITY, $G_PAGE, TRUE ) ) != FALSE 
     && count( $edata ) > 0
     ){
         $TITLE = get_msg( 'LIST_TITLE_LAST', FALSE );
         $edata_pages = (int)( $edata_pages / O_LIST_BIG_QUANTITY );
-        echo get_html_list( $edata, $TITLE, $G_PAGE, $edata_pages );
+        echo get_html_list_series( $edata, $TITLE, $G_PAGE, $edata_pages );
     }else{
         echo get_msg( 'DEF_EMPTYLIST', FALSE );
     }
