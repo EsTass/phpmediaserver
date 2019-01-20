@@ -97,7 +97,12 @@
         && count( $edata ) > 0
         ){
             $TITLE = get_msg( 'LIST_TITLE_LAST', FALSE );
-            echo get_html_list( $edata, $TITLE, 0 );
+            if( ( $edata_pages = sqlite_media_getdata_filtered_grouped_pages_total( $G_SEARCH, O_LIST_BIG_QUANTITY, FALSE, FALSE ) ) != FALSE ){
+                $edata_pages = (int)( $edata_pages / O_LIST_BIG_QUANTITY );
+            }else{
+                $edata_pages = 1;
+            }
+            echo get_html_list( $edata, $TITLE, 0, $edata_pages );
         }
         
     }else{
