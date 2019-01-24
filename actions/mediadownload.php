@@ -34,6 +34,7 @@
 	&& getFileMimeTypeVideo( $mi[ 0 ][ 'file' ] )
 	){
         $FMEDIA = $mi[ 0 ][ 'file' ];
+        $IDMEDIAINFO = $mi[ 0 ][ 'idmediainfo' ];
 	}elseif( $IDMEDIAINFO > 0
 	&& ( $mi = sqlite_media_getdata_mediainfo( $IDMEDIAINFO ) ) != FALSE 
 	&& is_array( $mi )
@@ -42,12 +43,26 @@
 	&& getFileMimeTypeVideo( $mi[ 0 ][ 'file' ] )
 	){
         $FMEDIA = $mi[ 0 ][ 'file' ];
+        $IDMEDIA = $mi[ 0 ][ 'idmedia' ];
 	}else{
         $FMEDIA = FALSE;
 	}
 	
 	if( $FMEDIA ){
-       //header( "X-Sendfile: $FMEDIA" );
+        
+        //SET PLAYING NOW
+        if( ( $idplaying = sqlite_playing_insert( USERNAME, $IDMEDIA, FALSE, 'WEB-download', getmypid() ) ) != FALSE 
+        ){
+            $CHECKPLAYING = TRUE;
+            register_shutdown_function( function( $idplaying ){
+                sqlite_playing_delete( $idplaying );
+            }, $idplaying );
+        }else{
+            $CHECKPLAYING = FALSE;
+            $idplaying = FALSE;
+        }
+        
+        //header( "X-Sendfile: $FMEDIA" );
 		header( 'Content-Description: File Transfer' );
 		header( 'Content-Type: application/octet-stream' );
 		header( 'Content-Disposition: attachment; filename="' . basename( $FMEDIA ) . '"' );
@@ -59,6 +74,14 @@
 		flush();
 		//readfile( $FMEDIA );
 		readfile_chunked( $FMEDIA );
+		
+        //REMOVE PLAYING NOW
+        if( $CHECKPLAYING
+        && $idplaying
+        ){
+            sqlite_playing_delete( $idplaying );
+        }
+		
 		exit( 0 );
     }else{
         echo get_msg( 'DEF_NOTEXIST' );

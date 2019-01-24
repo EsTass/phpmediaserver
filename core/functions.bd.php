@@ -8,6 +8,7 @@
         //'table' => 'CREATE TABLE',
         'medialive' => "CREATE TABLE 'medialive' ('idmedialive' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'title' TEXT, 'url' TEXT, 'poster' TEXT, 'date' DATETIME)",
         'medialiveurls' => "CREATE TABLE 'medialiveurls' ('idmedialiveurls' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'title' TEXT, 'url' TEXT, 'date' DATETIME)",
+        'playing' => "CREATE TABLE 'playing' ('idplaying' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'user' TEXT, 'idmedia' INTEGER DEFAULT 0, 'date' DATETIME, 'mode' TEXT, 'pid' TEXT)",
 	);
 	
 	$G_DB = FALSE;
@@ -2336,5 +2337,138 @@
 		
 		return $result;
 	}
+	
+	//PLAYING NOW
+	//idplaying, user, idmedia, date, mode, pid
+	
+	function sqlite_playing_getdata( $idplaying = FALSE, $limit = 1000, $extdata = FALSE ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM playing ';
+			if( $idplaying != FALSE
+			&& is_numeric( $idplaying )
+			&& (int)$idplaying > 0
+			){
+				$sql .= ' WHERE idplaying = ' . $idplaying . ' ';
+			}
+			if( $extdata ){
+                $sql .= ' LEFT JOIN media ON media.idmedia = playing.idmedia';
+                $sql .= ' LEFT JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
+            }
+			$sql .= ' ORDER BY date DESC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_playing_insert( $user, $idmedia, $date = FALSE, $mode = 'WEB', $pid = FALSE ){
+		//Vars
+		$result = FALSE;
+		$idmedialiveurls = 0;
+		
+		if( $date == FALSE ){
+            $date = date( 'Y-m-d H:i:s' );
+		}
+		if( $pid == FALSE ){
+            $pid = getmypid();
+		}
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'INSERT INTO playing VALUES(';
+			$sql .= '';
+			$sql .= ' NULL, ';
+			$sql .= ' "' . $dbhandle->escapeString( $user ) . '", ';
+			$sql .= ' ' . $idmedia . ', ';
+			$sql .= ' "' . $date . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $mode ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $pid ) . '" ';
+			$sql .= ')';
+			$result = $dbhandle->exec( $sql );
+			if( $result
+			&& ( $lastid = sqlite_lastid() ) 
+            ){
+                $result = $lastid;
+			}
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_playing_delete( $idplaying ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'DELETE FROM playing ';
+			$sql .= '';
+			$sql .= ' WHERE idplaying = ' . $idplaying . ' ';
+			//die( $sql );
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_playing_checkexist( $idplaying ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT idplaying FROM playing ';
+            $sql .= ' WHERE idplaying = ' . $idplaying . ' ';
+			//$sql .= ' ORDER BY title ASC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+			if( is_array( $result ) 
+			&& array_key_exists( 0, $result )
+			&& is_array( $result[ 0 ] ) 
+			&& array_key_exists( 'idplaying', $result[ 0 ] )
+			){
+                $result = $result[ 0 ][ 'idplaying' ];
+			}else{
+                $result = FALSE;
+			}
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_playing_clean(){
+		//Vars
+		$result = TRUE;
+		
+		if( ( $data = sqlite_playing_getdata() ) != FALSE 
+		&& is_array( $data )
+		&& count( $data ) > 0
+		){
+            foreach( $data AS $row ){
+                if( array_key_exists( 'pid', $row )
+                && strlen( $row[ 'pid' ] ) > 0 
+                ){
+                    if( posix_getsid( $row[ 'pid' ] ) === FALSE ){
+                        sqlite_playing_delete( $row[ 'idplaying' ] );
+                    }
+                }elseif( array_key_exists( 'date', $row )
+                && strlen( $row[ 'date' ] ) > 0 
+                && strtotime( $row[ 'date' ] ) !== FALSE
+                && strtotime( 'NOW -200 minutes' ) > strtotime( $row[ 'date' ] )
+                ){
+                    sqlite_playing_delete( $row[ 'idplaying' ] );
+                }
+            }
+		}
+		
+        return $result;
+    }
 	
 ?>

@@ -282,9 +282,30 @@
             
             //passthru
             if( $_SERVER['REQUEST_METHOD'] != 'HEAD' ){
+                
+                //SET PLAYING NOW
+                if( ( $idplaying = sqlite_playing_insert( USERNAME, $IDMEDIA, FALSE, 'WEB-' . $G_QUALITY . '-' . $G_MODE, getmypid() ) ) != FALSE 
+                ){
+                    $CHECKPLAYING = TRUE;
+                    register_shutdown_function( function( $idplaying ){
+                            sqlite_playing_delete( $idplaying );
+                        }, 
+                    $idplaying );
+                }else{
+                    $CHECKPLAYING = FALSE;
+                    $idplaying = FALSE;
+                }
+                
+                //ACTION
                 passthru( $cmd, $cmdok );
+                
+                //REMOVE PLAYING NOW
+                if( $CHECKPLAYING
+                && $idplaying
+                ){
+                    sqlite_playing_delete( $idplaying );
+                }
             }
-            
         }
     }
     exit();

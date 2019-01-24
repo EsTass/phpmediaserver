@@ -69,6 +69,11 @@
 	//START
 	echo "<br />--START--" . date( 'Y-m-d H:i:s' );
 	
+	//CLEAN PLAYING MEDIA
+	echo "<br />" . date( 'Y-m-d H:i:s' );
+	echo "<br />Clean Playing Media Folders: " . sqlite_playing_clean();
+	echo "<br />";
+	
 	//CLEAN TEMP FOLDER
 	echo "<br />" . date( 'Y-m-d H:i:s' );
 	echo "<br />Clean Temp Folders: " . media_clean_temp_folder( 20 );
