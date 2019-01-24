@@ -71,7 +71,7 @@
 	
 	//CLEAN PLAYING MEDIA
 	echo "<br />" . date( 'Y-m-d H:i:s' );
-	echo "<br />Clean Playing Media Folders: " . sqlite_playing_clean();
+	echo "<br />Clean Playing Media: " . sqlite_playing_clean();
 	echo "<br />";
 	
 	//CLEAN TEMP FOLDER
