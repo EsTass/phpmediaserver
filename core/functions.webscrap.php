@@ -32,22 +32,28 @@
                 'urlbase' => '',
                 //URL Append to links: add to links for incomplete URLs: domain.com/
                 'linksappend' => '',
-                //html object have links: a
+                //html object have links: a or function name to extract (example: webscrap_extract_links_all_html( $html, $title ))
                 'linksobject' => 'a',
                 //alternative mode to get title
                 'linkstitle' => array( 'mode', param1, param2, ... ),
                     //Modes
                     'linkstitle' => array( 'inhtml', (-/+)sizetosearch, pre-text, posttext ),
                     'linkstitle' => array( 'inurl', pre-text, posttext )
+                    'linkstitle' => array( 'regexp', (-/+)sizetosearch, '/regexp/' ),
                 //Extract image from search and use on list
                 'linksimage' => array( 'mode', param1, param2, ... ),
                     //Modes
                     'linksimage' => array( 'inhtml', (-/+)sizetosearch, pre-text, posttext ),
                     'linksimage' => array( 'near' ),
+                    'linksimage' => array( 'regexp', (-/+)sizetosearch, '/regexp/' ),
                 //String needed in linkTitle to be valid
                 'linktitleneeded' => array(),
+                //RegExp needed in linkTitle to be valid
+                'linktitleneededregexp' => array(),
                 //String needed in linkURL to be valid
                 'linkurlneeded' => array(),
+                //RegExp needed in linkURL to be valid
+                'linkurlneededregexp' => array(),
                 //String Exclude in linkTitle to be valid
                 'linktitleexclude' => array(),
                 //String Exclude in linkURL to be valid
@@ -75,6 +81,8 @@
                 0 => array(
                     //Needed In URL to be valid, if pass not valid search for valid pass to launch
                     'urlvalid' => '',
+                    //REG EXP. Needed In URL to be valid, if pass not valid search for valid pass to launch
+                    'urlvalidpreg' => '',
                     //Next pass: int|FALSE, if FALSE try to download file
                     'passnext' => FALSE,
                     //URL Append to links: add to links for incomplete URLs: domain.com/
@@ -83,8 +91,12 @@
                     'linksobject' => 'a',
                     //String needed in linkTitle to be valid
                     'linktitleneeded' => array(),
+                    //RegExp needed in linkTitle to be valid
+                    'linktitleneededregexp' => array(),
                     //String needed in linkURL to be valid
                     'linkurlneeded' => array(),
+                    //RegExp needed in linkURL to be valid
+                    'linkurlneededregexp' => array(),
                     //String Exclude in linkTitle to be valid
                     'linktitleexclude' => array(),
                     //String Exclude in linkURL to be valid
@@ -163,10 +175,30 @@
             }else{
                 @$dom->loadHTML( $htmldata );
             }
-            $neededtitle = $scrapperdata[ 'searchdata' ][ 'linktitleneeded' ];
-            $neededurl = $scrapperdata[ 'searchdata' ][ 'linkurlneeded' ];
-            $excludetitle = $scrapperdata[ 'searchdata' ][ 'linktitleexclude' ];
-            $excludeurl = $scrapperdata[ 'searchdata' ][ 'linkurlexclude' ];
+            $neededtitle = FALSE;
+            if( array_key_exists( 'linktitleneeded', $scrapperdata[ 'searchdata' ] ) ){
+                $neededtitle = $scrapperdata[ 'searchdata' ][ 'linktitleneeded' ];
+            }
+            $neededtitlere = FALSE;
+            if( array_key_exists( 'linktitleneededregexp', $scrapperdata[ 'searchdata' ] ) ){
+                $neededtitlere = $scrapperdata[ 'searchdata' ][ 'linktitleneededregexp' ];
+            }
+            $neededurl = FALSE;
+            if( array_key_exists( 'linkurlneeded', $scrapperdata[ 'searchdata' ] ) ){
+                $neededurl = $scrapperdata[ 'searchdata' ][ 'linkurlneeded' ];
+            }
+            $neededurlre = FALSE;
+            if( array_key_exists( 'linkurlneededregexp', $scrapperdata[ 'searchdata' ] ) ){
+                $neededurlre = $scrapperdata[ 'searchdata' ][ 'linkurlneededregexp' ];
+            }
+            $excludetitle = FALSE;
+            if( array_key_exists( 'linktitleexclude', $scrapperdata[ 'searchdata' ] ) ){
+                $excludetitle = $scrapperdata[ 'searchdata' ][ 'linktitleexclude' ];
+            }
+            $excludeurl = FALSE;
+            if( array_key_exists( 'linkurlexclude', $scrapperdata[ 'searchdata' ] ) ){
+                $excludeurl = $scrapperdata[ 'searchdata' ][ 'linkurlexclude' ];
+            }
             foreach ( $dom->getElementsByTagName( $scrapperdata[ 'searchdata' ][ 'linksobject' ] ) as $link ){
 				$href = $link->getAttribute( "href" );
 				
@@ -231,12 +263,27 @@
 				){
                     $VALID = FALSE;
                     foreach( $neededtitle AS $e ){
-                        if( stripos( $href, $e ) !== FALSE ){
+                        if( stripos( $title, $e ) !== FALSE ){
                             $VALID = TRUE;
                             break;
                         }
                     }
                 }
+                
+                if( $VALID
+                && is_array( $neededtitlere )
+                && count( $neededtitlere ) > 0
+                ){
+                    $VALID = FALSE;
+                    foreach( $neededtitlere AS $e ){
+                        preg_match( $e, $title, $match );
+                        if( $match !== FALSE ){
+                            $VALID = TRUE;
+                            break;
+                        }
+                    }
+                }
+                
 				if( $VALID
 				&& is_array( $neededurl ) 
 				&& count( $neededurl ) > 0
@@ -249,6 +296,21 @@
                         }
                     }
                 }
+                
+				if( $VALID
+				&& is_array( $neededurlre ) 
+				&& count( $neededurlre ) > 0
+				){
+                    $VALID = FALSE;
+                    foreach( $neededurlre AS $e ){
+                        preg_match( $e, $href, $match );
+                        if( $match !== FALSE ){
+                            $VALID = TRUE;
+                            break;
+                        }
+                    }
+                }
+                
                 if( $debug ) echo "<br />Links Status after Need/Exclude: " . ( $VALID ? 'TRUE' : 'FALSE' );
                 
                 //CHECK SIZE
@@ -266,10 +328,20 @@
                     ){
                         if( $debug ) echo '<br />SIZE FUNCTION: ' . $SIZE;
                 
-                    }elseif( array_key_exists( 'filtersizetextpre', $scrapperdata[ 'searchdata' ] )
-                    && array_key_exists( 'filtersizetextpos', $scrapperdata[ 'searchdata' ] ) 
-                    && strlen( $scrapperdata[ 'searchdata' ][ 'filtersizetextpre' ] ) > 0
-                    && strlen( $scrapperdata[ 'searchdata' ][ 'filtersizetextpos' ] ) > 0
+                    }elseif( 
+                    (
+                        (
+                            array_key_exists( 'filtersizetextpre', $scrapperdata[ 'searchdata' ] )
+                            && array_key_exists( 'filtersizetextpos', $scrapperdata[ 'searchdata' ] ) 
+                            && strlen( $scrapperdata[ 'searchdata' ][ 'filtersizetextpre' ] ) > 0
+                            && strlen( $scrapperdata[ 'searchdata' ][ 'filtersizetextpos' ] ) > 0
+                        )
+                        ||
+                        (
+                            array_key_exists( 'filtersizetextpreg', $scrapperdata[ 'searchdata' ] )
+                            && strlen( $scrapperdata[ 'searchdata' ][ 'filtersizetextpreg' ] ) > 0
+                        )
+                    )
                     && ( $SIZE = webscrapp_get_size( $scrapperdata, $htmldata, $href, 'searchdata', $debug ) ) != FALSE
                     && $SIZE > 0
                     ){
@@ -374,6 +446,46 @@
         && array_key_exists( $pass, $scrapperdata[ 'passdata' ] )
         //&& filter_var( $url, FILTER_VALIDATE_URL )
         ){
+            //REG EXP Check Valid or search valid $pass
+            //Check Valid or search valid $pass
+            if( 
+                (   array_key_exists( 'urlvalidpreg', $scrapperdata[ 'passdata' ][ $pass ] ) != FALSE 
+                    && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'urlvalidpreg' ] ) > 0
+                    && preg_match( $scrapperdata[ 'passdata' ][ $pass ][ 'urlvalidpreg' ], $url ) !== FALSE
+                )
+                ||
+                (
+                    array_key_exists( 'urlvalid', $scrapperdata[ 'passdata' ][ $pass ] ) != FALSE 
+                    && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'urlvalid' ] ) > 0
+                    && stripos( $url, $scrapperdata[ 'passdata' ][ $pass ][ 'urlvalid' ] ) !== FALSE
+                )
+            ){
+                //Valid pass
+            }else{
+                //check next
+                if( $echo ) echo '<br />' . get_msg( 'WEBSCRAP_PASS_INVALID', FALSE ) . $pass . ' => ' . $url;
+                //Not Valid, search for valid
+                foreach( $scrapperdata[ 'passdata' ] AS $k => $epass ){
+                    if( 
+                        (
+                            array_key_exists( 'urlvalid', $epass ) != FALSE 
+                            && strlen( $epass[ 'urlvalid' ] ) > 0
+                            && stripos( $url, $epass[ 'urlvalid' ] ) !== FALSE
+                        )
+                    ||
+                        (
+                            array_key_exists( 'urlvalidpreg', $epass ) != FALSE 
+                            && strlen( $epass[ 'urlvalidpreg' ] ) > 0
+                            && preg_match( $scrapperdata[ 'passdata' ][ $epass ][ 'urlvalidpreg' ], $url ) !== FALSE
+                        )
+                    ){
+                        $pass = $k;
+                        break;
+                    }
+                }
+                if( $echo ) echo '<br />' . get_msg( 'WEBSCRAP_PASS_NEW_VALID', FALSE ) . $pass . ' => ' . $url;
+            }
+            
             //Check Valid or search valid $pass
             if( array_key_exists( 'urlvalid', $scrapperdata[ 'passdata' ][ $pass ] ) != FALSE 
             && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'urlvalid' ] ) > 0
@@ -450,10 +562,31 @@
                 }else{
                     @$dom->loadHTML( $htmldata );
                 }
-                $neededtitle = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleneeded' ];
-                $neededurl = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlneeded' ];
-                $excludetitle = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleexclude' ];
-                $excludeurl = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlexclude' ];
+                
+                $neededtitle = FALSE;
+                if( array_key_exists( 'linktitleneeded', $scrapperdata[ $pass ] ) ){
+                    $neededtitle = $scrapperdata[ $pass ][ 'linktitleneeded' ];
+                }
+                $neededtitlere = FALSE;
+                if( array_key_exists( 'linktitleneededregexp', $scrapperdata[ $pass ] ) ){
+                    $neededtitlere = $scrapperdata[ $pass ][ 'linktitleneededregexp' ];
+                }
+                $neededurl = FALSE;
+                if( array_key_exists( 'linkurlneeded', $scrapperdata[ $pass ] ) ){
+                    $neededurl = $scrapperdata[ $pass ][ 'linkurlneeded' ];
+                }
+                $neededurlre = FALSE;
+                if( array_key_exists( 'linkurlneededregexp', $scrapperdata[ 'searchdata' ] ) ){
+                    $neededurlre = $scrapperdata[ 'searchdata' ][ 'linkurlneededregexp' ];
+                }
+                $excludetitle = FALSE;
+                if( array_key_exists( 'linktitleexclude', $scrapperdata[ $pass ] ) ){
+                    $excludetitle = $scrapperdata[ $pass ][ 'linktitleexclude' ];
+                }
+                $excludeurl = FALSE;
+                if( array_key_exists( 'linkurlexclude', $scrapperdata[ $pass ] ) ){
+                    $excludeurl = $scrapperdata[ $pass ][ 'linkurlexclude' ];
+                }
                 
                 if( function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] ) ){
                     $elements = $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ]( $htmldata, $title );
@@ -527,12 +660,42 @@
                     if( $debug ) echo '<br />NEEDEDTITLE-VALID: ' . ( $VALID ? 'TRUE' : 'FALSE' );
                     
                     if( $VALID
+                    && is_array( $neededtitlere )
+                    && count( $neededtitlere ) > 0
+                    ){
+                        $VALID = FALSE;
+                        foreach( $neededtitlere AS $e ){
+                            preg_match( $e, $titlelink, $match );
+                            if( $match !== FALSE ){
+                                $VALID = TRUE;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if( $debug ) echo '<br />NEEDEDTITLE-VALID-RE: ' . ( $VALID ? 'TRUE' : 'FALSE' );
+                    
+                    if( $VALID
                     && is_array( $neededurl ) 
                     && count( $neededurl ) > 0
                     ){
                         $VALID = FALSE;
                         foreach( $neededurl AS $e ){
                             if( stripos( $href, $e ) !== FALSE ){
+                                $VALID = TRUE;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if( $VALID
+                    && is_array( $neededurlre ) 
+                    && count( $neededurlre ) > 0
+                    ){
+                        $VALID = FALSE;
+                        foreach( $neededurlre AS $e ){
+                            preg_match( $e, $href, $match );
+                            if( $match !== FALSE ){
                                 $VALID = TRUE;
                                 break;
                             }
@@ -556,10 +719,20 @@
                         ){
                             if( $debug ) echo '<br />SIZE FUNCTION: ' . $SIZE;
                     
-                        }elseif( array_key_exists( 'filtersizetextpre', $scrapperdata[ 'passdata' ][ $pass ] )
-                        && array_key_exists( 'filtersizetextpos', $scrapperdata[ 'passdata' ][ $pass ] ) 
-                        && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpre' ] ) > 0
-                        && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpos' ] ) > 0
+                        }elseif( 
+                        (
+                            (
+                                array_key_exists( 'filtersizetextpre', $scrapperdata[ 'passdata' ][ $pass ] )
+                                && array_key_exists( 'filtersizetextpos', $scrapperdata[ 'passdata' ][ $pass ] ) 
+                                && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpre' ] ) > 0
+                                && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpos' ] ) > 0
+                            )
+                            ||
+                            (
+                                array_key_exists( 'filtersizetextpreg', $scrapperdata[ 'passdata' ][ $pass ] )
+                                && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpreg' ] ) > 0
+                            )
+                        )
                         && ( $SIZE = webscrapp_get_size( $scrapperdata, $htmldata, $href, $pass, $debug ) ) != FALSE
                         && $SIZE > 0
                         ){
@@ -751,8 +924,10 @@
         $linkpos = 0;
         $start = 0;
         $end = 0;
+        $pre = '';
+        $pos = '';
         
-        if( $debug ) echo "<br />CHECKING SIZE: " . $link . ' ' . strlen( $html );
+        if( $debug ) echo "<br />CHECKING SIZE: " . $link . ' - ' . strlen( $html );
         
         if( array_key_exists( $pass, $webscrapperdata ) ){
             if( array_key_exists( 'linksappend', $webscrapperdata[ $pass ] ) 
@@ -760,8 +935,12 @@
             ){
                 $link = str_ireplace( $webscrapperdata[ $pass ][ 'linksappend'], '', $link );
             }
-            $pre = $webscrapperdata[ $pass ][ 'filtersizetextpre' ];
-            $pos = $webscrapperdata[ $pass ][ 'filtersizetextpos' ];
+            if( array_key_exists( 'filtersizetextpre', $webscrapperdata[ $pass ]) ){
+                $pre = $webscrapperdata[ $pass ][ 'filtersizetextpre' ];
+            }
+            if( array_key_exists( 'filtersizetextpos', $webscrapperdata[ $pass ] ) ){
+                $pos = $webscrapperdata[ $pass ][ 'filtersizetextpos' ];
+            }
             
             if( array_key_exists( 'filtersizetextdistance', $webscrapperdata[ $pass ] ) 
             && (int)$webscrapperdata[ $pass ][ 'filtersizetextdistance' ] > 0
@@ -789,8 +968,12 @@
             ){
                 $link = str_ireplace( $webscrapperdata[ 'passdata' ][ $pass ][ 'linksappend'], '', $link );
             }
-            $pre = $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpre' ];
-            $pos = $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpos' ];
+            if( array_key_exists( 'filtersizetextpre', $webscrapperdata[ 'passdata' ][ $pass ] ) ){
+                $pre = $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpre' ];
+            }
+            if( array_key_exists( 'filtersizetextpos', $webscrapperdata[ 'passdata' ][ $pass ] ) ){
+                $pos = $webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpos' ];
+            }
             
             if( array_key_exists( 'filtersizetextdistance', $webscrapperdata[ 'passdata' ][ $pass ] ) 
             && (int)$webscrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextdistance' ] > 0
@@ -811,7 +994,7 @@
                 $html = substr( $html, $start, $end );
             }
         }else{
-            //$html = '--NO DISTANCE--';
+            if( $debug ) echo '--FILTER SIZE NO DISTANCE--';
         }
         
         if( $debug ) echo "<br />GET pretag: " . htmlspecialchars( $pre );
@@ -825,6 +1008,8 @@
         
         if( strlen( $html ) > 20 ){
             while( $posa !== FALSE
+            && strlen( $pre ) > 0
+            && strlen( $pos ) > 0
             && ( $posa = stripos( $html, $pre, $posa ) ) !== FALSE
             && ( $posb = stripos( $html, $pos, $posa ) ) !== FALSE
             && ( $stext = substr( $html, ( $posa + strlen( $pre ) ), ( $posb - $posa ) ) ) !== FALSE
@@ -1411,7 +1596,7 @@
 	
 	//TITLE EXTRACTION
 	
-	//Get title from html with selected method (inhtml, inurl)
+	//Get title from html with selected method (inhtml, inurl, regexp)
 	function webscrap_get_title( $html, $stdata, $href, $DEBUG = FALSE ){
         $result = FALSE;
         
@@ -1486,6 +1671,40 @@
                             if( $DEBUG ) echo "<br />TITLEEXTRACT_INHTML_SEARCH2: " . htmlspecialchars( $hrefd ) . "";
                             if( strlen( $hrefd ) > 0 ){
                                 $result = $hrefd;
+                            }
+                        }
+                    }
+                }
+                break;
+            case 'regexp':
+                //PARAMS: 1=>(+-)sizetosearch, 2=>regexp
+                if( count( $stdata ) >= 3 ){
+                    if( $DEBUG ) echo "<br />TITLEEXTRACT_REGEXP: " . $href;
+                    //extract regexp from sizetosearch html
+                    $size = $stdata[ 1 ];
+                    $regexp = $stdata[ 2 ];
+                    if( ( $bpos = stripos( $html, $href ) ) !== FALSE ){
+                        //get text $size
+                        if( $size > 0 ){
+                            $search = substr( $html, $bpos, $size );
+                        }elseif( $size < 0 ){
+                            $search = substr( $html, ( $bpos + $size ), ( $bpos - $size ) );
+                        }else{
+                            $search = $html;
+                        }
+                        if( $DEBUG ) echo "<br />TITLEEXTRACT_REGEXP_SEARCH: " . htmlspecialchars( $search ) . "";
+                        //search
+                        if( strlen( $search ) > 0 ){
+                            $hrefd = '';
+                            preg_match_all( $regexp, $search, $match);
+                            if( is_array( $match )
+                            && count( $match ) > 0
+                            && array_key_exists( 1, $match )
+                            && is_array( $match[ 1 ] )
+                            && array_key_exists( 0, $match[ 1 ] )
+                            && strlen( trim( $match[ 1 ][ 0 ] ) ) > 0
+                            ){
+                                $result = trim( $match[ 1 ][ 0 ] );
                             }
                         }
                     }
@@ -1580,6 +1799,40 @@
                         }
                     }
                     if( $DEBUG ) echo "<br />IMGEXTRACT_NEAR_SELECTED: " . $nearest . ' -> ' . $result . '';
+                }
+                break;
+            case 'regexp':
+                //PARAMS: 1=>(+-)sizetosearch, 2=>regexp
+                if( count( $stdata ) >= 3 ){
+                    if( $DEBUG ) echo "<br />IMGEXTRACT_REGEXP: " . $href;
+                    //extract regexp from sizetosearch html
+                    $size = $stdata[ 1 ];
+                    $regexp = $stdata[ 2 ];
+                    if( ( $bpos = stripos( $html, $href ) ) !== FALSE ){
+                        //get text $size
+                        if( $size > 0 ){
+                            $search = substr( $html, $bpos, $size );
+                        }elseif( $size < 0 ){
+                            $search = substr( $html, ( $bpos + $size ), ( $bpos - $size ) );
+                        }else{
+                            $search = $html;
+                        }
+                        if( $DEBUG ) echo "<br />IMGEXTRACT_REGEXP_SEARCH: " . htmlspecialchars( $search ) . "";
+                        //search
+                        if( strlen( $search ) > 0 ){
+                            $hrefd = '';
+                            preg_match_all( $regexp, $search, $match);
+                            if( is_array( $match )
+                            && count( $match ) > 0
+                            && array_key_exists( 1, $match )
+                            && is_array( $match[ 1 ] )
+                            && array_key_exists( 0, $match[ 1 ] )
+                            && strlen( trim( $match[ 1 ][ 0 ] ) ) > 0
+                            ){
+                                $result = trim( $match[ 1 ][ 0 ] );
+                            }
+                        }
+                    }
                 }
                 break;
         }
