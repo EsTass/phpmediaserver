@@ -564,28 +564,28 @@
                 }
                 
                 $neededtitle = FALSE;
-                if( array_key_exists( 'linktitleneeded', $scrapperdata[ $pass ] ) ){
-                    $neededtitle = $scrapperdata[ $pass ][ 'linktitleneeded' ];
+                if( array_key_exists( 'linktitleneeded', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                    $neededtitle = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleneeded' ];
                 }
                 $neededtitlere = FALSE;
-                if( array_key_exists( 'linktitleneededregexp', $scrapperdata[ $pass ] ) ){
-                    $neededtitlere = $scrapperdata[ $pass ][ 'linktitleneededregexp' ];
+                if( array_key_exists( 'linktitleneededregexp', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                    $neededtitlere = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleneededregexp' ];
                 }
                 $neededurl = FALSE;
-                if( array_key_exists( 'linkurlneeded', $scrapperdata[ $pass ] ) ){
-                    $neededurl = $scrapperdata[ $pass ][ 'linkurlneeded' ];
+                if( array_key_exists( 'linkurlneeded', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                    $neededurl = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlneeded' ];
                 }
                 $neededurlre = FALSE;
                 if( array_key_exists( 'linkurlneededregexp', $scrapperdata[ 'searchdata' ] ) ){
-                    $neededurlre = $scrapperdata[ 'searchdata' ][ 'linkurlneededregexp' ];
+                    $neededurlre = $scrapperdata[ 'passdata' ][ 'searchdata' ][ 'linkurlneededregexp' ];
                 }
                 $excludetitle = FALSE;
-                if( array_key_exists( 'linktitleexclude', $scrapperdata[ $pass ] ) ){
-                    $excludetitle = $scrapperdata[ $pass ][ 'linktitleexclude' ];
+                if( array_key_exists( 'linktitleexclude', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                    $excludetitle = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleexclude' ];
                 }
                 $excludeurl = FALSE;
-                if( array_key_exists( 'linkurlexclude', $scrapperdata[ $pass ] ) ){
-                    $excludeurl = $scrapperdata[ $pass ][ 'linkurlexclude' ];
+                if( array_key_exists( 'linkurlexclude', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                    $excludeurl = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlexclude' ];
                 }
                 
                 if( function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] ) ){
