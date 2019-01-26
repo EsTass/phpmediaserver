@@ -173,6 +173,12 @@
         'vidoza.net',
         '1fichier.com',
         'mega.nz',
+        'streamplay.me',
+        'streamplay.to',
+        'powvideo.net',
+        'up.to',
+        'rapidvideo.com',
+        'flashx.tv',
 	));
 	
 	//CRON Enable
