@@ -1221,6 +1221,475 @@
 		    ),
 		),
 
+            //dd6
+            'dd6' => array(
+                //Type: torrent|amule|magnets or function
+                'type' => 'torrent',
+                //Title: domain.com
+                'title' => 'dd6 streamplay.to (NO SEARCH)',
+                //Pass needed to get torrent/amule, from base page search, 1 pass if torrent/amule in next, 2 if hava second page to link, ...
+                'passnumber' => 2,
+                //HTML Code Format: UTF-8, ANSI, ...
+                'htmlformat' => 'UTF-8',
+                //Check Duplicates: search if file media title exist and cancel download
+                'duplicatescheck' => FALSE,
+                //Title Clean, remove strings from title for duplicates scan
+                'titleclean' => array(
+                    
+                ),
+                //Search Data In Web
+                'searchdata' => array(
+                    //Own search function
+                    'searchfunction' => '',
+                    //Web URL to search: 'torrents.com/?q='
+                    'urlsearch' => '',
+                    //Web URL to baselist: 'torrents.com/'
+                    'urlbase' => 'streamplay.to',
+                    //URL Append to links: add to links for incomplete URLs: domain.com/
+                    'linksappend' => '',
+                    //html object have links: a
+                    'linksobject' => 'a',
+                    //String needed in linkTitle to be valid
+                    'linktitleneeded' => array(),
+                    //String needed in linkURL to be valid
+                    'linkurlneeded' => array(
+                        
+                    ),
+                    //String Exclude in linkTitle to be valid
+                    'linktitleexclude' => array(
+                        
+                    ),
+                    //String Exclude in linkURL to be valid
+                    'linkurlexclude' => array(),
+                    //FILTER SIZE
+                    //Max File Size: 0 disabled|X megabytes
+                    'filtersizemax' => 0,
+                    //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                    'filtersizetextpre' => '',
+                    'filtersizetextpos' => '',
+                    //FILTER SIZE: max distance from link
+                    'filtersizetextdistance' => 0,
+                    //FILTER SIZE: especific size(MB)=function( $html )
+                    'filtersizefunction' => '',
+                ),
+                //Pass Config
+                'passdata' => array(
+                    //Pass 1 Links
+                    0 => array(
+                        //Needed In URL to be valid, if pass not valid search for valid pass to launch
+                        'urlvalid' => 'streamplay.to',
+                        //Next pass: int|FALSE, if FALSE try to download file
+                        'passnext' => FALSE,
+                        //URL Append to links: add to links for incomplete URLs: domain.com/
+                        'linksappend' => '',
+                        //html object have links: a
+                        'linksobject' => 'a',
+                        //String needed in linkTitle to be valid
+                        'linktitleneeded' => array(
+                        ),
+                        //String needed in linkURL to be valid
+                        'linkurlneeded' => array(
+                            
+                        ),
+                        //String Exclude in linkTitle to be valid
+                        'linktitleexclude' => array(
+                            
+                        ),
+                        //String Exclude in linkURL to be valid
+                        'linkurlexclude' => array(),
+                        //FILTER SIZE
+                        //Max File Size: 0 disabled|X megabytes
+                        'filtersizemax' => 0,
+                        //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                        'filtersizetextpre' => '',
+                        'filtersizetextpos' => '',
+                        //FILTER SIZE: max distance from link
+                        'filtersizetextdistance' => 0,
+                        //FILTER SIZE: especific size(MB)=function( $html )
+                        'filtersizefunction' => '',
+                        //DOWNLOAD MULTIPLE
+                        'downloadmultiple' => FALSE,
+                        //DOWNLOAD function
+                        'downloadfunction' => 'jdownloader_downloader',
+                    ),
+                ),
+            ),
+            
+            //dd7
+            'dd7' => array(
+                //Type: torrent|amule|magnets or function
+                'type' => 'torrent',
+                //Title: domain.com
+                'title' => 'dd7 powvideo.net (NO SEARCH)',
+                //Pass needed to get torrent/amule, from base page search, 1 pass if torrent/amule in next, 2 if hava second page to link, ...
+                'passnumber' => 2,
+                //HTML Code Format: UTF-8, ANSI, ...
+                'htmlformat' => 'UTF-8',
+                //Check Duplicates: search if file media title exist and cancel download
+                'duplicatescheck' => FALSE,
+                //Title Clean, remove strings from title for duplicates scan
+                'titleclean' => array(
+                    
+                ),
+                //Search Data In Web
+                'searchdata' => array(
+                    //Own search function
+                    'searchfunction' => '',
+                    //Web URL to search: 'torrents.com/?q='
+                    'urlsearch' => '',
+                    //Web URL to baselist: 'torrents.com/'
+                    'urlbase' => 'powvideo.net',
+                    //URL Append to links: add to links for incomplete URLs: domain.com/
+                    'linksappend' => '',
+                    //html object have links: a
+                    'linksobject' => 'a',
+                    //String needed in linkTitle to be valid
+                    'linktitleneeded' => array(),
+                    //String needed in linkURL to be valid
+                    'linkurlneeded' => array(
+                        
+                    ),
+                    //String Exclude in linkTitle to be valid
+                    'linktitleexclude' => array(
+                        
+                    ),
+                    //String Exclude in linkURL to be valid
+                    'linkurlexclude' => array(),
+                    //FILTER SIZE
+                    //Max File Size: 0 disabled|X megabytes
+                    'filtersizemax' => 0,
+                    //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                    'filtersizetextpre' => '',
+                    'filtersizetextpos' => '',
+                    //FILTER SIZE: max distance from link
+                    'filtersizetextdistance' => 0,
+                    //FILTER SIZE: especific size(MB)=function( $html )
+                    'filtersizefunction' => '',
+                ),
+                //Pass Config
+                'passdata' => array(
+                    //Pass 1 Links
+                    0 => array(
+                        //Needed In URL to be valid, if pass not valid search for valid pass to launch
+                        'urlvalid' => 'powvideo.net',
+                        //Next pass: int|FALSE, if FALSE try to download file
+                        'passnext' => FALSE,
+                        //URL Append to links: add to links for incomplete URLs: domain.com/
+                        'linksappend' => '',
+                        //html object have links: a
+                        'linksobject' => 'a',
+                        //String needed in linkTitle to be valid
+                        'linktitleneeded' => array(
+                        ),
+                        //String needed in linkURL to be valid
+                        'linkurlneeded' => array(
+                            
+                        ),
+                        //String Exclude in linkTitle to be valid
+                        'linktitleexclude' => array(
+                            
+                        ),
+                        //String Exclude in linkURL to be valid
+                        'linkurlexclude' => array(),
+                        //FILTER SIZE
+                        //Max File Size: 0 disabled|X megabytes
+                        'filtersizemax' => 0,
+                        //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                        'filtersizetextpre' => '',
+                        'filtersizetextpos' => '',
+                        //FILTER SIZE: max distance from link
+                        'filtersizetextdistance' => 0,
+                        //FILTER SIZE: especific size(MB)=function( $html )
+                        'filtersizefunction' => '',
+                        //DOWNLOAD MULTIPLE
+                        'downloadmultiple' => FALSE,
+                        //DOWNLOAD function
+                        'downloadfunction' => 'jdownloader_downloader',
+                    ),
+                ),
+            ),
+            
+            //dd8
+            'dd8' => array(
+                //Type: torrent|amule|magnets or function
+                'type' => 'torrent',
+                //Title: domain.com
+                'title' => 'dd8 up.to (NO SEARCH)',
+                //Pass needed to get torrent/amule, from base page search, 1 pass if torrent/amule in next, 2 if hava second page to link, ...
+                'passnumber' => 2,
+                //HTML Code Format: UTF-8, ANSI, ...
+                'htmlformat' => 'UTF-8',
+                //Check Duplicates: search if file media title exist and cancel download
+                'duplicatescheck' => FALSE,
+                //Title Clean, remove strings from title for duplicates scan
+                'titleclean' => array(
+                    
+                ),
+                //Search Data In Web
+                'searchdata' => array(
+                    //Own search function
+                    'searchfunction' => '',
+                    //Web URL to search: 'torrents.com/?q='
+                    'urlsearch' => '',
+                    //Web URL to baselist: 'torrents.com/'
+                    'urlbase' => 'up.to',
+                    //URL Append to links: add to links for incomplete URLs: domain.com/
+                    'linksappend' => '',
+                    //html object have links: a
+                    'linksobject' => 'a',
+                    //String needed in linkTitle to be valid
+                    'linktitleneeded' => array(),
+                    //String needed in linkURL to be valid
+                    'linkurlneeded' => array(
+                        
+                    ),
+                    //String Exclude in linkTitle to be valid
+                    'linktitleexclude' => array(
+                        
+                    ),
+                    //String Exclude in linkURL to be valid
+                    'linkurlexclude' => array(),
+                    //FILTER SIZE
+                    //Max File Size: 0 disabled|X megabytes
+                    'filtersizemax' => 0,
+                    //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                    'filtersizetextpre' => '',
+                    'filtersizetextpos' => '',
+                    //FILTER SIZE: max distance from link
+                    'filtersizetextdistance' => 0,
+                    //FILTER SIZE: especific size(MB)=function( $html )
+                    'filtersizefunction' => '',
+                ),
+                //Pass Config
+                'passdata' => array(
+                    //Pass 1 Links
+                    0 => array(
+                        //Needed In URL to be valid, if pass not valid search for valid pass to launch
+                        'urlvalid' => 'up.to',
+                        //Next pass: int|FALSE, if FALSE try to download file
+                        'passnext' => FALSE,
+                        //URL Append to links: add to links for incomplete URLs: domain.com/
+                        'linksappend' => '',
+                        //html object have links: a
+                        'linksobject' => 'a',
+                        //String needed in linkTitle to be valid
+                        'linktitleneeded' => array(
+                        ),
+                        //String needed in linkURL to be valid
+                        'linkurlneeded' => array(
+                            
+                        ),
+                        //String Exclude in linkTitle to be valid
+                        'linktitleexclude' => array(
+                            
+                        ),
+                        //String Exclude in linkURL to be valid
+                        'linkurlexclude' => array(),
+                        //FILTER SIZE
+                        //Max File Size: 0 disabled|X megabytes
+                        'filtersizemax' => 0,
+                        //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                        'filtersizetextpre' => '',
+                        'filtersizetextpos' => '',
+                        //FILTER SIZE: max distance from link
+                        'filtersizetextdistance' => 0,
+                        //FILTER SIZE: especific size(MB)=function( $html )
+                        'filtersizefunction' => '',
+                        //DOWNLOAD MULTIPLE
+                        'downloadmultiple' => FALSE,
+                        //DOWNLOAD function
+                        'downloadfunction' => 'jdownloader_downloader',
+                    ),
+                ),
+            ),
+            
+            //dd9
+            'dd9' => array(
+                //Type: torrent|amule|magnets or function
+                'type' => 'torrent',
+                //Title: domain.com
+                'title' => 'dd9 rapidvideo.com (NO SEARCH)',
+                //Pass needed to get torrent/amule, from base page search, 1 pass if torrent/amule in next, 2 if hava second page to link, ...
+                'passnumber' => 2,
+                //HTML Code Format: UTF-8, ANSI, ...
+                'htmlformat' => 'UTF-8',
+                //Check Duplicates: search if file media title exist and cancel download
+                'duplicatescheck' => FALSE,
+                //Title Clean, remove strings from title for duplicates scan
+                'titleclean' => array(
+                    
+                ),
+                //Search Data In Web
+                'searchdata' => array(
+                    //Own search function
+                    'searchfunction' => '',
+                    //Web URL to search: 'torrents.com/?q='
+                    'urlsearch' => '',
+                    //Web URL to baselist: 'torrents.com/'
+                    'urlbase' => 'rapidvideo.com',
+                    //URL Append to links: add to links for incomplete URLs: domain.com/
+                    'linksappend' => '',
+                    //html object have links: a
+                    'linksobject' => 'a',
+                    //String needed in linkTitle to be valid
+                    'linktitleneeded' => array(),
+                    //String needed in linkURL to be valid
+                    'linkurlneeded' => array(
+                        
+                    ),
+                    //String Exclude in linkTitle to be valid
+                    'linktitleexclude' => array(
+                        
+                    ),
+                    //String Exclude in linkURL to be valid
+                    'linkurlexclude' => array(),
+                    //FILTER SIZE
+                    //Max File Size: 0 disabled|X megabytes
+                    'filtersizemax' => 0,
+                    //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                    'filtersizetextpre' => '',
+                    'filtersizetextpos' => '',
+                    //FILTER SIZE: max distance from link
+                    'filtersizetextdistance' => 0,
+                    //FILTER SIZE: especific size(MB)=function( $html )
+                    'filtersizefunction' => '',
+                ),
+                //Pass Config
+                'passdata' => array(
+                    //Pass 1 Links
+                    0 => array(
+                        //Needed In URL to be valid, if pass not valid search for valid pass to launch
+                        'urlvalid' => 'rapidvideo.com',
+                        //Next pass: int|FALSE, if FALSE try to download file
+                        'passnext' => FALSE,
+                        //URL Append to links: add to links for incomplete URLs: domain.com/
+                        'linksappend' => '',
+                        //html object have links: a
+                        'linksobject' => 'a',
+                        //String needed in linkTitle to be valid
+                        'linktitleneeded' => array(
+                        ),
+                        //String needed in linkURL to be valid
+                        'linkurlneeded' => array(
+                            
+                        ),
+                        //String Exclude in linkTitle to be valid
+                        'linktitleexclude' => array(
+                            
+                        ),
+                        //String Exclude in linkURL to be valid
+                        'linkurlexclude' => array(),
+                        //FILTER SIZE
+                        //Max File Size: 0 disabled|X megabytes
+                        'filtersizemax' => 0,
+                        //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                        'filtersizetextpre' => '',
+                        'filtersizetextpos' => '',
+                        //FILTER SIZE: max distance from link
+                        'filtersizetextdistance' => 0,
+                        //FILTER SIZE: especific size(MB)=function( $html )
+                        'filtersizefunction' => '',
+                        //DOWNLOAD MULTIPLE
+                        'downloadmultiple' => FALSE,
+                        //DOWNLOAD function
+                        'downloadfunction' => 'jdownloader_downloader',
+                    ),
+                ),
+            ),
+            
+            //dd10
+            'dd10' => array(
+                //Type: torrent|amule|magnets or function
+                'type' => 'torrent',
+                //Title: domain.com
+                'title' => 'dd10 flashx.tv (NO SEARCH)',
+                //Pass needed to get torrent/amule, from base page search, 1 pass if torrent/amule in next, 2 if hava second page to link, ...
+                'passnumber' => 2,
+                //HTML Code Format: UTF-8, ANSI, ...
+                'htmlformat' => 'UTF-8',
+                //Check Duplicates: search if file media title exist and cancel download
+                'duplicatescheck' => FALSE,
+                //Title Clean, remove strings from title for duplicates scan
+                'titleclean' => array(
+                    
+                ),
+                //Search Data In Web
+                'searchdata' => array(
+                    //Own search function
+                    'searchfunction' => '',
+                    //Web URL to search: 'torrents.com/?q='
+                    'urlsearch' => '',
+                    //Web URL to baselist: 'torrents.com/'
+                    'urlbase' => 'flashx.tv',
+                    //URL Append to links: add to links for incomplete URLs: domain.com/
+                    'linksappend' => '',
+                    //html object have links: a
+                    'linksobject' => 'a',
+                    //String needed in linkTitle to be valid
+                    'linktitleneeded' => array(),
+                    //String needed in linkURL to be valid
+                    'linkurlneeded' => array(
+                        
+                    ),
+                    //String Exclude in linkTitle to be valid
+                    'linktitleexclude' => array(
+                        
+                    ),
+                    //String Exclude in linkURL to be valid
+                    'linkurlexclude' => array(),
+                    //FILTER SIZE
+                    //Max File Size: 0 disabled|X megabytes
+                    'filtersizemax' => 0,
+                    //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                    'filtersizetextpre' => '',
+                    'filtersizetextpos' => '',
+                    //FILTER SIZE: max distance from link
+                    'filtersizetextdistance' => 0,
+                    //FILTER SIZE: especific size(MB)=function( $html )
+                    'filtersizefunction' => '',
+                ),
+                //Pass Config
+                'passdata' => array(
+                    //Pass 1 Links
+                    0 => array(
+                        //Needed In URL to be valid, if pass not valid search for valid pass to launch
+                        'urlvalid' => 'flashx.tv',
+                        //Next pass: int|FALSE, if FALSE try to download file
+                        'passnext' => FALSE,
+                        //URL Append to links: add to links for incomplete URLs: domain.com/
+                        'linksappend' => '',
+                        //html object have links: a
+                        'linksobject' => 'a',
+                        //String needed in linkTitle to be valid
+                        'linktitleneeded' => array(
+                        ),
+                        //String needed in linkURL to be valid
+                        'linkurlneeded' => array(
+                            
+                        ),
+                        //String Exclude in linkTitle to be valid
+                        'linktitleexclude' => array(
+                            
+                        ),
+                        //String Exclude in linkURL to be valid
+                        'linkurlexclude' => array(),
+                        //FILTER SIZE
+                        //Max File Size: 0 disabled|X megabytes
+                        'filtersizemax' => 0,
+                        //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
+                        'filtersizetextpre' => '',
+                        'filtersizetextpos' => '',
+                        //FILTER SIZE: max distance from link
+                        'filtersizetextdistance' => 0,
+                        //FILTER SIZE: especific size(MB)=function( $html )
+                        'filtersizefunction' => '',
+                        //DOWNLOAD MULTIPLE
+                        'downloadmultiple' => FALSE,
+                        //DOWNLOAD function
+                        'downloadfunction' => 'jdownloader_downloader',
+                    ),
+                ),
+            ),
 	
 	);
 	
