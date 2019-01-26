@@ -883,21 +883,26 @@
 	
 	function webscrap_search_updated( $wscrapper, $echo = FALSE, $debug = PPATH_WEBSCRAP_DEBUG ){
 		$result = FALSE;
+		$in_list = array();
 		
         if( ( $links = webscrapp_search( $wscrapper, '', $debug ) ) != FALSE 
         && count( $links ) > 0
         ){
             if( $echo ) echo "<br />";
             if( $echo ) echo "Links: " . count( $links );
-                    
+            
             foreach( $links AS $title => $href ){
-                if( strpos( $title, 'EXIST:' ) === FALSE ){
+                if( in_array( $href, $in_list  ) ){
+                    if( $echo ) echo "<br />";
+                    if( $echo ) echo "Added before: " . $title . ' => ' . $href;
+                }elseif( strpos( $title, 'EXIST:' ) === FALSE ){
                     if( $echo ) echo "<br />";
                     if( $echo ) echo get_msg( 'WEBSCRAP_ADD_URL', FALSE ) . ': ' . $wscrapper . ' => ' . $title . ' => ' . $href;
                     
                     if( webscrapp_pass( $wscrapper, 0, $href, $title, $debug, $debug ) ){
                         if( $echo ) echo "<br />";
                         if( $echo ) echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ': ' . $wscrapper . ' => ' . $title . ' => ' . $href;
+                        $in_list[] = $href;
                     }else{
                         if( $echo ) echo "<br />";
                         if( $echo ) echo get_msg( 'WEBSCRAP_ADDKO', FALSE ) . ': ' . $wscrapper . ' => ' . $title . ' => ' . $href;
@@ -1507,6 +1512,25 @@
         
         $filename = basename( $url );
         $file = PPATH_WEBSCRAP_DOWNLOAD . DS . $filename;
+        //Get Data
+        $cmd = O_WGET . ' -O "' . $file . '" "' . $url . '"';
+        runExtCommand( $cmd );
+        $result = TRUE;
+		
+		return $result;
+	}
+	
+	//WGET DOWNLOADER with .torrent check (for webs with redirect, etc)
+	
+	function wget_downloader_torrent( $url, $debug ){
+        $result = FALSE;
+        
+        $filename = basename( $url );
+        if( !endsWith( $filename, '.torrent' ) ){
+            $filename .= ".torrent";
+        }
+        $file = PPATH_WEBSCRAP_DOWNLOAD . DS . $filename;
+        
         //Get Data
         $cmd = O_WGET . ' -O "' . $file . '" "' . $url . '"';
         runExtCommand( $cmd );

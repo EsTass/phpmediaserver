@@ -111,7 +111,7 @@
         //Next
         if( $page !== FALSE 
         && $page >= 0
-        && $page <= $totalpages
+        && $page < $totalpages
         ){
             if( array_key_exists( 'action', $G_DATA ) ){
                 $action = $G_DATA[ 'action' ];
@@ -243,7 +243,7 @@
         //Next
         if( $page !== FALSE 
         && $page >= 0
-        && $page <= $totalpages
+        && $page < $totalpages
         ){
             if( array_key_exists( 'action', $G_DATA ) ){
                 $action = $G_DATA[ 'action' ];
@@ -339,6 +339,7 @@
 	function get_html_list_kodi( $data, $title ){
         $result[ $title ] = array();
         $session = '&PHPSESSION=' . session_id();
+        global $G_FILENAME_INFO;
         
         foreach( $data AS $element ){
             $genres = $element[ 'genre' ];
@@ -358,9 +359,30 @@
                     $ftitle .= ' ' . $element[ 'titleepisode' ];
                 }
             }
+            
+            //add to plot extra filename info
+            $extrainfo = "";
+            if( //check_user_admin() &&
+            isset( $G_FILENAME_INFO )
+            && is_array( $G_FILENAME_INFO )
+            && count( $G_FILENAME_INFO ) > 0
+            && array_key_exists( 'file', $element )
+            ){
+                $extrai = '';
+                foreach( $G_FILENAME_INFO AS $ititle => $grep ){
+                    if( preg_match("/" . $grep . "/i", $element[ 'file' ] ) ){
+                        $extrai .= '' . $ititle . ' ';
+                    }
+                }
+                $extrai .= '';
+                if( strlen( $extrai ) > 0 ){
+                    $extrainfo = '( ' . $extrai . ') ';
+                }
+            }
+            
             $e = array(
                 'name' => $ftitle,
-                'plot' => $plot,
+                'plot' => $extrainfo . $plot,
                 'year' => $year,
                 'season' => $season,
                 'episode' => $episode,
