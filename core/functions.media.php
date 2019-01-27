@@ -672,15 +672,28 @@
         && count( $mdata ) > 0
         ){
             foreach( $mdata AS $media ){
-                if( array_key_exists( 'file', $media )
+                if( $quantity > 0
+                && array_key_exists( 'file', $media )
                 && !@file_exists( $media[ 'file' ] ) 
                 ){
                     if( $echo ) echo "-";
                     sqlite_media_delete( $media[ 'idmedia' ] );
                     $quantity--;
                     if( $quantity <= 0 ){
-                        break;
+                        //break;
                     }
+                }
+                //check valid idmediainfo
+                if( array_key_exists( 'idmediainfo', $media ) 
+                && $media[ 'idmediainfo' ] > 0
+                && (
+                    ( $minfo = sqlite_mediainfo_getdata( $media[ 'idmediainfo' ] ) ) == FALSE
+                    || !is_array( $minfo )
+                    || count( $minfo ) == 0
+                    )
+                ){
+                    sqlite_media_update_mediainfo( $media[ 'idmedia' ], 0 );
+                    if( $echo ) echo "+";
                 }
             }
         }
