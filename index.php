@@ -6,6 +6,14 @@
     error_reporting( E_ALL );
     ini_set( 'display_errors', '0' );
 	
+	//REMOVE HEAD CONNS
+	if( $_SERVER['REQUEST_METHOD'] != 'GET' 
+	&& $_SERVER['REQUEST_METHOD'] != 'POST'
+	){
+        header("HTTP/1.1 401 Unauthorized");
+        exit();
+    }
+	
 	//FOLDERS
 	
 	define( 'PPATH_BASE', dirname( __FILE__ ) );
@@ -109,6 +117,7 @@
 	<meta http-equiv='X-UA-Compatible' content='IE=8' />
 	<meta http-equiv='Pragma' content='no-cache' />
 	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
 	
 	<meta name='Keywords' content='' />
 	<meta name='Description' content='' />
