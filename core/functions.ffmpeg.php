@@ -137,7 +137,7 @@
 	function ffprobe_get_data( $file, $debug = FALSE ){
         $result = FALSE;
         //TEST -rw_timeout 5M max time urls
-        $cmd = O_FFPROBE . " -rw_timeout 5M -i " . escapeshellarg( $file ) . " -v quiet -print_format xml -show_format -show_streams -hide_banner";
+        $cmd = O_FFPROBE . " --cookie '' referer '' -rw_timeout 5M -i " . escapeshellarg( $file ) . " -v quiet -print_format xml -show_format -show_streams -hide_banner";
         $ocrsubs = array(
             'dvd_subtitle',
         );

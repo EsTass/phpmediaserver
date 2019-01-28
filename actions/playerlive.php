@@ -101,7 +101,7 @@ $(function () {
                     $extra_vdata = "";
                 }
         ?>
-        <source id='my-player-source' src="?r=r&action=playlive&mode=<?php echo $urlident; ?>&idmedialive=<?php echo $IDMEDIALIVE; ?><?php echo $session; ?>" type="video/<?php echo $videoheader; ?>" <?php echo $extra_vdata; ?> preload="auto" >
+        <source id='my-player-source' src="?r=r&action=playlive&mode=<?php echo $urlident; ?>&idmedialive=<?php echo $IDMEDIALIVE; ?><?php echo $session; ?>" type="video/<?php echo $videoheader; ?>" <?php echo $extra_vdata; ?> preload="none" >
         <?php
                 $num++;
             }
