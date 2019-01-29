@@ -19,7 +19,8 @@
         'episode',
 	);
 	
-	if( ( $edata = sqlite_media_getdata_identify( $G_SEARCH ) ) ){
+	//get bad idents, not idents and last elements added
+	if( ( $edata = sqlite_media_getdata_identify_orderer( $G_SEARCH ) ) ){
 ?>
 
 <script type="text/javascript">
@@ -116,10 +117,15 @@ function ident_preview_media( idmedia, starttime ){
                 <img class='listElementImg listElementImgMini lazy' src='' data-src='<?php echo getURLImg( $lrow[ 'idmedia' ], FALSE, 'poster' ); ?>' class='listElementPosterTiny' />
             </td>
                 <?php
-                        foreach( $lrow AS $field => $data ){
-                            if( in_array( $field, $fields ) ){
+                        foreach( $fields AS $field ){
+                            if( array_key_exists( $field, $lrow ) ){
+                                $data = $lrow[ $field ];
                 ?>
             <td class='<?php echo $css_extra; ?>' title='<?php echo $data; ?>'><?php echo substr( $data, 0, 250 ); ?></td>
+                <?php
+                            }else{
+                ?>
+            <td class='<?php echo $css_extra; ?>' title=''></td>
                 <?php
                             }
                         }

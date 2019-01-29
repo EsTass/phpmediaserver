@@ -1553,6 +1553,53 @@
 		return $result;
 	}
 	
+	function sqlite_media_getdata_identify_orderer( $search = '', $limit = 100 ){
+		//Vars
+		$result = array();
+		
+		if( ( $data = sqlite_media_getdata_identify_tryed( $search, $limit ) ) != FALSE
+		&& is_array( $data )
+		){
+            $result = array_merge( $result, $data );
+		}
+		if( ( $data = sqlite_media_getdata_identify_auto( $search, $limit ) ) != FALSE 
+		&& is_array( $data )
+		){
+            $result = array_merge( $result, $data );
+		}
+		if( ( $data = sqlite_media_getdata_identify_added( $search, $limit ) ) != FALSE 
+		&& is_array( $data )
+		){
+            $result = array_merge( $result, $data );
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_media_getdata_identify_added( $search = '', $limit = 100, $addnoident = FALSE ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'SELECT *, media.idmediainfo AS idmediainfo FROM media ';
+			$sql .= ' LEFT JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
+			if( $addnoident == FALSE ){
+                $sql .= ' WHERE media.idmediainfo > 0';
+            }else{
+                $sql .= ' WHERE 1 = 1';
+            }
+			if( strlen( $search ) > 0 ){
+                $sql .= ' AND file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\'';
+			}
+			$sql .= ' ORDER BY media.idmedia DESC LIMIT ' . $limit;
+			//var_dump( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
 	function sqlite_media_getdata_identify( $search = '', $limit = 100 ){
 		//Vars
 		$result = FALSE;
@@ -1580,7 +1627,8 @@
 		
 		if( ( $dbhandle = sqlite_init() ) != FALSE ){
 			$sql = 'SELECT * FROM media ';
-			$sql .= ' WHERE idmediainfo < 0';
+			//$sql .= ' LEFT JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
+			$sql .= ' WHERE media.idmediainfo < 0';
 			if( strlen( $search ) > 0 ){
                 $sql .= ' AND file LIKE \'%' . $dbhandle->escapeString( $search ) . '%\'';
 			}

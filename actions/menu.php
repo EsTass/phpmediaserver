@@ -86,7 +86,7 @@
                     
                     $LOGLIST = array(
                         'log' => get_msg( 'MENU_LOG', FALSE ),
-                        'medialog' => get_msg( 'MENU_LOGMEDIA', FALSE ),
+                        //'medialog' => get_msg( 'MENU_LOGMEDIA', FALSE ),
                         'mediainfolog' => get_msg( 'MENU_LOGMEDIAINFO', FALSE ),
                         'playedlog' => get_msg( 'MENU_LOGPLAYED', FALSE ),
                         'cronlog' => get_msg( 'MENU_CRON', FALSE ),
