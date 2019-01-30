@@ -118,10 +118,11 @@
                     //var_dump( $t_ext );
                     //$t_ext = $t;
                     $inlist[] = $t_ext;
-                    
+                    $t2 = str_replace( '"', '', $t );
+                    $t2 = str_replace( "'", '', $t2 );
         ?>
         <tr>
-            <td><a class='aIdentSearchResult' href='#' onclick='ident_get_set_title( "<?php echo addslashes( $t ); ?>", "<?php echo $t_ext; ?>" )'><?php echo $t; ?></a></td>
+            <td><a class='aIdentSearchResult' href='#' onclick='ident_get_set_title( "<?php echo $t2; ?>", "<?php echo $t_ext; ?>" )'><?php echo $t; ?></a></td>
         </tr>
         <?php 
                 }

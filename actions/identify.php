@@ -17,6 +17,7 @@
         'title',
         'season',
         'episode',
+        'year',
 	);
 	
 	//get bad idents, not idents and last elements added
@@ -106,6 +107,7 @@ function ident_preview_media( idmedia, starttime ){
             <th>Title</th>
             <th>Season</th>
             <th>Episode</th>
+            <th>Year</th>
             <th><?php echo get_msg( 'MENU_ACTION', FALSE ); ?></th>
         </tr>
                 <?php

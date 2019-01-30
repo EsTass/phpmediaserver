@@ -99,6 +99,53 @@
         return $result;
     }
 	
+	function getFilesFilterLimitAll( $dir, &$quantity = 100, $pattern = '/./', $recursive = FALSE, $debug = FALSE ){
+		$result = array();
+        $prefix = $dir . DS;
+        $folders = array();
+        if( $debug ) echo "<br />CHECKING: " . $dir;
+        
+        if( ( $dir = dir($dir) ) != FALSE )
+        while( ( $file = $dir->read() ) !== FALSE ){
+            if( $file === '.' 
+            || $file === '..'
+            ){
+                continue;
+            }
+            if( $debug ) echo "<br />TEST: " . $file;
+            $file = $prefix . $file;
+            if( is_dir( $file )
+            //&& media_scan_exclude_folders( $file ) == FALSE
+            ){
+                $folders[] = $file;
+            }elseif( ( is_file( $file ) || is_link( $file ) )
+            && preg_match( $pattern, $file ) 
+            //&& media_scan_exclude_files( $file ) == FALSE
+            ){
+                if( $debug ) echo "<br />ADDING FILE: " . $file;
+                $result[] = $file;
+                $quantity--;
+            }
+            if( $quantity <= 0 ){
+                break;
+            }
+        }
+        //Subfolders
+        if( $recursive ){
+            foreach( $folders AS $folder ){
+                if( ( $more = getFilesFilterLimitAll( $folder, $quantity, $pattern, $recursive, $debug ) ) != FALSE
+                && is_array( $more )
+                && count( $more ) > 0
+                ){
+                    if( $debug ) echo "<br />ADDING FOLDER RESULT: " . count( $more );
+                    $result = array_merge( $result, $more );
+                }
+            }
+        }
+        
+        return $result;
+    }
+	
 	function getFiles( $directory, $recursive = TRUE ){
 		$result = array();
 		
@@ -271,65 +318,172 @@
 	function media_extract_files( $quantity = 10, $recursive = FALSE, $echo = FALSE ){
         $result = TRUE;
         
-        $all = 100000;
-        if( ( $elements = getFilesFilterLimit( PPATH_DOWNLOADS, $all ) ) != FALSE 
+        $all = 100000000;
+        
+        if( ( $elements = getFilesFilterLimit( PPATH_DOWNLOADS, $all, '/.+\.((part01\.)*rar|\.r01|7z(\.\d{0,4})*|zip(\.\d{0,4}))$/' ) ) != FALSE 
         ){
             foreach( $elements AS $file ){
-                //var_dump( $file );
                 
+                $mpartvalid = checkCompressesMultipartValid( $file );
+                $mpartcompleted = checkCompressesMultipartCompleted( $file );
+                
+                if( $mpartvalid == FALSE ){
+                    //multipart >1
+                    //if( $echo ) echo "<br />MPi: " . $file;
+                    if( $echo ) echo "MP ";
+                //check incomplete multiple download
+                }elseif( $mpartvalid
+                && $mpartcompleted == FALSE 
+                ){
+                    //incomplete multiple download
+                    //if( $echo ) echo "<br />MIi: " . $file;
+                    if( $echo ) echo "MIi ";
+                //Exclude multipart files
+                }elseif( !file_exists( $file ) ){
+                    //deleted?
+                    //if( $echo ) echo "<br />FNEi: " . $file;
+                    if( $echo ) echo "FNEi ";
                 //Generic extractor CMDs
-                if( ( $cmde = checkCompressesCMDValid( $file ) ) != FALSE
+                }elseif( ( $cmde = checkCompressesCMDValid( $file ) ) != FALSE
                 && !file_exists( $file . '_' )
                 ){
                     //echo "<br />" . $cmde;
-                    if( $echo ) echo "+";
+                    //if( $echo ) echo "<br />GDi: " . $file;
+                    if( $echo ) echo "GDi ";
                     runExtCommandNoRedirect( $cmde );
                     $quantity--;
                 //Extension extractors
-                }elseif( (
-                    endsWith( $file, '.zip' )
-                    //slow
-                    //|| stripos( getFileMimeType( $file ), 'zip' ) !== FALSE
-                    )
+                }elseif( endsWith( $file, '.zip' )
                 && !file_exists( $file . '_' )
                 ){
                     extractZip( $file );
                     $quantity--;
-                    if( $echo ) echo "+";
-                }elseif( (
-                    endsWith( $file, '.rar' )
-                    //slow
-                    //|| stripos( getFileMimeType( $file ), 'rar' ) !== FALSE
-                    )
+                    //if( $echo ) echo "<br />GZi: " . $file;
+                    if( $echo ) echo "GZi ";
+                }elseif( endsWith( $file, '.rar' )
                 && !file_exists( $file . '_' )
                 ){
                     extractRar( $file );
                     $quantity--;
-                    if( $echo ) echo "+";
-                }elseif( (
-                    endsWith( $file, '.7z' )
-                    //slow
-                    //|| stripos( getFileMimeType( $file ), '7z' ) !== FALSE
-                    )
+                    //if( $echo ) echo "<br />GRi: " . $file;
+                    if( $echo ) echo "GRi ";
+                }elseif( endsWith( $file, '.7z' )
                 && !file_exists( $file . '_' )
                 ){
                     //TODO
                     extract7z( $file );
                     $quantity--;
-                    if( $echo ) echo "+";
+                    //if( $echo ) echo "<br />G7i: " . $file;
+                    if( $echo ) echo "G7i ";
                 }
                 
                 if( defined( 'O_CRON_EXTRACTFILES_CLEAN' ) 
                 && O_CRON_EXTRACTFILES_CLEAN > 0
                 && file_exists( $file . '_' )
                 && is_dir( $file . '_' )
-                && ( time() - filemtime( $file ) ) > ( O_CRON_EXTRACTFILES_CLEAN * 86400 )
+                //days from extracted
+                && (
+                    ( time() - filemtime( $file . '_' ) ) > ( O_CRON_EXTRACTFILES_CLEAN * 86400 )
+                    //or base file time *2
+                    || ( time() - filemtime( $file ) ) > ( O_CRON_EXTRACTFILES_CLEAN * 86400 * 2 )
+                )
                 ){
                     @unlink( $file );
+                    //remove all compressed files on folder
+                    //deletedCompressedMultipart( $file, 999, $echo );
+                    //if( $echo ) echo "<br />DELETE: " . $file;
+                    if( $echo ) echo "- ";
                 }
                 if( $quantity <= 0 ){
                     break;
                 }
+            }
+        }
+        
+        return $result;
+	}
+	
+	function checkCompressesMultipartCompleted( $file, $limit = 1000, $echo = FALSE ){
+        //check on folder if multiple file have incomplete downloads
+        $result = TRUE;
+        $filename = basename( $file );
+        $path = dirname( $file );
+        
+        if( defined( 'O_DOWNLOADS_FILES_EXCLUDE' ) 
+        && is_array( O_DOWNLOADS_FILES_EXCLUDE )
+        ){
+            $extin = O_DOWNLOADS_FILES_EXCLUDE;
+        }else{
+            $extin = array();
+        }
+        
+        //add basic tmp ext
+        $extin[] = '.temp';
+        $extin[] = '.tmp';
+        
+        //check file with temp extensions exist
+        $fn = $filename;
+        for( $x = 0; $x < 10; $x++ ){
+            $fn = str_ireplace( $x, '?', $fn );
+        }
+        $filetest = $path . DS . $fn;
+        foreach( $extin AS $ext ){
+            if( count( glob( $filetest . $ext ) ) > 0 ){
+                $result = FALSE;
+                break;
+            }
+        }
+        
+        return $result;
+	}
+	
+	function deletedCompressedMultipart( $file, $max = 999, $echo = FALSE ){
+        //delete all compressed with same name on folder
+        $limit = 1000;
+        $result = TRUE;
+        $filename = basename( $file );
+        $path = dirname( $file );
+        
+        if( ( $pfile = explode( '.', $filename ) ) != FALSE 
+        && is_array( $pfile )
+        && count( $pfile ) > 0
+        ){
+            $pfilename = preg_quote( $pfile[ 0 ] ) . '.*(rar|7z|zip).*';
+        }else{
+            $pfilename = preg_quote( $filename );
+        }
+        $filter = '/' . $pfilename . '/';
+        if( ( $elements = getFilesFilterLimit( $path, $limit, $filter ) ) != FALSE 
+        ){
+            foreach( $elements AS $f ){
+                if( is_file( $f ) ){
+                    if( $echo ) echo "-";
+                    @unlink( $f );
+                }
+            }
+        }
+        
+        return $result;
+	}
+	
+	function checkCompressesMultipartValid( $file, $max = 999 ){
+        //exclude multipart files != first file
+        $result = TRUE;
+        
+        $rar = array( '/.+part\d{1,3}\.rar/', '/.+part0{0,2}1\.rar/' );
+        $zip = array( '/.+zip\.\d{1,3}/', '/.+zip\.0{0,2}1/' );
+        $z7z = array( '/.+7z\.\d{1,3}/', '/.+7z\.0{0,2]1/' );
+        
+        for( $x = 2; $x < $max; $x++ ){
+            //rar: partX.rar
+            //zip: zip.00X
+            //7z: 7z.00X
+            if( ( preg_match( $rar[ 0 ], $file ) && preg_match( $rar[ 1 ], $file ) == FALSE )
+            || ( preg_match( $zip[ 0 ], $file ) && preg_match( $zip[ 1 ], $file ) == FALSE )
+            || ( preg_match( $z7z[ 0 ], $file ) && preg_match( $z7z[ 1 ], $file ) == FALSE )
+            ){
+                $result = FALSE;
+                break;
             }
         }
         
@@ -347,7 +501,9 @@
         ){
             $cmds = O_CRON_EXTRACTFILES_CMD;
             foreach( $cmds AS $ext => $cmd ){
-                if( endsWith( $file, $ext ) ){
+                if( endsWith( $file, $ext ) 
+                || stripos( $file, $ext ) !== FALSE
+                ){
                     //%FILE% %FOLDER% %PASS%
                     $cmd = str_replace( '%FILE%', $file, $cmd );
                     $foldere = dirname( $file ) . DS . basename( $file ) . '_';

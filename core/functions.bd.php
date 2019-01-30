@@ -1884,6 +1884,24 @@
 		return $result;
 	}
 	
+	function sqlite_mediainfo_search_imdb( $imdb, $limit = 1000 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM mediainfo ';
+			$sql .= ' WHERE imdbid LIKE \'' . $dbhandle->escapeString( $imdb ) . '\' ';
+			$sql .= ' OR imdb LIKE \'%' . $dbhandle->escapeString( $imdb ) . '\' ';
+			$sql .= ' ORDER BY idmediainfo DESC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
 	function sqlite_mediainfo_search_title( $title, $limit = 1000 ){
 		//Vars
 		$result = FALSE;

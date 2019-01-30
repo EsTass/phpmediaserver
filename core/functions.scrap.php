@@ -1396,15 +1396,33 @@
             if( $debug ) echo "<br />TITLE CLEAN TITLES-SXECUT: " . $lt;
         }
         
-        //add base title and sort -
+        //add base title
         $titles[] = $title;
+        
+        //add base title from imdb
+        if( $imdb != FALSE 
+        && ( $imdbdata = sqlite_mediainfo_search_imdb( $imdb ) ) != FALSE
+        && is_array( $imdbdata )
+        && count( $imdbdata ) > 0
+        && array_key_exists( 0, $imdbdata )
+        && is_array( $imdbdata[ 0 ] )
+        && array_key_exists( 'title', $imdbdata[ 0 ] )
+        ){
+            $titles[] = $imdbdata[ 0 ][ 'title' ];
+            $titles[] = $imdb;
+        }
+        
+        //sort
         $titles = array_reverse( $titles );
         
         if( $debug ) echo "<br />TITLES LIST: " . nl2br( print_r( $titles, TRUE ) );
         
         foreach( $titles AS $title ){
             //BASE MODE: string similarity by search
-            if( ( $mediainfo = sqlite_mediainfo_search_title( $title, 5 ) ) != FALSE
+            if( ( 
+                ( $mediainfo = sqlite_mediainfo_search_title( $title, 5 ) ) != FALSE
+                || ( $mediainfo = sqlite_mediainfo_search_imdb( $title, 5 ) ) != FALSE
+            )
             && is_array( $mediainfo )
             && count( $mediainfo ) > 0
             ){
