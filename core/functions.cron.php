@@ -360,8 +360,10 @@
 	
 	function cron_searchs_downloads( $minutesback, $echo = TRUE ){
         global $G_WEBSCRAPPER;
+        global $G_CLEAN_FILENAME;
         $genres = implode( ' ', O_MENU_GENRES );
         $genres .= implode( ' ', array_keys( O_MENU_GENRES ) );
+        $excludedwords = implode( ' ', $G_CLEAN_FILENAME );
         
         if( ( $logs = sqlite_log_getsearchs( $minutesback ) ) != FALSE 
         && is_array( $logs )
@@ -383,6 +385,7 @@
                     && strlen( $query[ 'search' ] ) > 0
                     && ( $bword = get_word_better( urldecode( $query[ 'search' ] ) ) ) != FALSE
                     && !in_array( $bword, $searched )
+                    && stripos( $excludedwords, $bword ) === FALSE
                     ){
                         $searchs[] = urldecode( $query[ 'search' ] );
                         $searched[] = $bword;

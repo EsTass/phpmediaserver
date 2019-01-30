@@ -1353,10 +1353,13 @@
         $titles = array();
         if( ( $e = explode( '%', $title ) ) != FALSE ){
             foreach( $e AS $ea ){
-                //$lt = ' ' . $ea;
-                $lt = str_replace( $ea . '', '', $title );
-                $titles[] = $lt;
-                if( $debug ) echo "<br />TITLE CLEAN TITLES-RWORDS: " . $lt;
+                //remove only tiny words
+                if( strlen( $ea ) <= 3 ){
+                    //$lt = ' ' . $ea;
+                    $lt = str_replace( $ea . '', '', $title );
+                    $titles[] = $lt;
+                    if( $debug ) echo "<br />TITLE CLEAN TITLES-RWORDS: " . $lt;
+                }
             }
             
         }
@@ -1400,7 +1403,8 @@
         $titles[] = $title;
         
         //add base title from imdb
-        if( $imdb != FALSE 
+        if( $imdb != FALSE
+        && $imdb != ""
         && ( $imdbdata = sqlite_mediainfo_search_imdb( $imdb ) ) != FALSE
         && is_array( $imdbdata )
         && count( $imdbdata ) > 0

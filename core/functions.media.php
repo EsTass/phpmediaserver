@@ -389,8 +389,8 @@
                 )
                 ){
                     @unlink( $file );
-                    //remove all compressed files on folder
-                    //deletedCompressedMultipart( $file, 999, $echo );
+                    //TEST remove all compressed files on folder
+                    deletedCompressedMultipart( $file, 999, $echo );
                     //if( $echo ) echo "<br />DELETE: " . $file;
                     if( $echo ) echo "- ";
                 }
@@ -1091,6 +1091,10 @@
         
         $CLEANNAME = str_ireplace( '  ', ' ', $CLEANNAME );
         $CLEANNAME = trim( $CLEANNAME );
+        
+        if( strlen( $CLEANNAME ) == 0 ){
+            $CLEANNAME = $filename;
+        }
         
         return $CLEANNAME;
 	}

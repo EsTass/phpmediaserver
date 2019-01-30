@@ -99,6 +99,7 @@
         
         $audiolist = array();
         $subslist = array();
+        $subslistv = array();
         $AUDIOTRACK = 1;
         $CODECORDER = array(
             //url ident = header type
