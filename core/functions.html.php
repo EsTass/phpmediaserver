@@ -448,7 +448,7 @@
             $css_extra = '';
             $urlinfo = '';
             $ftitle = $element[ 'title' ];
-            $urlposter = getURLImg( FALSE, 1, 'iptv' );
+            $urlposter = getURLImg( $element[ 'idmedialive' ], $element[ 'idmedialive' ], 'livetv' );
             $urlplayer = getURLPlayerLive( $element[ 'idmedialive' ], FALSE, 'poster' );
             
             $onclick = 'goToURL( "' . $urlplayer . '" );';
@@ -509,7 +509,8 @@
             $year = date( 'Y' );
             $season = '';
             $episode = '';
-            $urlposter = $element[ 'poster' ];
+            //$urlposter = $element[ 'poster' ];
+            $urlposter = getURLImg( $element[ 'idmedialive' ], $element[ 'idmedialive' ], 'livetv' ) . $session;
             $urllandscape = '';
             $urlbanner =  '';
             //direct, fast, mp4, 

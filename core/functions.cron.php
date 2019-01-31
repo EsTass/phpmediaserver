@@ -279,26 +279,30 @@
                             && $ldata[ 'width' ] > 0
                             ){
                                 //+1 url
-                                if( strlen( $ltitle ) == 0 ){
-                                    $ltitle = 'NO-TITLE';
+                                if( $ltitle != FALSE ){
+                                    if( strlen( $ltitle[ 'titleg' ] ) > 0 ){
+                                        $lltitle = $ltitle[ 'titleg' ] . ': ' . $ltitle[ 'title' ];
+                                    }else{
+                                        $lltitle = $ltitle[ 'title' ];
+                                    }
+                                    $poster = $ltitle[ 'poster' ];
+                                    if( ( $lastid = sqlite_medialive_insert( 0, $lltitle, $line, $poster ) ) != FALSE ){
+                                        //download poster
+                                        if( filter_var( $poster, FILTER_VALIDATE_URL ) ){
+                                            $fileimg = PPATH_MEDIAINFO . DS . $lastid . '.livetv';
+                                            downloadPosterToFile( $poster, $fileimg );
+                                        }
+                                        //echo get_msg( 'DEF_ELEMENTUPDATED' );
+                                    }else{
+                                        //echo get_msg( 'WEBSCRAP_ADDKO' );
+                                        $URLs_ERROR++;
+                                    }
+                                    $ltitle = FALSE;
+                                    $URLs++;
                                 }
-                                if( sqlite_medialive_insert( 0, $ltitle, $line, '' ) ){
-                                    //echo get_msg( 'DEF_ELEMENTUPDATED' );
-                                }else{
-                                    //echo get_msg( 'WEBSCRAP_ADDKO' );
-                                    $URLs_ERROR++;
-                                }
-                                $URLs++;
                             }elseif( startsWith( $line, '#EXTINF' ) ){
-                                //extract title
-                                $tt = explode( ',', $line );
-                                if( array_key_exists( 1, $tt ) ){
-                                    $ltitle = $tt[ 1 ];
-                                }else{
-                                    $ltitle = $line;
-                                    $ltitle = str_ireplace( '#EXTINF:', '', $ltitle );
-                                    $ltitle = trim( $ltitle );
-                                }
+                                //extract title data
+                                $ltitle = liveTVLineData( $line );
                             }elseif( filter_var( $line, FILTER_VALIDATE_URL ) ){
                                 //no data valid
                                 $URLs_ERROR++;
@@ -321,6 +325,58 @@
         }else{
             echo '<br />' . get_msg( 'WEBSCRAP_ADDKO' );
         }
+    }
+    
+    function liveTVLineData( $data ){
+        //extract info from #EXTINF: line
+        $result = array( 
+            'title' => '', 
+            'poster' => '',
+            'titleg' => '', 
+        );
+        
+        //get title: *, TITLE
+        $pg = '/.*,(.*)$/';
+        if( ( preg_match_all( $pg, $data, $match ) ) !== FALSE 
+        && count( $match ) > 0
+        && array_key_exists( 1, $match )
+        && is_array( $match[ 1 ] )
+        && array_key_exists( 0, $match[ 1 ] )
+        && strlen( trim( $match[ 1 ][ 0 ] ) ) > 0
+        ){
+            $result[ 'title' ] = trim( $match[ 1 ][ 0 ] );
+        }else{
+            $result[ 'title' ] = 'NO-TITLE';
+        }
+        //get poster: tvg-logo="urlimg"
+        $pg = '/.*tvg-logo=\"(.*?)\".*$/';
+        if( ( preg_match_all( $pg, $data, $match ) ) !== FALSE 
+        && count( $match ) > 0
+        && array_key_exists( 1, $match )
+        && is_array( $match[ 1 ] )
+        && array_key_exists( 0, $match[ 1 ] )
+        && strlen( trim( $match[ 1 ][ 0 ] ) ) > 0
+        && filter_var( trim( $match[ 1 ][ 0 ] ), FILTER_VALIDATE_URL )
+        ){
+            $result[ 'poster' ] = trim( $match[ 1 ][ 0 ] );
+        }else{
+            $result[ 'poster' ] = '';
+        }
+        //get titleg: group-title="TITLEG"
+        $pg = '/.*group-title=\"(.*?)\".*$/';
+        if( ( preg_match_all( $pg, $data, $match ) ) !== FALSE 
+        && count( $match ) > 0
+        && array_key_exists( 1, $match )
+        && is_array( $match[ 1 ] )
+        && array_key_exists( 0, $match[ 1 ] )
+        && strlen( trim( $match[ 1 ][ 0 ] ) ) > 0
+        ){
+            $result[ 'titleg' ] = trim( $match[ 1 ][ 0 ] );
+        }else{
+            $result[ 'titleg' ] = '';
+        }
+        
+        return $result;
     }
 	
 	function cleanDownloadsFolders( $echo = FALSE, $days = 1 ){

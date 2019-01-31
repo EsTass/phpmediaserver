@@ -2210,6 +2210,11 @@
 			$sql .= ' "' . date( 'Y-m-d H:i:s' ) . '" ';
 			$sql .= ')';
 			$result = $dbhandle->exec( $sql );
+			if( $result
+			&& ( $lastid = sqlite_lastid() ) != FALSE
+            ){
+                $result = $lastid;
+			}
 			sqlite_db_close();
 		}
 		
@@ -2247,6 +2252,13 @@
 			//die( $sql );
 			$result = $dbhandle->exec( $sql );
 			sqlite_db_close();
+		}
+		
+		$file = PPATH_MEDIAINFO . DS . $idmedialive . '.livetv';
+		if( $result 
+		&& file_exists( $file )
+		){
+            @unlink( $file );
 		}
 		
 		return $result;

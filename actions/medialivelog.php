@@ -93,7 +93,7 @@
                         //echo get_msg( 'DEF_EXIST' );
                         $URLs_OK++;
                     }else{
-                        if( sqlite_medialive_delete( $G_IDMEDIALIVE )
+                        if( sqlite_medialive_delete( $d[ 'idmedialive' ] )
                         ){
                             //echo get_msg( 'DEF_DELETED' );
                             $URLs_DEL++;
@@ -159,7 +159,7 @@
                 $G_LISTLINKS = trim( $G_LISTLINKS );
                 $G_LISTLINKS = explode( PHP_EOL, $G_LISTLINKS );
                 $G_LISTLINKS = array_filter( $G_LISTLINKS, 'trim' );
-                $ltitle = '';
+                $ltitle = FALSE;
                 $URLs = 0;
                 $URLs_ERROR = 0;
                 $URLs_DUPLY = 0;
@@ -170,32 +170,37 @@
                         $URLs_DUPLY++;
                     }elseif( filter_var( $line, FILTER_VALIDATE_URL )
                     && sqlite_medialive_checkexist( $line ) == FALSE
-                    && ( $ldata = ffprobe_get_data( $line ) ) != FALSE 
+                    && ( $ldata = ffprobe_get_data( $line, FALSE ) ) != FALSE 
                     && is_array( $ldata )
                     && array_key_exists( 'width', $ldata )
-                    && $ldata[ 'width' ] > 0
+                    && array_key_exists( 'codec', $ldata )
+                    && ( $ldata[ 'width' ] > 0 )
                     ){
                         //+1 url
-                        if( strlen( $ltitle ) == 0 ){
-                            $ltitle = 'NO-TITLE';
+                        if( $ltitle != FALSE ){
+                            if( strlen( $ltitle[ 'titleg' ] ) > 0 ){
+                                $lltitle = $ltitle[ 'titleg' ] . ': ' . $ltitle[ 'title' ];
+                            }else{
+                                $lltitle = $ltitle[ 'title' ];
+                            }
+                            $poster = $ltitle[ 'poster' ];
+                            if( ( $lastid = sqlite_medialive_insert( 0, $lltitle, $line, $poster ) ) != FALSE ){
+                                //download poster
+                                if( filter_var( $poster, FILTER_VALIDATE_URL ) ){
+                                    $fileimg = PPATH_MEDIAINFO . DS . $lastid . '.livetv';
+                                    downloadPosterToFile( $poster, $fileimg );
+                                }
+                                //echo get_msg( 'DEF_ELEMENTUPDATED' );
+                            }else{
+                                //echo get_msg( 'WEBSCRAP_ADDKO' );
+                                $URLs_ERROR++;
+                            }
+                            $ltitle = FALSE;
+                            $URLs++;
                         }
-                        if( sqlite_medialive_insert( 0, $ltitle, $line, '' ) ){
-                            //echo get_msg( 'DEF_ELEMENTUPDATED' );
-                        }else{
-                            //echo get_msg( 'WEBSCRAP_ADDKO' );
-                            $URLs_ERROR++;
-                        }
-                        $URLs++;
                     }elseif( startsWith( $line, '#EXTINF' ) ){
-                        //extract title
-                        $tt = explode( ',', $line );
-                        if( array_key_exists( 1, $tt ) ){
-                            $ltitle = $tt[ 1 ];
-                        }else{
-                            $ltitle = $line;
-                            $ltitle = str_ireplace( '#EXTINF:', '', $ltitle );
-                            $ltitle = trim( $ltitle );
-                        }
+                        //extract title data
+                        $ltitle = liveTVLineData( $line );
                     }elseif( filter_var( $line, FILTER_VALIDATE_URL ) ){
                         //no data valid
                         $URLs_ERROR++;
@@ -210,7 +215,8 @@
             $SHOW_LIST = FALSE;
             break;
         case 'delete':
-            if( sqlite_medialive_delete( $G_IDMEDIALIVE )
+            if( $G_IDMEDIALIVE > 0
+            && sqlite_medialive_delete( $G_IDMEDIALIVE )
             ){
                 echo get_msg( 'DEF_DELETED' );
             }else{
@@ -257,7 +263,8 @@
             $SHOW_LIST = FALSE;
             break;
         case 'edit':
-            if( ( $d = sqlite_medialive_getdata( $G_IDMEDIALIVE, 1 ) ) 
+            if( $G_IDMEDIALIVE > 0
+            && ( $d = sqlite_medialive_getdata( $G_IDMEDIALIVE, 1 ) ) 
             && is_array( $d )
             && array_key_exists( 0, $d )
             ){
@@ -420,13 +427,13 @@ function log_cleanall_medialive(){
                 ?>
         <tr>
             <td>
-                <img class='listElementImg listElementImgMini lazy' src='' data-src='<?php echo getURLImg( FALSE, 1, 'poster' ); ?>' class='listElementPosterTiny' />
+                <img class='listElementImg listElementImgMini lazy' src='' data-src='<?php echo getURLImg( $lrow[ 'idmedialive' ], $lrow[ 'idmedialive' ], 'livetv' ); ?>' class='listElementPosterTiny' />
             </td>
                 <?php
                         foreach( $lrow AS $field => $data ){
                             if( array_key_exists( $field, $FIELDS ) ){
                 ?>
-            <td class='<?php echo $css_extra; ?>' title='<?php echo $data; ?>'><?php echo substr( $data, 0, 100 ); ?></td>
+            <td class='<?php echo $css_extra; ?>' title='<?php echo $data; ?>'><?php echo substr( $data, 0, 60 ); ?></td>
                 <?php
                             }
                         }

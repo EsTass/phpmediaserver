@@ -9,7 +9,7 @@
 	if( ( $tlist = sqlite_mediainfo_getdata_titles( FALSE, 10000 ) ) != FALSE ){
         $MEDIAINFOLIST = array();
         foreach( $tlist AS $row ){
-            $MEDIAINFOLIST[ $row[ 'idmediainfo' ] ] = $row[ 'title' ];
+            $MEDIAINFOLIST[ $row[ 'idmediainfo' ] ] = $row[ 'title' ] . ' (' . $row[ 'year' ] . ')';
         }
 	}else{
         $MEDIAINFOLIST = array();

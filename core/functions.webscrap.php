@@ -8,11 +8,11 @@
         /*
         //IDENT Scrapper
         'example' => array(
-            //Type: torrent|amule|magnets
+            //Type: torrent|amule|magnets (ignored when "downloadfunction" defined like dd downloads)
             'type' => 'torrent',
             //Title: domain.com
             'title' => '',
-            //Pass needed to get torrent/amule, from base page search, 1 pass if torrent/amule in next, 2 if hava second page to link, ...
+            //Pass needed to get torrent/amule, from base page search, 1 pass if torrent/amule in next, 2 if have second page to link, ...
             'passnumber' => 2,
             //HTML Code Format: UTF-8, ANSI, ...
             'htmlformat' => 'UTF-8',
@@ -61,13 +61,13 @@
                 //POST DATA if needed POST: list fields => values and last is search query param
                 'postdata' => array( 'q' => '' ),
                 //FILTER SIZE
-                //Max File Size: 0 disabled|X megabytes
+                //Max File Size: 0 disabled|X megabytes (if not detected remove link from list)
                 'filtersizemax' => 0,
                 //FILTER SIZE: get size between text: textpre + XX.XX Gb|Mb + textpos
                 'filtersizetextpre' => 'Size: ',
                 'filtersizetextpos' => '</span> ',
                 //FILTER SIZE: preg_match on html, rewrite filtersizetextpre && filtersizetextpos
-                'filtersizetextpreg' => '/(<td>)[0-9]+ *MB(<\/td>)/i',
+                'filtersizetextpreg' => '/(<span>)[0-9]+ *\wB(<\/span>)/i',
                 //FILTER SIZE: max chars distance from link (-before,+after)
                 'filtersizetextdistance' => 1000,
                 //FILTER SIZE: especific size(MB)=function( $webscrapperdata, $html, $link )
@@ -108,12 +108,12 @@
                     'filtersizetextpre' => 'Size: ',
                     'filtersizetextpos' => '</span> ',
                     //FILTER SIZE: preg_match on html, rewrite filtersizetextpre && filtersizetextpos
-                    'filtersizetextpreg' => '/(<td>)[0-9]+ *MB(<\/td>)/i',
+                    'filtersizetextpreg' => '/(<span>)[0-9]+ *\wB(<\/span>)/i',
                     //FILTER SIZE: especific size(MB)=function( $html )
                     'filtersizefunction' => '',
                     //DOWNLOAD MULTIPLE
                     'downloadmultiple' => FALSE,
-                    //DOWNLOAD function
+                    //DOWNLOAD function  function( link, debug ) (wget_downloader, wget_downloader_torrent, jdownloader_downloader, youtube_download)
                     'downloadfunction' => FALSE,
                 ),
                 //Pass 2 config
@@ -1535,6 +1535,28 @@
         $cmd = O_WGET . ' -O "' . $file . '" "' . $url . '"';
         runExtCommand( $cmd );
         $result = TRUE;
+		
+		return $result;
+	}
+	
+	//WGET DOWNLOADER with media check
+	
+	function wget_downloader_image( $url, $filename, $debug = FALSE ){
+        $result = FALSE;
+        
+        //Get Data
+        $cmd = O_WGET . ' -O "' . $filename . '" "' . $url . '"';
+        runExtCommand( $cmd );
+        
+        if( !file_exists( $filename ) ){
+            $result = FALSE;
+        }elseif( !getFileMimeTypeImg( $filename )
+		){
+            @unlink( $filename );
+            $result = FALSE;
+		}else{
+            $result = TRUE;
+		}
 		
 		return $result;
 	}

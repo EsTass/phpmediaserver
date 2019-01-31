@@ -900,13 +900,33 @@
 	function downloadPosterToFile( $url, $file ){
 		$result = @file_put_contents( $file, file_get_contents_timed( $url ) );
 		
-		if( filesize( $file ) < 500 ){
+		if( !file_exists( $file ) ){
+            $result = FALSE;
+        }elseif( filesize( $file ) < 500 ){
 			@unlink( $file );
 			$result = FALSE;
 		}elseif( !getFileMimeTypeImg( $file )
 		){
             @unlink( $file );
             $result = FALSE;
+		}else{
+            $result = TRUE;
+		}
+		
+		if( $result == FALSE ){
+            wget_downloader_image( $url, $file );
+            if( !file_exists( $file ) ){
+                $result = FALSE;
+            }elseif( filesize( $file ) < 500 ){
+                @unlink( $file );
+                $result = FALSE;
+            }elseif( !getFileMimeTypeImg( $file )
+            ){
+                @unlink( $file );
+                $result = FALSE;
+            }else{
+                $result = TRUE;
+            }
 		}
 		
 		return $result;

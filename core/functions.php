@@ -275,6 +275,7 @@
         || $type == 'back'
         || $type == 'next'
         || $type == 'iptv'
+        || $type == 'livetv'
         ){
             $result .= '&type=' . $type;
         }else{

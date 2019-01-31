@@ -25,6 +25,7 @@
     || $G_DATA[ 'type' ] == 'back'
     || $G_DATA[ 'type' ] == 'next'
     || $G_DATA[ 'type' ] == 'iptv'
+    || $G_DATA[ 'type' ] == 'livetv'
 	){
         $TYPE = $G_DATA[ 'type' ];
 	}else{
@@ -34,7 +35,13 @@
 	$FMEDIA = PPATH_MEDIAINFO . DS . $IDMEDIAINFO . '.' . $TYPE;
 	$FMEDIA_BASE = PPATH_MEDIAINFO . DS . $IDMEDIAINFO . '.poster';
 	$FMEDIA_B = PPATH_IMGS . DS . $TYPE . '.jpg';
-	if( ( $IDMEDIAINFO == 1 || $IDMEDIA == 1 )
+	
+	if( $TYPE == 'livetv'
+	&& file_exists( $FMEDIA )
+	&& getFileMimeTypeImg( $FMEDIA )
+	){
+        //$FMEDIA = $FMEDIA;
+	}elseif( ( $IDMEDIAINFO == 1 || $IDMEDIA == 1 )
 	&& ( $TYPE == 'next' || $TYPE == 'back' || $TYPE == 'iptv' )
 	&& file_exists( $FMEDIA_B )
 	&& getFileMimeTypeImg( $FMEDIA_B )
