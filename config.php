@@ -102,7 +102,7 @@
 	//PATH ffmpeg
 	define( 'O_FFMPEG', 'ffmpeg' );
 	//PATH ffprobe
-	define( 'O_FFPROBE', 'ffprobe' );
+	define( 'O_FFPROBE', 'timeout 10s ffprobe' );
 	//PATH filebot
 	define( 'O_FILEBOT', 'export HOME="' . PPATH_CACHE . '" && filebot' );
 	//PATH PHP (run cron jobs)
