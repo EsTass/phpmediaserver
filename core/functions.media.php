@@ -385,7 +385,10 @@
                 && (
                     ( time() - filemtime( $file . '_' ) ) > ( O_CRON_EXTRACTFILES_CLEAN * 86400 )
                     //or base file time *2
-                    || ( time() - filemtime( $file ) ) > ( O_CRON_EXTRACTFILES_CLEAN * 86400 * 2 )
+                    || 
+                        ( file_exists( $file )
+                        && ( time() - filemtime( $file ) ) > ( O_CRON_EXTRACTFILES_CLEAN * 86400 * 2 )
+                        )
                 )
                 ){
                     @unlink( $file );
