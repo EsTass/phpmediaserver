@@ -492,6 +492,7 @@
 			$sql = 'SELECT * FROM logs ';
 			$sql .= ' WHERE date > "' . $date . '" ';
 			$sql .= ' AND url LIKE "%search=%" ';
+			$sql .= ' AND action LIKE "list%" ';
 			$sql .= ' ORDER BY date DESC LIMIT 1000';
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
 			sqlite_db_close();
@@ -772,6 +773,23 @@
 		return $result;
 	}
 	
+	function sqlite_session_getdata_user( $user ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM sessions ';
+			$sql .= ' WHERE user LIKE \'' . $dbhandle->escapeString( $user ) . '\' ';
+			$sql .= ' ORDER BY date DESC LIMIT 1000';
+			//echo $sql;
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
 	function sqlite_session_delete( $session = FALSE ){
 		//Vars
 		$result = FALSE;
@@ -808,6 +826,48 @@
             }elseif( sqlite_session_insert( $result, 'admin' )
             ){
                 
+            }
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_sessions_clean( $echo = FALSE ){
+		//Vars
+		$result = FALSE;
+		
+		if( defined( 'O_USERS_MAX_SESSIONS' ) 
+		&& defined( 'O_USERSADMIN_MAX_SESSIONS' ) 
+		&& (int)O_USERS_MAX_SESSIONS > 0
+		&& defined( 'USERNAME' )
+		&& strlen( USERNAME ) > 0
+		&& ( $d = sqlite_session_getdata_user( USERNAME ) ) != FALSE
+		&& is_array( $d )
+		&& count( $d ) > 0
+		){
+            
+            if( !defined( 'USERNAMEADMIN' )
+            && (int)O_USERS_MAX_SESSIONS == 0
+            ){
+                $max = 10;
+            }elseif( defined( 'USERNAMEADMIN' )
+            && (int)O_USERSADMIN_MAX_SESSIONS == 0
+            ){
+                $max = 10;
+            }elseif( !defined( 'USERNAMEADMIN' )
+            ){
+                $max = (int)O_USERS_MAX_SESSIONS;
+            }else{
+                $max = (int)O_USERSADMIN_MAX_SESSIONS;
+            }
+            foreach( $d AS $row ){
+                if( $max > 0 ){
+                    $max--;
+                }else{
+                    sqlite_session_delete( $row[ 'session' ] );
+                    if( $echo ) echo "-";
+                    $result = TRUE;
+                }
             }
 		}
 		

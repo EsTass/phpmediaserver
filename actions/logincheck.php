@@ -39,6 +39,7 @@
 		){
             $G_DATA[ 'action' ] = O_ACTIONDEFAULT;
 		}
+		sqlite_sessions_clean();
 	}elseif( $G_DATA[ 'action' ] == 'login'
 	&& checkLoginsAttempts() == FALSE
 	){
@@ -68,6 +69,7 @@
 			}
 			//login valid
 			$G_DATA[ 'action' ] = O_ACTIONDEFAULT;
+            sqlite_sessions_clean();
 		}else{
 			$ACTIONINFO = get_msg( 'LOGIN_ERRUSERPASS' );
 			$G_DATA[ 'action' ] = 'login';
