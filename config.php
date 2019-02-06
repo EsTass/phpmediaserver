@@ -15,6 +15,12 @@
 	//Force HTTPS connection
 	define( 'O_FORCE_HTTPS', FALSE );
 	
+	//Max sessions for normal user (each new session delete old)
+	define( 'O_USERS_MAX_SESSIONS', 1 );
+	
+	//Max sessions for admin user (each new session delete old)
+	define( 'O_USERSADMIN_MAX_SESSIONS', 3 );
+	
 	//List Quantity
 	define( 'O_LIST_QUANTITY', 32 );
 	
