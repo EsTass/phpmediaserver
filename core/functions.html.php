@@ -338,7 +338,7 @@
 	
 	function get_html_list_kodi( $data, $title ){
         $result[ $title ] = array();
-        $session = '&PHPSESSION=' . session_id();
+        $session = '&PHPSESSION=' . session_id() . '&|verifypeer=false';
         global $G_FILENAME_INFO;
         
         foreach( $data AS $element ){
