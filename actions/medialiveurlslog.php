@@ -161,7 +161,7 @@
                         //echo get_msg( 'DEF_EXIST' );
                         $URLs_OK++;
                     }else{
-                        if( sqlite_medialiveurls_delete( $G_IDMEDIALIVEURLS )
+                        if( sqlite_medialiveurls_delete( $d[ 'idmedialiveurls' ] )
                         ){
                             //echo get_msg( 'DEF_DELETED' );
                             $URLs_DEL++;
