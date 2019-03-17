@@ -515,7 +515,7 @@
 		$debug = FALSE;
 		$in_list = array();
 		
-		$list = array( 'searchImagesPyMI', 'searchImagesBing', 'searchImagesIXQick', 'searchImagesWebcrawler' );
+		$list = array( 'searchImagesDDGApi', 'searchImagesPyMI', 'searchImagesBing', 'searchImagesIXQick', 'searchImagesWebcrawler' );
 		
 		if( $debug ) echo "<br />SEARCHIMAGES: " . $search;
 		
@@ -541,6 +541,53 @@
 		
 		$result = array_slice( $result, 0, $max );
 		
+		return $result;
+	}
+	
+	//DuckDuckGo API SEARCH IMAGES
+	
+	function searchImagesDDGApi( $search, $max = 5, $getthumb = TRUE ){
+		$result = array();
+		global $G_MEDIADATA;
+		
+        $url = 'https://api.duckduckgo.com/?q=%SEARCH%&format=json&pretty=1';
+        //remove serie/movie
+        $search = str_ireplace( 'movie', '', $search );
+        $search = str_ireplace( 'serie', '', $search );
+        //remove year
+        if( ( $year = get_year( $search ) ) != FALSE 
+        && strlen( $year ) > 0 ){
+            $search = str_ireplace( $year, '', $search );
+        }
+        //remove search type
+        foreach( $G_MEDIADATA AS $k => $v ){
+            if( is_string( $v ) ){
+                $search = str_ireplace( $k, '', $search );
+            }
+        }
+        $search = trim( $search );
+        
+        $url = str_ireplace( '%SEARCH%', urlencode( $search ), $url );
+        $json = file_get_contents( $url );
+        //$obj = json_decode( $json );
+        
+        preg_match_all('/(https?:\/\/\S+\.(?:jpg|jpeg|png))/', $json, $matches );
+        
+        if( is_array( $matches ) 
+        && array_key_exists( 0, $matches )
+        && is_array( $matches[ 0 ] )
+        ){
+            $n = 0;
+            foreach( $matches[ 0 ] AS $turl ){
+                if( filter_var( $turl, FILTER_VALIDATE_URL )
+                ){
+                    $result[] = $turl;
+                    $n++;
+                    if( $n > $max ) break;
+                }
+            }
+        }
+        
 		return $result;
 	}
 	
