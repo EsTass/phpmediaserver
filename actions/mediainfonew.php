@@ -69,7 +69,7 @@ function new_mediainfo_insert(){
                 <input id='title' name='title' value='<?php echo $TITLE; ?>' />
             </td>
             <td>
-                <input id='episodetitle' name='episodetitle' value='' />
+                <input id='titleepisode' name='titleepisode' value='' />
             </td>
             <td>
                 <textarea id='plot' name='plot'></textarea>

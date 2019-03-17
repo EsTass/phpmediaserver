@@ -27,6 +27,16 @@
 $(function () {
     
 });
+function log_edit_mediainfo( idmediainfo ){
+    var url = '<?php getURL(); ?>';
+    url += '?r=r&action=mediainfoedit&idmediainfo=' + idmediainfo;
+    $.get( url )
+    .done( function( data ){
+        $( '#dResultIdent' ).html( data );
+        loading_hide();
+    });
+    return false;
+}
 function log_delete_mediainfo( idmediainfo ){
     var url = '<?php getURL(); ?>';
     url += '?r=r&action=mediainfodelete&idmediainfo=' + idmediainfo;
@@ -113,6 +123,7 @@ function log_mediainfo_search_images( idmediainfo ){
                         }
                 ?>
             <td>
+                <input onclick='log_edit_mediainfo( <?php echo $lrow[ 'idmediainfo' ]; ?> );' type='button' id='bLogEdit' name='bLogEdit' value='<?php echo get_msg( 'MENU_EDIT', FALSE ); ?>' />
                 <input onclick='log_delete_mediainfo( <?php echo $lrow[ 'idmediainfo' ]; ?> );' type='button' id='bLogDelete' name='bLogDelete' value='<?php echo get_msg( 'MENU_DELETE', FALSE ); ?>' />
                 <input onclick='log_delete_mediainfo_imgs( <?php echo $lrow[ 'idmediainfo' ]; ?> );' type='button' id='bLogDeleteImgs' name='bLogDeleteImgs' value='<?php echo get_msg( 'MENU_DELETE_IMGS', FALSE ); ?>' />
                 <input onclick='log_mediainfo_search_images( <?php echo $lrow[ 'idmediainfo' ]; ?> );' type='button' id='bLogSearchImgs' name='bLogSearchImgs' value='<?php echo get_msg( 'MENU_IMGS_SEARCH', FALSE ); ?>' />
