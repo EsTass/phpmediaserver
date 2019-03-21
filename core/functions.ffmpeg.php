@@ -291,4 +291,65 @@
         return $result;
 	}
 	
+	//make 2 images from video with 5 secs step
+	
+	function ffmpeg_capture_img( $filevideo, $seconds = 5, $debug = FALSE ){
+        $result = FALSE;
+        
+        $filepreview = PPATH_TEMP . DS . 'vcapture%02d.png'; //vcapture01.png, vcapture02.png
+        $file1 = PPATH_TEMP . DS . 'vcapture01.png';
+        $file2 = PPATH_TEMP . DS . 'vcapture02.png';
+        
+        @unlink( $file1 );
+        @unlink( $file2 );
+        
+        //ffmpeg -i myvideo.avi -vf fps=1/60 img%03d.jpg
+        $cmd = O_FFMPEG . " -i " . escapeshellarg( $filevideo ) . " -vf fps=1/" . $seconds . " -s 240x135  -vframes 2 " . escapeshellarg( $filepreview );
+        if( $debug ) echo "<br />" . $cmd;
+        if( ( $data = runExtCommand( $cmd ) ) != FALSE 
+        && file_exists( $file1 )
+        && file_exists( $file2 )
+        ){
+            $result = array( $file1, $file2 );
+        }
+        
+        return $result;
+	}
+	
+	//Compare 2 images GD same size and return same in % $samepc
+	
+	function sameImage( $img1, $img2, $samepc = 90, $debug = FALSE ){
+        $result = TRUE;
+        
+        if( file_exists( $img1 )
+        && file_exists( $img2 )
+        && ( $a = imagecreatefrompng( $img1 ) ) != FALSE
+        && ( $b = imagecreatefrompng( $img2 ) ) != FALSE
+        ){
+            $diff = 0;
+            
+            $width = imagesx( $a );
+            $height = imagesy( $a );
+            
+            for( $x = 0; $x < $width; $x++ ){
+                for( $y = 0; $y < $height; $y++ ){
+                    // pixel color at (x, y)
+                    $diff += abs( imagecolorat( $a, $x, $y ) - imagecolorat( $b, $x, $y ) );
+                }
+            }
+            
+            if( $debug ) echo "<br />WIDTH: " . $width;
+            if( $debug ) echo "<br />HEIGHT: " . $height;
+            if( $debug ) echo "<br />W*H: " . ( $height * $width );
+            if( $debug ) echo "<br />DIFF: " . $diff;
+            $div = ( 100 * $diff ) / ( $height * $width * 255 * 255 * 255 );
+            if( $debug ) echo "<br />%: " . $div;
+            
+            if( (int)$div >= ( 100 - $samepc ) ){
+                $result = FALSE;
+            }
+        }
+        
+        return $result;
+    }
 ?>

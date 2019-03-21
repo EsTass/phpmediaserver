@@ -85,10 +85,11 @@
                 $URLs_DEL = 0;
                 $URLs_DEL_E = 0;
                 foreach( $da AS $d ){
-                    if( ( $ldata = ffprobe_get_data( $d[ 'url' ] ) ) != FALSE 
+                    if( ( $ldata = ffmpeg_capture_img( $d[ 'url' ] ) ) != FALSE 
                     && is_array( $ldata )
-                    && array_key_exists( 'width', $ldata )
-                    && $ldata[ 'width' ] > 0
+                    && array_key_exists( 0, $ldata )
+                    && array_key_exists( 1, $ldata )
+                    && sameImage( $ldata[ 0 ], $ldata[ 1 ] ) == FALSE
                     ){
                         //echo get_msg( 'DEF_EXIST' );
                         $URLs_OK++;
@@ -116,10 +117,11 @@
             && array_key_exists( 0, $d )
             ){
                 $d = $d[ 0 ];
-                if( ( $ldata = ffprobe_get_data( $d[ 'url' ] ) ) != FALSE 
+                if( ( $ldata = ffmpeg_capture_img( $d[ 'url' ] ) ) != FALSE 
                 && is_array( $ldata )
-                && array_key_exists( 'width', $ldata )
-                && $ldata[ 'width' ] > 0
+                && array_key_exists( 0, $ldata )
+                && array_key_exists( 1, $ldata )
+                && sameImage( $ldata[ 0 ], $ldata[ 1 ] ) == FALSE
                 ){
                     echo get_msg( 'DEF_EXIST' );
                 }else{
@@ -131,6 +133,7 @@
                     }
                 }
             }
+            //check allways same image 
             $SHOW_LIST = FALSE;
             break;
         case 'check':
@@ -140,6 +143,18 @@
             && array_key_exists( 0, $d )
             ){
                 $d = $d[ 0 ];
+                if( ( $ldata = ffmpeg_capture_img( $d[ 'url' ] ) ) != FALSE 
+                && is_array( $ldata )
+                && array_key_exists( 0, $ldata )
+                && array_key_exists( 1, $ldata )
+                && sameImage( $ldata[ 0 ], $ldata[ 1 ] ) == FALSE
+                ){
+                    echo get_msg( 'DEF_EXIST' );
+                }else{
+                    echo get_msg( 'DEF_DELETED' );
+                }
+                /*
+                //old method check valid size
                 if( ( $ldata = ffprobe_get_data( $d[ 'url' ] ) ) != FALSE 
                 && is_array( $ldata )
                 && array_key_exists( 'width', $ldata )
@@ -149,6 +164,7 @@
                 }else{
                     echo get_msg( 'DEF_DELETED' );
                 }
+                */
             }
             $SHOW_LIST = FALSE;
             break;
