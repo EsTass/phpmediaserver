@@ -15,6 +15,7 @@
             'scrap_startpage_nearest_title',
             'scrap_searchencrypt_nearest_title',
             'scrap_searx_nearest_title',
+            'scrap_qwant_nearest_title',
         );
         
         //serch 2 times, enought to know viable title
@@ -51,6 +52,7 @@
             'scrap_startpage',
             'scrap_searchencrypt',
             'scrap_searx',
+            'scrap_qwant',
         );
         
         //serch 2 times, enought to know viable title
@@ -474,6 +476,89 @@
         return $result;
     }
     
+    //qwant.com SEARCH SCRAPPING
+    
+    function scrap_qwant( $search, $filterurl = '', $site = '', $timed = FALSE ){
+        //SECURE TIME TO SPAM
+        if( $timed ) sleep( 5 );
+        $result = array();
+        $URL = 'https://lite.qwant.com/?';
+        if( strlen( $site ) > 0 ){
+            //$URL .= 'q=' . rawurlencode( $search. ' site:' . $site );
+            $URL .= 'q=' . rawurlencode( $search );
+        }else{
+            $URL .= 'q=' . rawurlencode( $search );
+        }
+        $URL .= '&t=web';
+        
+        $data = @file_get_contents_timed( $URL );
+        
+        // Create a new DOMDocument
+        $dom = new DOMDocument();
+        @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+        $xp = new DOMXPath($dom);
+        //$nodes = $xp->query('//h3[@class="result--web--link"]/a');
+        $nodes = $xp->query('//a');
+        foreach ( $nodes as $re ){
+            $href = $re->getAttribute( "href" );
+            if( startsWith( $href, '/redirect/' ) ){
+                $href = substr( $href, stripos( $href, 'http' ) );
+                $href = urldecode( $href );
+                $title = $re->nodeValue;
+                $title = strip_tags( $title );
+                if( strlen( $filterurl ) == 0
+                || stripos( $href, $filterurl ) !== FALSE
+                ){
+                    $result[ $title ] = $href;
+                }
+            }
+        }
+        
+        return $result;
+    }
+    
+    function scrap_qwant_nearest_title( $title, $type = TRUE, $filterurl = 'imdb.com/title/tt', $site = 'imdb.com' ){
+        $result = '';
+        if( $type ){
+            $STYPE = 'Movie';
+        }else{
+            $STYPE = 'TV';
+        }
+        $search = O_LANG . ' ' . $STYPE . ' ' . $title;
+        if( ( $links = scrap_qwant( $search, $filterurl, $site, TRUE ) ) != FALSE 
+        && count( $links ) > 0
+        ){
+            //Clean Title - imdb | imdb -
+            $l2 = array();
+            $CLEAN = array( '- imdb', 'imdb -' );
+            foreach( $links AS $t => $href ){
+                if( getIMDB_ID( $href ) ){
+                    foreach( $CLEAN AS $c ){
+                        $t = str_ireplace( $c, '', $t );
+                    }
+                    $l2[ trim( $t ) ] = $href;
+                }
+            }
+            $links = $l2;
+        }
+        $now_k = 0;
+        $now_k_sim = 0;
+        foreach( $links AS $t => $href ){
+            if( strSimilarity( $title, $t, $pc ) > $now_k_sim ){
+                $now_k_sim = $pc;
+                $now_k = $t;
+            }
+        }
+        if( array_key_exists( $now_k, $links ) 
+        && ( $result = getIMDB_ID( $links[ $now_k ] ) ) != FALSE
+        ){
+            
+        }else{
+            $result = '';
+        }
+        return $result;
+    }
+    
     //IMGS DOWNLOADS
     
     //ACTOR FILE DIRECT DOWNLOAD
@@ -515,7 +600,14 @@
 		$debug = FALSE;
 		$in_list = array();
 		
-		$list = array( 'searchImagesDDGApi', 'searchImagesPyMI', 'searchImagesBing', 'searchImagesIXQick', 'searchImagesWebcrawler' );
+		$list = array( 
+            'searchImagesDDGApi', 
+            'searchImagesPyMI', 
+            'searchImagesBing', 
+            'searchImagesIXQick', 
+            'searchImagesWebcrawler',
+            'searchImagesQWant',
+        );
 		
 		if( $debug ) echo "<br />SEARCHIMAGES: " . $search;
 		
@@ -937,6 +1029,51 @@
                 //echo htmlspecialchars( $html );
                 //var_dump( $result );die();
             }
+		}
+		
+		return $result;
+	}
+	
+	//qwant SEARCH IMAGES
+	
+	function searchImagesQWant( $search, $max = 5, $getthumb = TRUE ){
+		$result = array();
+		
+		$url = "https://lite.qwant.com/?q=" . urlencode( $search ) . "&t=images";
+		if( ( $html = @file_get_contents_timed( $url ) ) != FALSE ){
+			$result = array();
+
+			$doc = new DOMDocument();
+			@$doc->loadHTML($html);
+            
+            //file_put_contents( PPATH_CACHE . DS . 'QWant-html-' . date( 'd-m-y-H-i-s' ), $html );
+            
+            // Create a new DOMDocument
+            $dom = new DOMDocument();
+            @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+            $xp = new DOMXPath($dom);
+            $nodes = $xp->query('*/a/img');
+            $n = 0;
+            foreach ( $nodes as $re ){
+                $turl = $re->getAttribute( "src" );
+                if( startsWith( $turl, '//s-lite.' ) ){
+                    $turl = 'https:' . $turl;
+                    if( $getthumb == FALSE 
+                    && ( $turl2 = urldecode( substr( $turl, stripos( $turl, '?u=http' ) + 3 ) ) ) != FALSE
+                    && strlen( $turl2 ) > 0
+                    && filter_var( $turl2, FILTER_VALIDATE_URL )
+                    ){
+                        $turl = $turl2;
+                    }
+                    if( filter_var( $turl, FILTER_VALIDATE_URL )
+                    ){
+                        $result[] = $turl;
+                    }
+                    if( $n > $max ) break;
+                    $n++;
+                }
+            }
+        
 		}
 		
 		return $result;
