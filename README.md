@@ -118,6 +118,8 @@ Restart apache, and login with default user/pass.
  - [omdbapi APIKEY](https://www.omdbapi.com)
  - [www.thetvdb.com APIKEY](https://www.thetvdb.com)
  - [PHP-IMDB-Grabber](https://github.com/FabianBeiner/PHP-IMDB-Grabber)
+ - [googler](https://pypi.python.org/pypi/googler)
+ - [ddgr](https://github.com/jarun/ddgr)
 
 ## Admin SQLite DB
 
