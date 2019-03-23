@@ -16,6 +16,8 @@
             'scrap_searchencrypt_nearest_title',
             'scrap_searx_nearest_title',
             'scrap_qwant_nearest_title',
+            'scrap_ddg_nearest_title',
+            'scrap_googler_nearest_title',
         );
         
         //serch 2 times, enought to know viable title
@@ -53,6 +55,8 @@
             'scrap_searchencrypt',
             'scrap_searx',
             'scrap_qwant',
+            'scrap_ddgr',
+            'scrap_googler',
         );
         
         //serch 2 times, enought to know viable title
@@ -526,6 +530,150 @@
         }
         $search = O_LANG . ' ' . $STYPE . ' ' . $title;
         if( ( $links = scrap_qwant( $search, $filterurl, $site, TRUE ) ) != FALSE 
+        && count( $links ) > 0
+        ){
+            //Clean Title - imdb | imdb -
+            $l2 = array();
+            $CLEAN = array( '- imdb', 'imdb -' );
+            foreach( $links AS $t => $href ){
+                if( getIMDB_ID( $href ) ){
+                    foreach( $CLEAN AS $c ){
+                        $t = str_ireplace( $c, '', $t );
+                    }
+                    $l2[ trim( $t ) ] = $href;
+                }
+            }
+            $links = $l2;
+        }
+        $now_k = 0;
+        $now_k_sim = 0;
+        foreach( $links AS $t => $href ){
+            if( strSimilarity( $title, $t, $pc ) > $now_k_sim ){
+                $now_k_sim = $pc;
+                $now_k = $t;
+            }
+        }
+        if( array_key_exists( $now_k, $links ) 
+        && ( $result = getIMDB_ID( $links[ $now_k ] ) ) != FALSE
+        ){
+            
+        }else{
+            $result = '';
+        }
+        return $result;
+    }
+    
+    //ddgr SEARCH SCRAPPING
+    
+    function scrap_ddgr( $search, $filterurl = '', $site = '', $timed = FALSE ){
+        //SECURE TIME TO SPAM
+        if( $timed ) sleep( 5 );
+        $result = array();
+        
+        $cmd = O_DDGR . ' --json "' . $search . '"';
+        $data = runExtCommand( $cmd );
+        
+		if( ( $xml = (array)@json_decode( $data, TRUE ) ) != FALSE
+		){
+            foreach( $xml AS $row ){
+                //title url
+                if( array_key_exists( 'title', $row )
+                && array_key_exists( 'url', $row )
+                && filter_var( $row[ 'url' ], FILTER_VALIDATE_URL ) 
+                ){
+                    if( strlen( $filterurl ) == 0
+                    || stripos( $row[ 'url' ], $filterurl ) !== FALSE
+                    ){
+                        $result[ $row[ 'title' ] ] = $row[ 'url' ];
+                    }
+                }
+            }
+		}
+        
+        return $result;
+    }
+    
+    function scrap_ddgr_nearest_title( $title, $type = TRUE, $filterurl = 'imdb.com/title/tt', $site = 'imdb.com' ){
+        $result = '';
+        if( $type ){
+            $STYPE = 'Movie';
+        }else{
+            $STYPE = 'TV';
+        }
+        $search = O_LANG . ' ' . $STYPE . ' ' . $title;
+        if( ( $links = scrap_ddgr( $search, $filterurl, $site, TRUE ) ) != FALSE 
+        && count( $links ) > 0
+        ){
+            //Clean Title - imdb | imdb -
+            $l2 = array();
+            $CLEAN = array( '- imdb', 'imdb -' );
+            foreach( $links AS $t => $href ){
+                if( getIMDB_ID( $href ) ){
+                    foreach( $CLEAN AS $c ){
+                        $t = str_ireplace( $c, '', $t );
+                    }
+                    $l2[ trim( $t ) ] = $href;
+                }
+            }
+            $links = $l2;
+        }
+        $now_k = 0;
+        $now_k_sim = 0;
+        foreach( $links AS $t => $href ){
+            if( strSimilarity( $title, $t, $pc ) > $now_k_sim ){
+                $now_k_sim = $pc;
+                $now_k = $t;
+            }
+        }
+        if( array_key_exists( $now_k, $links ) 
+        && ( $result = getIMDB_ID( $links[ $now_k ] ) ) != FALSE
+        ){
+            
+        }else{
+            $result = '';
+        }
+        return $result;
+    }
+    
+    //ddgr SEARCH SCRAPPING
+    
+    function scrap_googler( $search, $filterurl = '', $site = '', $timed = FALSE ){
+        //SECURE TIME TO SPAM
+        if( $timed ) sleep( 5 );
+        $result = array();
+        
+        $cmd = O_GOOGLER . ' --json "' . $search . '"';
+        $data = runExtCommand( $cmd );
+        
+		if( ( $xml = (array)@json_decode( $data, TRUE ) ) != FALSE
+		){
+            foreach( $xml AS $row ){
+                //title url
+                if( array_key_exists( 'title', $row )
+                && array_key_exists( 'url', $row )
+                && filter_var( $row[ 'url' ], FILTER_VALIDATE_URL ) 
+                ){
+                    if( strlen( $filterurl ) == 0
+                    || stripos( $row[ 'url' ], $filterurl ) !== FALSE
+                    ){
+                        $result[ $row[ 'title' ] ] = $row[ 'url' ];
+                    }
+                }
+            }
+		}
+        
+        return $result;
+    }
+    
+    function scrap_googler_nearest_title( $title, $type = TRUE, $filterurl = 'imdb.com/title/tt', $site = 'imdb.com' ){
+        $result = '';
+        if( $type ){
+            $STYPE = 'Movie';
+        }else{
+            $STYPE = 'TV';
+        }
+        $search = O_LANG . ' ' . $STYPE . ' ' . $title;
+        if( ( $links = scrap_googler( $search, $filterurl, $site, TRUE ) ) != FALSE 
         && count( $links ) > 0
         ){
             //Clean Title - imdb | imdb -
