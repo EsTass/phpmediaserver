@@ -117,6 +117,10 @@
 	define( 'O_WGET', 'wget' );
 	//pymediaident
 	define( 'O_PYMEDIAIDENT', 'PYTHONWARNINGS="ignore" pymediaident.py' );
+	//ddgr search
+	define( 'O_DDGR', 'ddgr' );
+	//googler search
+	define( 'O_GOOGLER', 'googler' );
 	
 	//FOLDERS
 	
