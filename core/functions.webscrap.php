@@ -576,8 +576,8 @@
                     $neededurl = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlneeded' ];
                 }
                 $neededurlre = FALSE;
-                if( array_key_exists( 'linkurlneededregexp', $scrapperdata[ 'searchdata' ] ) ){
-                    $neededurlre = $scrapperdata[ 'passdata' ][ 'searchdata' ][ 'linkurlneededregexp' ];
+                if( array_key_exists( 'linkurlneededregexp', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                    $neededurlre = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlneededregexp' ];
                 }
                 $excludetitle = FALSE;
                 if( array_key_exists( 'linktitleexclude', $scrapperdata[ 'passdata' ][ $pass ] ) ){
