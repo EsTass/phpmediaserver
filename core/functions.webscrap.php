@@ -240,7 +240,9 @@
 				&& count( $excludetitle ) > 0
 				){
                     foreach( $excludetitle AS $e ){
+                        if( $debug ) echo "<br />Exclude TITLE str: " . $e . ' - ' . $title;
                         if( stripos( $title, $e ) !== FALSE ){
+                            if( $debug ) echo "<br />VALID: " . $e;
                             $VALID = FALSE;
                             break;
                         }
@@ -251,7 +253,9 @@
 				&& count( $excludeurl ) > 0
 				){
                     foreach( $excludeurl AS $e ){
+                        if( $debug ) echo "<br />Exclude URL link str: " . $e . ' - ' . $href;
                         if( stripos( $href, $e ) !== FALSE ){
+                            if( $debug ) echo "<br />VALID: " . $e;
                             $VALID = FALSE;
                             break;
                         }
@@ -263,7 +267,9 @@
 				){
                     $VALID = FALSE;
                     foreach( $neededtitle AS $e ){
+                        if( $debug ) echo "<br />Needed TITLE str: " . $e . ' - ' . $title;
                         if( stripos( $title, $e ) !== FALSE ){
+                            if( $debug ) echo "<br />VALID: " . $e;
                             $VALID = TRUE;
                             break;
                         }
@@ -276,8 +282,13 @@
                 ){
                     $VALID = FALSE;
                     foreach( $neededtitlere AS $e ){
+                        if( $debug ) echo "<br />Needed TITLE regexp str: " . $e . ' - ' . $title;
                         preg_match( $e, $title, $match );
-                        if( $match !== FALSE ){
+                        if( $match !== FALSE 
+                        && is_array( $match )
+                        && count( $match ) > 0
+                        ){
+                            if( $debug ) echo "<br />VALID: " . print_r( $match, TRUE );
                             $VALID = TRUE;
                             break;
                         }
@@ -290,7 +301,9 @@
 				){
                     $VALID = FALSE;
                     foreach( $neededurl AS $e ){
+                        if( $debug ) echo "<br />Needed URL Link str: " . $e . ' - ' . $href;
                         if( stripos( $href, $e ) !== FALSE ){
+                            if( $debug ) echo "<br />VALID: " . $e;
                             $VALID = TRUE;
                             break;
                         }
@@ -303,8 +316,13 @@
 				){
                     $VALID = FALSE;
                     foreach( $neededurlre AS $e ){
+                        if( $debug ) echo "<br />Needed URL Link RegExp: " . $e . ' - ' . $href;
                         preg_match( $e, $href, $match );
-                        if( $match !== FALSE ){
+                        if( $match !== FALSE
+                        && is_array( $match )
+                        && count( $match ) > 0
+                        ){
+                            if( $debug ) echo "<br />VALID: " . print_r( $match, TRUE );
                             $VALID = TRUE;
                             break;
                         }
@@ -621,7 +639,9 @@
                     && count( $excludetitle ) > 0
                     ){
                         foreach( $excludetitle AS $e ){
+                            if( $debug ) echo "<br />Needed TITLE str: " . $e . ' - ' . $titlelink;
                             if( stripos( $titlelink, $e ) !== FALSE ){
+                                if( $debug ) echo "<br />VALID: " . $e;
                                 $VALID = FALSE;
                                 break;
                             }
@@ -635,7 +655,9 @@
                     && count( $excludeurl ) > 0
                     ){
                         foreach( $excludeurl AS $e ){
+                            if( $debug ) echo "<br />Needed URL link str: " . $e . ' - ' . $href;
                             if( stripos( $href, $e ) !== FALSE ){
+                                if( $debug ) echo "<br />VALID: " . $e;
                                 $VALID = FALSE;
                                 break;
                             }
@@ -650,7 +672,9 @@
                     ){
                         $VALID = FALSE;
                         foreach( $neededtitle AS $e ){
+                            if( $debug ) echo "<br />Needed TITLE str: " . $e . ' - ' . $titlelink;
                             if( stripos( $titlelink, $e ) !== FALSE ){
+                                if( $debug ) echo "<br />VALID: " . $e;
                                 $VALID = TRUE;
                                 break;
                             }
@@ -665,8 +689,13 @@
                     ){
                         $VALID = FALSE;
                         foreach( $neededtitlere AS $e ){
+                            if( $debug ) echo "<br />Needed TITLE RegExp: " . $e . ' - ' . $titlelink;
                             preg_match( $e, $titlelink, $match );
-                            if( $match !== FALSE ){
+                            if( $match !== FALSE
+                            && is_array( $match )
+                            && count( $match ) > 0
+                            ){
+                                if( $debug ) echo "<br />VALID: " . print_r( $match, TRUE );
                                 $VALID = TRUE;
                                 break;
                             }
@@ -681,7 +710,9 @@
                     ){
                         $VALID = FALSE;
                         foreach( $neededurl AS $e ){
+                            if( $debug ) echo "<br />Needed URL link str: " . $e . ' - ' . $href;
                             if( stripos( $href, $e ) !== FALSE ){
+                                if( $debug ) echo "<br />VALID: " . $e;
                                 $VALID = TRUE;
                                 break;
                             }
@@ -694,8 +725,13 @@
                     ){
                         $VALID = FALSE;
                         foreach( $neededurlre AS $e ){
+                            if( $debug ) echo "<br />Needed URL Link RegExp: " . $e . ' - ' . $href;
                             preg_match( $e, $href, $match );
-                            if( $match !== FALSE ){
+                            if( $match !== FALSE
+                            && is_array( $match )
+                            && count( $match ) > 0
+                            ){
+                                if( $debug ) echo "<br />VALID: " . print_r( $match, TRUE );
                                 $VALID = TRUE;
                                 break;
                             }
@@ -1009,7 +1045,7 @@
         if( $debug ) echo "<br />GET linkpos end: " . $end;
         if( $debug ) echo "<br />GET posA: " . $posa;
         if( $debug ) echo "<br />GET posB: " . $posb;
-        if( $debug ) echo "<br />GET html: " . htmlspecialchars( $html );
+        if( $debug ) echo "<br />GET html(" . strlen( $html ) . "): " . htmlspecialchars( $html );
         
         if( strlen( $html ) > 20 ){
             while( $posa !== FALSE
