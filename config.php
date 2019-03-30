@@ -103,6 +103,26 @@
 	//SCRAPPER FOR CRON FILE SCRAPPER filebot recomended
 	define( 'O_SCRAP_CRON', 'pymi' );
 	
+	//MEDIA SEASONxCHAPTER EXTRACTION
+	
+	define( 'MEDIA_CHAPTERS', array(
+        '/([0-9]{1,2})[x,X]([0-9]{1,3})/',
+        '/[s,S]?([0-9]{1,2})[e,E]([0-9]{1,3})/',
+        '/([0-9]{1,2})×([0-9]{1,3})/',
+        '/Cap\.([0-9]{1,2})([0-9]{2,3})/',
+        '/([0-9]{1,2})([0-9]{2})/',
+        '/([0-9]{1,2})([0-9]{2,3})/',
+        '/Season\s*([0-9]{1,2})[\w\s]*Chapter\s*([0-9]{1,3})/',
+        '/Temporada\s*([0-9]{1,2})[\w\s]*Capitulo\s*([0-9]{1,3})/',
+	) );
+	define( 'MEDIA_CHAPTERS_EXCLUDE', array(
+        1080, 720, 480, 360, 1024, 264, 265
+	) );
+	define( 'MEDIA_CHAPTERS_MAXSEASON', 30 );
+	define( 'MEDIA_CHAPTERS_MAXCHAPTER', 200 );
+	define( 'MEDIA_CHAPTERS_MINYEAR', 1920 );
+	define( 'MEDIA_CHAPTERS_MAXYEAR', (int)date( 'Y' ) + 1 );
+	
 	//EXTERNAL COMMANDS
 	
 	//PATH ffmpeg
