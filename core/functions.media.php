@@ -1027,8 +1027,8 @@
         && is_array( $years[ 0 ] ) 
         ){
             foreach( $years[ 0 ] AS $y ){
-                if( $y > 1900 
-                && $y <= ( date( 'Y' ) + 1 )
+                if( $y >= MEDIA_CHAPTERS_MINYEAR 
+                && $y <= MEDIA_CHAPTERS_MAXYEAR
                 ){
                     $result = $y;
                     break;
@@ -1114,135 +1114,45 @@
     
     function get_media_chapter( $title ){
         $result = FALSE;
-        $min_year = 1920;
-        $max_year = (int)date( 'Y' ) + 1;
-        $exclude = array( 1080, 720, 480, 360, 1024, 264, 265 );
+        $min_year = MEDIA_CHAPTERS_MINYEAR;
+        $max_year = MEDIA_CHAPTERS_MAXYEAR;
+        $exclude = MEDIA_CHAPTERS_EXCLUDE;
         
         //Clean domains, can have numbers
         $title = clean_string_domains( basename( $title ), TRUE );
         
-        if( preg_match( "/[0-9]{1,2}[x,X][0-9]{1,3}/", $title, $match ) 
-        && is_array( $match )
-        && count( $match ) > 0
-        && strlen( $match[ 0 ] ) > 3
-        && (
-            ( $d = explode( 'x', $match[ 0 ] ) ) != FALSE
-            || ( $d = explode( 'X', $match[ 0 ] ) ) != FALSE
-            )
-        && count( $d ) == 2
-        && (int)$d[ 0 ] > 0
-        && (int)$d[ 1 ] > 0
-        ){
-            $result = array();
-            $result[] = (int)$d[ 0 ];
-            $result[] = (int)$d[ 1 ];
-        }elseif( preg_match( "/[s,S]?[0-9]{1,2}[e,E][0-9]{1,3}/", $title, $match ) 
-        && is_array( $match )
-        && count( $match ) > 0
-        && strlen( $match[ 0 ] ) > 3
-        && ( $t = str_ireplace( 's', '', $match[ 0 ] ) ) != FALSE
-        && ( $t = str_ireplace( 'e', 'e', $t ) ) != FALSE
-        && ( $d = explode( 'e', $t ) ) != FALSE
-        && count( $d ) == 2
-        && (int)$d[ 0 ] > 0
-        && (int)$d[ 1 ] > 0
-        ){
-            $result = array();
-            $result[] = (int)$d[ 0 ];
-            $result[] = (int)$d[ 1 ];
-        }elseif( preg_match( "/[0-9]{1,2}×[0-9]{1,3}/", $title, $match ) 
-        && is_array( $match )
-        && count( $match ) > 0
-        && strlen( $match[ 0 ] ) > 3
-        && ( $t = str_ireplace( '×', 'e', $match[ 0 ] ) ) != FALSE
-        && ( $d = explode( 'e', $t ) ) != FALSE
-        && count( $d ) == 2
-        && (int)$d[ 0 ] > 0
-        && (int)$d[ 1 ] > 0
-        ){
-            $result = array();
-            $result[] = (int)$d[ 0 ];
-            $result[] = (int)$d[ 1 ];
-        }elseif( preg_match_all( "/([0-9]{3,5})/", $title, $match ) 
-        && is_array( $match )
-        && count( $match ) > 1
-        && is_array( $match[ 1 ] )
-        && count( $match[ 1 ] ) > 0
-        && strlen( $match[ 1 ][ 0 ] ) > 2
-        && (int)$match[ 1 ][ 0 ] > 100
-        && (int)$match[ 1 ][ 0 ] < (int)date( 'Y' ) + 2
-        ){
-            //Exclude Years
-            foreach( $match[ 1 ] AS $row ) {
-                if( ( 
-                    (int)$row < $min_year
-                    || (int)$row > $max_year
-                )
-                && !in_array( (int)$row, $exclude )
+        $re = MEDIA_CHAPTERS;
+        
+        foreach( $re AS $r ){
+            if( preg_match( $r, $title, $match ) 
+            && is_array( $match )
+            && count( $match ) > 2
+            ){
+                //0=>string, 1=>season ,2=>chapter
+                //check != years
+                if( is_numeric( $match[ 0 ] ) 
+                && (int)$match[ 0 ] >= $min_year
+                && (int)$match[ 0 ] <= $max_year
                 ){
-                    $season = (int)( (int)$row / 100 );
-                    $episode = (int)( (int)$row - ( $season * 100 ) );
-                    if( $season < 30
-                    && $season > 0
-                    && $episode > 0
-                    ){
-                        $result = array();
-                        $result[] = $season;
-                        $result[] = $episode;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        return $result;
-    }
-    
-    //TODO
-    function get_media_chapter_aggresive( $title ){
-        $result = array();
-        $result[] = 1;
-        $result[] = 1;
-        
-        if( preg_match_all( "/([0-9]{1,4})/", basename( $title ), $match ) 
-        && is_array( $match )
-        && count( $match ) > 1
-        && is_array( $match[ 1 ] )
-        && count( $match[ 1 ] ) > 0
-        && strlen( $match[ 1 ][ 0 ] ) > 0
-        ){
-            foreach( $match[ 1 ] AS $mm ){
-                if( (int)$mm > 99 ){
-                    //3 numbers
-                    //Exclude Years
-                    if( (int)$mm < 1920
-                    || (int)$mm > ( (int)date( 'Y' ) + 1 )
-                    ){
-                        $season = (int)( (int)$row / 100 );
-                        $episode = (int)( (int)$row - ( $season * 100 ) );
-                        if( 
-                        ( $season == 10 && $episode == 80 )
-                        || ( $season == 7 && $episode == 20 )
-                        || ( $season == 2 && $episode == 64 )
-                        || ( $season == 2 && $episode == 65 )
-                        ||  $season < 0 
-                        || $season > 40
-                        ){
-                    
-                        }else{
-                            $result = array();
-                            $result[] = $season;
-                            $result[] = $episode;
-                            break;
-                        }
-                    }else{
-                        //Year or format number excluded
-                        
-                    }
+                    //exclude by valid year posibility
+                }elseif( is_numeric( $match[ 0 ] ) 
+                && in_array( (int)$match[ 0 ], $exclude )
+                ){
+                    //exclude by generic string for codecs or width-height
+                }elseif( (
+                    !is_numeric( $match[ 1 ] ) 
+                    || (int)$match[ 1 ] < 1
+                    || (int)$match[ 1 ] > MEDIA_CHAPTERS_MAXSEASON
+                )
+                || (
+                    !is_numeric( $match[ 2 ] ) 
+                    || (int)$match[ 2 ] < 1
+                    || (int)$match[ 2 ] > MEDIA_CHAPTERS_MAXCHAPTER
+                )
+                ){
+                    //exclude: invalid season or chapter
                 }else{
-                    //2 numbers = 1xEpisode
-                    $result[ 0 ] = 1;
-                    $result[ 1 ] = (int)$mm;
+                    $result = array( (int)$match[ 1 ], (int)$match[ 2 ], $match[ 0 ] );
                     break;
                 }
             }
@@ -1254,42 +1164,11 @@
     function clean_media_chapter( $title, $replace = '' ){
         $result = $title;
         
-        if( ( $season = get_media_chapter( $title ) ) != FALSE
-        && is_array( $season )
-        && count( $season ) > 0
+        if( ( $mchapters = get_media_chapter( $title ) ) != FALSE
+        && is_array( $mchapters )
+        && count( $mchapters ) > 2
         ){
-            if( preg_match( "/[0-9]{1,2}[x,X][0-9]{1,3}/", basename( $title ), $match ) 
-            && is_array( $match )
-            && count( $match ) > 0
-            && strlen( $match[ 0 ] ) > 3
-            ){
-                $title = str_ireplace( $match[ 0 ], $replace, $title );
-            }elseif( preg_match( "/[s,S]?[0-9]{1,2}[e,E][0-9]{1,3}/", basename( $title ), $match ) 
-            && is_array( $match )
-            && count( $match ) > 0
-            && strlen( $match[ 0 ] ) > 3
-            ){
-                $title = str_ireplace( $match[ 0 ], $replace, $title );
-            }elseif( preg_match( "/[0-9]{1,2}×[0-9]{1,3}/", basename( $title ), $match ) 
-            && is_array( $match )
-            && count( $match ) > 0
-            && strlen( $match[ 0 ] ) > 3
-            ){
-                $title = str_ireplace( $match[ 0 ], $replace, $title );
-            }elseif( preg_match_all( "/([0-9]{3,5})/", basename( $title ), $match ) 
-            && is_array( $match )
-            && count( $match ) > 1
-            && is_array( $match[ 1 ] )
-            && count( $match[ 1 ] ) > 0
-            && strlen( $match[ 1 ][ 0 ] ) > 2
-            && str_ireplace( 'x', '', $replace ) == $match[ 1 ][ 0 ]
-            ){
-                $title = str_ireplace( $match[ 1 ][ 0 ], $replace, $title );
-            }else{
-                $result = $title . ' ' . $replace;
-                $result = trim( $result );
-            }
-            $result = $title;
+            $result = str_ireplace( $mchapters[ 2 ], $replace,  $title );
             $result = trim( $result );
         }else{
             $result = $title . ' ' . $replace;
