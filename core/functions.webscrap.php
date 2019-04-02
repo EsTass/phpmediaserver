@@ -1363,10 +1363,10 @@
     
 	function extract_magnets_title( $magnet ){
         $result = '';
-        $magnet = urldecode($magnet); 
-        preg_match('/(?<=&dn=)\S+/', $magnet, $magnet_link);
-        if( array_key_exists( 0, $magnet_link ) ){
-            $result = $magnet_link[ 0 ];
+        $magnet = urldecode( $magnet ); 
+        preg_match( '/&dn=(.*?)&/', $magnet, $magnet_link );
+        if( array_key_exists( 1, $magnet_link ) ){
+            $result = $magnet_link[ 1 ];
         }
         
         return $result;
@@ -1374,10 +1374,10 @@
     
 	function extract_elinks_title( $magnet ){
         $result = '';
-        $magnet = urldecode($magnet); 
-        preg_match('/(?<=file\|)\S*?\|/', $magnet, $magnet_link);
-        if( array_key_exists( 0, $magnet_link ) ){
-            $result = $magnet_link[ 0 ];
+        $magnet = urldecode( $magnet ); 
+        preg_match( '/file\|(.*?)\|\d+\|/', $magnet, $magnet_link );
+        if( array_key_exists( 1, $magnet_link ) ){
+            $result = $magnet_link[ 1 ];
         }
         
         return $result;
