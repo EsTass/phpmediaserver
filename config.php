@@ -235,6 +235,12 @@
 	define( 'O_CRON_CLEAN_DUPLICATES_MEDIAINFO', 14 );
 	//max size to priority delete of files with max quality but not excceding this size (Mb)
 	define( 'O_CRON_CLEAN_DUPLICATES_MEDIAINFO_MAXSIZE', 0 );
+	//cron delete duplicates get high priority to delete files with this preg_match, and low priority to play
+	define( 'O_CRON_CLEAN_DUPLICATES_HIGHPRIORITY_STRING', array(
+        '/vose/i',
+        '/v\.o\.s\.e\./i',
+        '/v\.o\./i',
+	) );
 	//CRON clean not identified files min days (0 disable)
 	//if file not identified for more than days, delete (seeding safe and be safe detected)
 	define( 'O_CRON_CLEAN_NOTIDENT_MEDIA', 14 );
