@@ -53,6 +53,28 @@
     //return low quality video
 	function ffmpeg_video_compare( $video1, $video2 ) {
         $result = FALSE;
+        $file1hp = FALSE;
+        $file2hp = FALSE;
+        //high priority strings in filename
+        if( defined( 'O_CRON_CLEAN_DUPLICATES_HIGHPRIORITY_STRING' ) 
+        && is_array( O_CRON_CLEAN_DUPLICATES_HIGHPRIORITY_STRING )
+        ){
+            $hpstrings = O_CRON_CLEAN_DUPLICATES_HIGHPRIORITY_STRING;
+            foreach( $hpstrings AS $re ){
+                if( preg_match( $re, $video1 ) ){
+                    $file1hp = TRUE;
+                }
+                if( preg_match( $re, $video2 ) ){
+                    $file2hp = TRUE;
+                }
+            }
+            if( $file1hp == TRUE
+            && $file2hp == TRUE
+            ){
+                $file1hp = FALSE;
+                $file2hp = FALSE;
+            }
+        }
         
 		if( !file_exists( $video1 ) 
 		|| ( $attr1 = ffprobe_get_data( $video1 ) ) === FALSE
@@ -60,6 +82,12 @@
             $result = $video1;
 		}elseif( !file_exists( $video2 ) 
 		|| ( $attr2 = ffprobe_get_data( $video2 ) ) === FALSE
+		){
+            $result = $video2;
+		}elseif( $file1hp == TRUE
+		){
+            $result = $video1;
+		}elseif( $file2hp == TRUE
 		){
             $result = $video2;
 		}elseif( is_array( $attr1 )

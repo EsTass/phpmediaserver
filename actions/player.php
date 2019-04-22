@@ -35,11 +35,30 @@
 	&& ( $mi = sqlite_media_getdata_mediainfo( $IDMEDIAINFO ) ) != FALSE 
 	&& is_array( $mi )
 	&& count( $mi ) > 0
-	&& @file_exists( $mi[ 0 ][ 'file' ] )
-	&& getFileMimeTypeVideo( $mi[ 0 ][ 'file' ] )
+	//&& @file_exists( $mi[ 0 ][ 'file' ] )
+	//&& getFileMimeTypeVideo( $mi[ 0 ][ 'file' ] )
 	){
-        $FMEDIA = $mi[ 0 ][ 'file' ];
-        $IDMEDIA = $mi[ 0 ][ 'idmedia' ];
+        //Get best video quality
+        if( count( $mi ) == 1 ){
+            $FMEDIA = $mi[ 0 ][ 'file' ];
+            $IDMEDIA = $mi[ 0 ][ 'idmedia' ];
+        }else{
+            $best = $mi[ 0 ];
+            foreach( $mi AS $v ){
+                if( $v[ 'idmedia' ] != $best[ 'idmedia' ] 
+                && ( $lowq = ffmpeg_video_compare( $v[ 'file' ], $best[ 'file' ] ) ) != FALSE
+                ){
+                    if( $lowq == $best[ 'file' ] ){
+                        $best = $v;
+                    }
+                }
+            }
+            $FMEDIA = $best[ 'file' ];
+            $IDMEDIA = $best[ 'idmedia' ];
+        }
+        //old, get first
+        //$FMEDIA = $mi[ 0 ][ 'file' ];
+        //$IDMEDIA = $mi[ 0 ][ 'idmedia' ];
 	}else{
         $FMEDIA = FALSE;
 	}
