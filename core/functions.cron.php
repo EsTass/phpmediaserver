@@ -386,8 +386,8 @@
         if( defined( 'O_CRON_FOLDERS_CLEAN_LOWSIZE' ) 
         && O_CRON_FOLDERS_CLEAN_LOWSIZE != FALSE
         ){
-            //( O_CRON_FOLDERS_CLEAN_LOWSIZE * 1024 * 1024 )
-            $size = O_CRON_FOLDERS_CLEAN_LOWSIZE;
+            //( O_CRON_FOLDERS_CLEAN_LOWSIZE * 1024 * 1024 ) in Mb
+            $size = O_CRON_FOLDERS_CLEAN_LOWSIZE * 1024 * 1024;
             $path = PPATH_DOWNLOADS;
             
             if( ( $folders = getFolders( $path ) ) != FALSE 
@@ -396,12 +396,16 @@
                     //if( $echo ) echo "<br />F:" . $folder;
                     //if( $echo ) echo "<br />FS:" . formatSizeUnits( get_dir_size( $folder ) );
                     if( file_exists( $folder ) 
-                    && ( $fsize = get_dir_size( $folder ) ) != FALSE
-                    && $fsize < $size
-                    && ( time() - filemtime( $folder ) ) > ( $days * 60 * 60 * 24 )
+                    && media_scan_exclude_folders( $folder ) == FALSE
+                    && ( $fsize = get_dir_size( $folder ) ) !== FALSE
+                    && $fsize <= $size
+                    && ( $mtime = filemtime( $folder ) ) != FALSE
+                    && ( time() - $mtime ) > ( $days * 60 * 60 * 24 )
                     && delTree( $folder )
                     ){
-                        if( $echo ) echo "<br />DEL: " . $folder;
+                        if( $echo ) echo "<br /><br />DEL: " . $folder;
+                        if( $echo ) echo "<br />DATE MODIF:" . date( 'Y-m-d H:i:s', $mtime );
+                        if( $echo ) echo "<br />FS:" . formatSizeUnits( $fsize );
                     }
                 }
             }
