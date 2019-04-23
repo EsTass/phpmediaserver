@@ -57,6 +57,7 @@
 	){
 		header("HTTP/1.1 401 Unauthorized");
 		echo "HTTP/1.1 401 Unauthorized";
+		sendMessage( 'IPBAN', USER_IP );
 		sqlite_log_insert( 'BANNEDIP', 'TRY TO ACCESS: ' . USER_IP );
 		exit();
 	}
