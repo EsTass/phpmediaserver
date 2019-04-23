@@ -293,6 +293,17 @@
 	@setlocale( LC_ALL, 'es_ES.utf8' );
 	//setlocale( LC_ALL, 'en_US.utf8' );
 	
+	//SEND EXT MESSAGES
+	//FALSE or array defined actions: IPBAN, LOGINMAXTRYS, LOGINBAD, LOGINOK
+	define( 'O_SEND_EXT_MSG', array( 'IPBAN', 'LOGINMAXTRYS', 'LOGINBAD', 'LOGINOK' ) );
+	define( 'O_SEND_EXT_TELEGRAM_TOKEN', FALSE );
+	define( 'O_SEND_EXT_TELEGRAM_CHATID', FALSE );
+	//ACTIONS LIST (/help show list)
+	//external url to action msghookt: https://mydomain/?r=r&action=msghookt
+	define( 'O_SEND_EXT_TELEGRAM_WEBHOOKURL', FALSE );
+	//telegram log file for debug (bool): cache/telegram.log
+	define( 'O_SEND_EXT_TELEGRAM_LOG', TRUE );
+	
 	//Info added to lists from filename: htmlappend => grep
 	$G_FILENAME_INFO = array(
         //Video Size
