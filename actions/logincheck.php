@@ -23,7 +23,10 @@
 	
 	//Check webhookt
 	if( in_array( USER_IP, $validips ) 
+	&& array_key_exists( 'action', $G_DATA )
 	&& $G_DATA[ 'action' ] == 'msghookt'
+	&& array_key_exists( 'r', $G_DATA )
+	&& $G_DATA[ 'r' ] == 'r'
 	){
         //msghookt
         $ACTIONINFO = 'WebHook From Valid IP';

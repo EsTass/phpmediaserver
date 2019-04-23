@@ -17,6 +17,8 @@
 	){
         header("HTTP/1.1 401 Unauthorized");
 		echo "HTTP/1.1 401 Unauthorized";
+		//10 years ban
+		addBannedIP( USER_IP, 'webhookt ip invalid', ( 10 * 24 * 365 ) );
 		sendMessage( 'IPBAN', 'webhookt ' . USER_IP );
 		sqlite_log_insert( 'BANNEDIP-WebHook', 'TRY TO ACCESS: ' . USER_IP );
 		exit();
