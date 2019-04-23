@@ -359,7 +359,7 @@
 	
 	//SQLITE LOGS
 	
-	function sqlite_log_insert( $action, $description ){
+	function sqlite_log_insert( $action, $description, $url = FALSE ){
 		//Vars
 		$result = FALSE;
 		
@@ -369,6 +369,10 @@
 			}else{
 				$log_user = 'nouser';
 			}
+			
+			if( $url == FALSE ){
+                $url = getURL();
+			}
             
 			$sql = 'REPLACE INTO logs VALUES(';
 			$sql .= '';
@@ -377,7 +381,7 @@
 			$sql .= ' "' . $dbhandle->escapeString( $log_user ) . '", ';
 			$sql .= ' "' . $dbhandle->escapeString( USER_IP ) . '", ';
 			$sql .= ' "' . $dbhandle->escapeString( $description ) . '", ';
-			$sql .= ' "' . $dbhandle->escapeString( getURL() ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $url ) . '", ';
 			$sql .= ' "' . $dbhandle->escapeString( getReferer() ) . '" ';
 			$sql .= ')';
 			$result = $dbhandle->exec( $sql );

@@ -123,6 +123,24 @@
             <div class='listMenuElementAdmin'>
                 <a href='?action=medialiveurlslog'><?php echo get_msg( 'LIVETVURLS_TITLE', FALSE ) ?></a>
             </div>
+            <?php
+                    if( defined( 'O_SEND_EXT_TELEGRAM_TOKEN' ) 
+                    && defined( 'O_SEND_EXT_TELEGRAM_CHATID' ) 
+                    && defined( 'O_SEND_EXT_TELEGRAM_WEBHOOKURL' )
+                    && is_string( O_SEND_EXT_TELEGRAM_TOKEN )
+                    && strlen( O_SEND_EXT_TELEGRAM_TOKEN ) > 0
+                    && is_string( O_SEND_EXT_TELEGRAM_CHATID )
+                    && strlen( O_SEND_EXT_TELEGRAM_CHATID ) > 0
+                    && is_string( O_SEND_EXT_TELEGRAM_WEBHOOKURL )
+                    && strlen( O_SEND_EXT_TELEGRAM_WEBHOOKURL ) > 0
+                    ){
+            ?>
+            <div class='listMenuElementAdmin'>
+                <a href='?action=msghookt'><?php echo 'TELEGRAMBOT'; ?></a>
+            </div>
+            <?php
+                    }
+            ?>
             <div class='listMenuElementAdmin'>
                 <a href='?action=dlnanotify'><?php echo 'DLNA'; ?></a>
             </div>

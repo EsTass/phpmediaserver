@@ -99,6 +99,9 @@
             '10.0.',
         );
         
+        //Add external msg server ips if needed
+        msgExternalIPs( $VALID_IPs );
+        
         if( inString( $IP, $VALID_IPs ) ){
             $result = TRUE;
         }elseif( checkWhitedIP( $IP ) ){
@@ -730,6 +733,121 @@
         }
         
         return $result;
+	}
+	
+	//EXTERNAL MSG WARNINGS
+	
+	function sendMessage( $ident, $msg ){
+        $result = FALSE;
+        
+        if( defined( 'O_SEND_EXT_MSG' ) 
+        && ( $actions = O_SEND_EXT_MSG ) !== FALSE
+        && $actions != FALSE
+        && is_array( $actions )
+        && in_array( $ident, $actions )
+        ){
+            if( defined( 'O_SEND_EXT_TELEGRAM_TOKEN' ) 
+            && O_SEND_EXT_TELEGRAM_TOKEN != FALSE
+            && defined( 'O_SEND_EXT_TELEGRAM_CHATID' ) 
+            && O_SEND_EXT_TELEGRAM_CHATID != FALSE
+            ){
+                $result = sendMessageTelegram( $ident . ' - ' . $msg );
+            }
+        }
+        
+        return $result;
+	}
+	
+	//External IPs for webhooks
+	
+	function msgExternalIPs( &$validips ){
+        //BOT IP TELEGRAM        
+        if( defined( 'O_SEND_EXT_MSG' ) 
+        && ( $actions = O_SEND_EXT_MSG ) !== FALSE
+        ){
+            $telegram_ip = '149.154.167.';
+            $telegram_ip_min = 197;
+            $telegram_ip_max = 233;
+            for( $x = $telegram_ip_min; $x <= $telegram_ip_max; $x++ ){
+                $validips[] = $telegram_ip . $x;
+            }
+        }
+	}
+	
+	//TELEGRAM BOT
+	
+	function sendMessageTelegram( $msg ){
+        $result = FALSE;
+        
+        $TELEGRAM = "https://api.telegram.org/bot" . O_SEND_EXT_TELEGRAM_TOKEN; 
+        
+        $query = http_build_query( array(
+            'chat_id'=> O_SEND_EXT_TELEGRAM_CHATID,
+            'text'=> $msg,
+            'parse_mode'=> "Markdown", // Optional: Markdown | HTML
+        ));
+        
+        if( ( $response = @file_get_contents( $TELEGRAM . "/sendMessage?" . $query ) ) != FALSE ){
+            //file_put_contents( PPATH_CACHE . DS . 'telegram.log', $response, FILE_APPEND );
+            $result = TRUE;
+        }
+        
+        return $result;
+    }
+	
+	function removeWebHookTelegram(){
+        //https://api.telegram.org/bot[myauthorization-token]/setwebhook?url=[myboturl]
+        $result = FALSE;
+        
+        $TELEGRAM = "https://api.telegram.org/bot" . O_SEND_EXT_TELEGRAM_TOKEN;
+        
+        $query = http_build_query( array(
+            //'url'=> O_SEND_EXT_TELEGRAM_WEBHOOKURL,
+        ));
+        
+        if( ( $response = @file_get_contents( $TELEGRAM . "/deleteWebhook?" . $query ) ) != FALSE ){
+            logWebHookTelegram( $response );
+            $result = TRUE;
+        }
+        
+        return $result;
+	}
+	
+	function setWebHookTelegram(){
+        //https://api.telegram.org/bot[myauthorization-token]/setwebhook?url=[myboturl]
+        $result = FALSE;
+        
+        $TELEGRAM = "https://api.telegram.org/bot" . O_SEND_EXT_TELEGRAM_TOKEN;
+        
+        $query = http_build_query( array(
+            'url'=> O_SEND_EXT_TELEGRAM_WEBHOOKURL,
+        ));
+        
+        if( ( $response = @file_get_contents( $TELEGRAM . "/setwebhook?" . $query ) ) != FALSE ){
+            logWebHookTelegram( $response );
+            $result = TRUE;
+        }
+        
+        return $result;
+	}
+	
+	function logWebHookTelegram( $data ){
+        file_put_contents( PPATH_CACHE . DS . 'telegram.log', "\n" . date( 'Y-m-d H:i:s' ) . "\n" . $data, FILE_APPEND );
+	}
+	
+	function logWebHookTelegramGet(){
+        $result = 'EMPTY';
+        if( file_exists( PPATH_CACHE . DS . 'telegram.log') ){
+            $result = file_get_contents( PPATH_CACHE . DS . 'telegram.log' );
+        }
+        
+        return $result;
+	}
+	
+	function logWebHookTelegramDel(){
+        if( file_exists( PPATH_CACHE . DS . 'telegram.log' ) ){
+            unlink( PPATH_CACHE . DS . 'telegram.log' );
+        }
 	}
 	
 ?>

@@ -17,7 +17,20 @@
 	}
 	$sessionid = session_id();
 	
-	if( ( $sessiondata = sqlite_session_getdata( '', $sessionid ) ) != FALSE 
+	//Check Valid IP for Telegram webhook
+	$validips = array();
+	msgExternalIPs( $validips );
+	
+	//Check webhookt
+	if( in_array( USER_IP, $validips ) 
+	&& $G_DATA[ 'action' ] == 'msghookt'
+	){
+        //msghookt
+        $ACTIONINFO = 'WebHook From Valid IP';
+		sqlite_log_insert( $G_DATA[ 'action' ], $ACTIONINFO );
+        require( PPATH_ACTIONS . DS . $G_DATA[ 'action' ] . '.php' );
+        exit();
+	}elseif( ( $sessiondata = sqlite_session_getdata( '', $sessionid ) ) != FALSE 
 	&& count( $sessiondata ) > 0
 	&& array_key_exists( 0, $sessiondata ) > 0
 	&& array_key_exists( 'user', $sessiondata[ 0 ] ) > 0
@@ -48,6 +61,7 @@
 		//ban system
 		if( checkLoginsBans() ){
             addBannedIP( USER_IP );
+            sendMessage( 'LOGINMAXTRYS', USER_IP );
             sqlite_log_insert( 'bannedip', $ACTIONINFO . $_POST[ 'user' ] . ' ' . $_POST[ 'pass' ] );
         }
 	}elseif( $G_DATA[ 'action' ] == 'login'
@@ -70,10 +84,12 @@
 			//login valid
 			$G_DATA[ 'action' ] = O_ACTIONDEFAULT;
             sqlite_sessions_clean();
+            sendMessage( 'LOGINOK', USER_IP . ' - ' . USERNAME );
 		}else{
 			$ACTIONINFO = get_msg( 'LOGIN_ERRUSERPASS' );
 			$G_DATA[ 'action' ] = 'login';
 			sqlite_log_insert( 'loginerr', $ACTIONINFO . $G_DATA[ 'user' ] . ' ' . strlen( $G_DATA[ 'pass' ] ) );
+			sendMessage( 'LOGINBAD', USER_IP . ' - ' . $G_DATA[ 'user' ] . ' ' . strlen( $G_DATA[ 'pass' ] ) );
 		}
 	}else{
 		
