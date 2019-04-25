@@ -421,6 +421,7 @@
 	function cron_searchs_downloads( $minutesback, $echo = TRUE ){
         global $G_WEBSCRAPPER;
         global $G_CLEAN_FILENAME;
+        $maxurls = 5;
         $genres = implode( ' ', O_MENU_GENRES );
         $genres .= implode( ' ', array_keys( O_MENU_GENRES ) );
         $excludedwords = implode( ' ', $G_CLEAN_FILENAME );
@@ -462,47 +463,74 @@
                 $searched = array();
                 $PASS = 0;
                 foreach( $searchs AS $search ){
+                    shuffle( $s );
                     $bword = get_word_better( $search );
-                    $sin = $s[ mt_rand( 0, ( count( $s ) - 1 ) ) ];
+                    $quantity = 0;
                     if( $echo ) echo "<br />SEARCH: " . $search;
-                    if( $echo ) echo "<br />WEBSEARCH: " . $sin;
-                    //send search on server
-                    if( isset( $G_WEBSCRAPPER )
-                    && $sin
-                    && !in_array( $bword, $searched )
-                    && array_key_exists( $sin, $G_WEBSCRAPPER )
-                    && strlen( $search ) > 0
-                    && ( $links = webscrapp_search( $sin, $search, FALSE ) ) != FALSE 
-                    && count( $links ) > 0
-                    ){
-                        //TODO CHECK DUPLYS
-                        //add each title => link
-                        foreach( $links AS $ltitle => $lurl ){
-                            if( !inString( $ltitle, $bword ) 
-                            //check its O_MENU_GENRES and exclude search
-                            && stripos( $genres, $bword ) === FALSE
-                            ){
-                                if( $echo ) echo "<br />";
-                                if( $echo ) echo 'TITLE DIFFER: ' . $ltitle . ' => ' . $bword;
-                            }elseif( in_array( $lurl, $iadded ) ){
-                                if( $echo ) echo "<br />";
-                                if( $echo ) echo 'ADDED BEFORE: ' . $ltitle;
-                            }elseif( webscrapp_pass( $sin, $PASS, $lurl, $ltitle, FALSE ) ){
-                                if( $echo ) echo "<br />";
-                                //if( $echo ) echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ': ' . $sin . ' => ' . $ltitle . ' => ' . $lurl;
-                                if( $echo ) echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ': ' . $ltitle;
-                                $iadded[] = $lurl;
-                            }else{
-                                if( $echo ) echo "<br />";
-                                //if( $echo ) echo get_msg( 'WEBSCRAP_ADDKO', FALSE ) . ': ' . $sin . ' => ' . $ltitle . ' => ' . $lurl;
-                                if( $echo ) echo get_msg( 'WEBSCRAP_ADDKO', FALSE ) . ': ' . $ltitle;
+                    if( $echo ) echo "<br />SEARCH-BWORD: " . $bword;
+                    foreach( $s AS $scrapper ){
+                        if( !in_array( $bword, $searched ) ){
+                            if( $echo ) echo "<br />WEBSEARCH: " . $scrapper;
+                            $quantity += cron_searchs_downloads_get( $scrapper, $bword, $echo );
+                            if( $maxurls <= $quantity ){
+                                break;
                             }
                         }
                     }
+                    //send search on server
                     $searched[] = $bword;
                 }
             }
         }
 	}
 	
+	function cron_searchs_downloads_get( $scrapper, $search, $echo = TRUE ){
+        $result = 0;
+        $genres = implode( ' ', O_MENU_GENRES );
+        $genres .= implode( ' ', array_keys( O_MENU_GENRES ) );
+        $PASS = 0;
+        
+        if( defined( 'O_CRON_WEBSCRAP_SEARCH' ) 
+        && is_array( O_CRON_WEBSCRAP_SEARCH )
+        && in_array( $scrapper, O_CRON_WEBSCRAP_SEARCH )
+        ){
+            $s = O_CRON_WEBSCRAP_SEARCH;
+            $links = array();
+            $iadded = array();
+            if( $echo ) echo "<br />WS-SEARCH: " . $search;
+            if( $echo ) echo "<br />WS-WEBSEARCH: " . $scrapper;
+            //send search on server
+            if( strlen( $search ) > 0
+            && ( $links = webscrapp_search( $scrapper, $search, FALSE ) ) != FALSE 
+            && count( $links ) > 0
+            ){
+                //TODO CHECK DUPLYS
+                //add each title => link
+                foreach( $links AS $ltitle => $lurl ){
+                    if( !inString( $ltitle, $search ) 
+                    //check its O_MENU_GENRES and exclude search
+                    && stripos( $genres, $search ) === FALSE
+                    ){
+                        if( $echo ) echo "<br />";
+                        if( $echo ) echo 'TITLE DIFFER: ' . $ltitle . ' => ' . $search;
+                    }elseif( in_array( $lurl, $iadded ) ){
+                        if( $echo ) echo "<br />";
+                        if( $echo ) echo 'ADDED BEFORE: ' . $ltitle;
+                    }elseif( webscrapp_pass( $scrapper, $PASS, $lurl, $ltitle, FALSE ) ){
+                        if( $echo ) echo "<br />";
+                        //if( $echo ) echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ': ' . $scrapper . ' => ' . $ltitle . ' => ' . $lurl;
+                        if( $echo ) echo get_msg( 'WEBSCRAP_ADDOK', FALSE ) . ': ' . $ltitle;
+                        $iadded[] = $lurl;
+                        $result++;
+                    }else{
+                        if( $echo ) echo "<br />";
+                        //if( $echo ) echo get_msg( 'WEBSCRAP_ADDKO', FALSE ) . ': ' . $scrapper . ' => ' . $ltitle . ' => ' . $lurl;
+                        if( $echo ) echo get_msg( 'WEBSCRAP_ADDKO', FALSE ) . ': ' . $ltitle;
+                    }
+                }
+            }
+        }
+        
+        return $result;
+	}
 ?>
