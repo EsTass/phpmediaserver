@@ -17,11 +17,12 @@
 	
 	if( array_key_exists( 'url', $G_DATA ) 
 	&& strlen( $G_DATA[ 'url' ] ) > 3
+	&& ( $G_DATA[ 'url' ] = filter_var( $G_DATA[ 'url' ], FILTER_SANITIZE_URL ) ) != FALSE
 	&& filter_var( $G_DATA[ 'url' ], FILTER_VALIDATE_URL )
 	){
         $URL = $G_DATA[ 'url' ];
 	}else{
-        echo "Invalid URL: ";
+        echo "Invalid URL: " . $G_DATA[ 'url' ];
         die();
 	}
 	
