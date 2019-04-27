@@ -49,9 +49,14 @@
                         $msg .= "\n /help : this help ";
                         $msg .= "\n /test : check command ";
                         $msg .= "\n /hi : check command ";
-                        $msg .= "\n /log : get last 5 logs entrys ";
-                        $msg .= "\n /files last : get last 20 files ";
-                        $msg .= "\n /files dl searchtext : set to donwload searchtext ";
+                        $msg .= "\n /log : get last 10 logs entrys ";
+                        $msg .= "\n /fileslast : get last 20 files ";
+                        $msg .= "\n /filesdl searchtext : set to donwload searchtext ";
+                        $msg .= "\n /ipcheck IP : get status of IP ";
+                        $msg .= "\n /ipban IP : ban IP ";
+                        $msg .= "\n /ipunban IP : unban IP ";
+                        $msg .= "\n /playnow : get list of playing items ";
+                        $msg .= "\n /playlast : get list of played items ";
                         sendMessageTelegram( $msg );
                         break;
                     case "/test":
@@ -64,48 +69,136 @@
                         $msg .= 'Hi!';
                         sendMessageTelegram( $msg );
                         break;
-                    case "/log":$msg = "\n";
+                    case "/log":
+                        $msg = "\n";
+                        $max = 5;
+                        $now = 1;
                         if( ( $ldata = sqlite_log_getdata() ) != FALSE ){
-                            $max = 5;
                             foreach( $ldata AS $row ){
                                 if( $row[ 'action' ] != 'msghookt' ){
+                                    $msg .= $now . '/' . $max . "\n";
                                     $msg .= $row[ 'date' ] . "\n";
                                     $msg .= $row[ 'user' ] . "\n";
                                     $msg .= $row[ 'action' ] . "\n";
                                     $msg .= $row[ 'ip' ] . "\n";
                                     $msg .= $row[ 'description' ] . "\n";
                                     $msg .= "---\n";
-                                    $max--;
-                                    if( $max <= 0 ){
+                                    $now++;
+                                    if( $now >= $max ){
                                         break;
                                     }
                                 }
                             }
                         }
+                        if( strlen( $msg ) <= 2 ){
+                            $msg = 'No Data';
+                        }
                         sendMessageTelegram( $msg );
                         break;
-                    case "/files last":
+                    case "/fileslast":
                         $msg = "\n";
                         $search = '';
-                        $limit = 20;
-                        if( ( $ldata = sqlite_media_getdata_identify_added( $search, $limit ) ) != FALSE ){
+                        $max = 20;
+                        $now = 1;
+                        if( ( $ldata = sqlite_media_getdata_identify_added( $search, $max ) ) != FALSE ){
                             foreach( $ldata AS $row ){
+                                $msg .= $now . '/' . $max . "\n";
                                 $msg .= $row[ 'title' ] . ' (' . $row[ 'year' ] . ') ';
                                 if( strlen( $row[ 'season' ] ) > 0 ){
                                     $msg .= $row[ 'season' ] . 'x' . $row[ 'episode' ] . '';
                                 }
                                 $msg .= "\n";
+                                $now++;
                             }
+                        }
+                        if( strlen( $msg ) <= 2 ){
+                            $msg = 'No Data';
+                        }
+                        sendMessageTelegram( $msg );
+                        break;
+                    case "/playnow":
+                        $msg = "\n";
+                        $max = 10;
+                        $now = 1;
+                        if( ( $ldata = sqlite_playing_getdata( FALSE, $max, TRUE ) ) != FALSE ){
+                            foreach( $ldata AS $row ){
+                                $msg .= $now . '/' . $max . "\n";
+                                $msg .= $row[ 'date' ] . "\n";
+                                $msg .= $row[ 'user' ] . "\n";
+                                $msg .= $row[ 'mode' ] . "\n";
+                                $msg .= $row[ 'title' ] . "";
+                                if( strlen( $row[ 'season' ] ) > 0 ){
+                                    $msg .= $row[ 'season' ] . 'x' . $row[ 'episode' ] . '';
+                                }
+                                $msg .= "\n";
+                                $msg .= "---\n";
+                                $now++;
+                            }
+                        }
+                        if( strlen( $msg ) <= 2 ){
+                            $msg = 'No Data';
+                        }
+                        sendMessageTelegram( $msg );
+                        break;
+                    case "/playlast":
+                        $msg = '';
+                        $max = 10;
+                        $now = 1;
+                        if( ( $ldata = sqlite_played_getdata_ext( FALSE, '', FALSE, $max ) ) != FALSE ){
+                            foreach( $ldata AS $row ){
+                                $msg .= $now . '/' . $max . "\n";
+                                $msg .= $row[ 'date' ] . "\n";
+                                $msg .= $row[ 'user' ] . "\n";
+                                $msg .= secondsToTimeFormat( $row[ 'now' ] ) . "/" . secondsToTimeFormat( $row[ 'max' ] ) . "\n";
+                                $msg .= $row[ 'title' ] . "";
+                                if( strlen( $row[ 'season' ] ) > 0 ){
+                                    $msg .= $row[ 'season' ] . 'x' . $row[ 'episode' ] . '';
+                                }
+                                $msg .= "\n";
+                                $msg .= "---\n";
+                                $now++;
+                            }
+                        }
+                        if( strlen( $msg ) <= 2 ){
+                            $msg = 'No Data';
                         }
                         sendMessageTelegram( $msg );
                         break;
                     default:
                         //extra params actions
-                        if( startsWith( $message, '/files dl ' ) ){
+                        if( startsWith( $message, '/filesdl ' ) ){
                             //set search param for download by adding to log search
                             $stext = str_ireplace( '/files dl ', '', $message );
                             sqlite_log_insert( 'list-webhook', 'adding download search: ' . $stext, '?action=list&search=' . urlencode( $stext ) );
                             sendMessageTelegram( " Added to dl: " . $stext );
+                        }elseif( startsWith( $message, '/ipcheck ' ) ){
+                            //check ip ban status
+                            $stext = str_ireplace( '/ipcheck ', '', $message );
+                            if( checkWhitedIP( $stext ) ){
+                                sendMessageTelegram( " IP ON WHITELIST: " . $stext );
+                            }elseif( checkBannedIP( $stext ) ){
+                                sendMessageTelegram( " IP BANNED: " . $stext );
+                            }else{
+                                sendMessageTelegram( " UNCHECKED IP: " . $stext );
+                            }
+                        }elseif( startsWith( $message, '/ipban ' ) ){
+                            //set ip ban
+                            $stext = str_ireplace( '/ipban ', '', $message );
+                            if( addBannedIP( $stext, 'webhookt banned action', ( 10 * 24 * 365 ) ) ){
+                                sendMessageTelegram( " IP BANNED: " . $stext );
+                            }else{
+                                sendMessageTelegram( " Error BAN: " . $stext );
+                            }
+                        }elseif( startsWith( $message, '/ipunban ' ) ){
+                            //set ip unban
+                            $stext = str_ireplace( '/ipunban ', '', $message );
+                            sqlite_bans_delete( $stext );
+                            if( addWhitedIP( $stext ) 
+                            ){
+                                sendMessageTelegram( " IP UNBANNED: " . $stext );
+                            }else{
+                                sendMessageTelegram( " Error UNBAN: " . $stext );
+                            }
                         }else{
                             sendMessageTelegram( " Invalid Action: " . $message );
                         }
