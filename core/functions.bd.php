@@ -2011,6 +2011,25 @@
 		return $result;
 	}
 	
+	function sqlite_mediainfo_search_file( $file, $limit = 1000 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT mediainfo.*, media.* FROM media ';
+			$sql .= ' LEFT JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
+			$sql .= ' WHERE file LIKE \'' . $dbhandle->escapeString( $file ) . '\' ';
+			$sql .= ' AND media.idmediainfo > 0 ';
+			$sql .= ' ORDER BY mediainfo.idmediainfo DESC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
 	function sqlite_mediainfo_getdata_titles( $idmediainfo = FALSE, $limit = 1000 ){
 		//Vars
 		$result = FALSE;

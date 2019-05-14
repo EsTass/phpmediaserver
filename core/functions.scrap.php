@@ -1644,16 +1644,16 @@
 	
 	$G_SCRAPPERS[ 'my_db' ] = array( '', 'ident_detect_file_db' );
 	
-	function ident_detect_file_db( $file, $title, $movies = TRUE, $imdb = FALSE, $season = FALSE, $episode = FALSE ){
+	function ident_detect_file_db( $file, $title, $movies = TRUE, $imdb = FALSE, $season = FALSE, $episode = FALSE, $debug = FALSE ){
         //Check same title in db
         //recolect NEEDED DATA
         // array( poster, fanart, logo, poster, banner, landscape, data => $G_MEDIAINFO )
         global $G_MEDIADATA;
         $result = $G_MEDIADATA;
         $bfile = basename( $file );
-        $debug = FALSE;
+        //$debug = FALSE;
         $MIN_SIMILARITY_TITLE = 80;
-        $MIN_SIMILARITY_FILE = 80;
+        $MIN_SIMILARITY_FILE = 90;
         $MIN_SIMILARITY_BWORD = 80;
         
         if( $debug ){
@@ -1682,15 +1682,15 @@
         if( $debug ) echo "<br />TITLE CLEAN 2: " . $title;
         
         //Clean non standar chars
-        $title = preg_replace( '/[^\x20-\x7E]/','_', $title );
+        $title = preg_replace( '/[^\\x20-\\x7E]/','_', $title );
         $title = str_ireplace( '__', '_', $title );
         if( $debug ) echo "<br />TITLE CLEAN 2b: " . $title;
         //remove 1 letter words
         $title = preg_replace('/(^| )[a-z0-9]{1}( |$)/i', ' ', $title);
         if( $debug ) echo "<br />TITLE CLEAN 2c: " . $title;
         //remove 1 number between letters (2 time double numbers TODO)
-        $title = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d|[a-z]| |$)/i', '$1_$2', $title);
-        $title = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d|[a-z]| |$)/i', '$1_$2', $title);
+        $title = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d^\d|[a-z]| |$)/i', '$1_$2', $title);
+        $title = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d^\d|[a-z]| |$)/i', '$1_$2', $title);
         if( $debug ) echo "<br />TITLE CLEAN 2d: " . $title;
         $title = str_ireplace( ' ', '%', $title );
         $title = trim( $title, '_' );
@@ -1709,7 +1709,9 @@
                 if( strlen( $ea ) <= 3 ){
                     //$lt = ' ' . $ea;
                     $lt = str_replace( $ea . '', '', $title );
-                    $titles[] = $lt;
+                    if( !in_array( $lt, $titles ) ){
+                        $titles[] = $lt;
+                    }
                     if( $debug ) echo "<br />TITLE CLEAN TITLES-RWORDS: " . $lt;
                 }
             }
@@ -1735,8 +1737,8 @@
             $lt = preg_replace('/(^| )[a-z0-9]{1}( |$)/i', ' ', $lt);
             if( $debug ) echo "<br />TITLE CLEAN-SXECUT 2c: " . $lt;
             //remove 1 number between letters (2 time double numbers TODO)
-            $lt = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d|[a-z]| |$)/i', '$1_$2', $lt);
-            $lt = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d|[a-z]| |$)/i', '$1_$2', $lt);
+            $lt = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d^\d|[a-z]| |$)/i', '$1_$2', $lt);
+            $lt = preg_replace('/(^| |[a-z]|_)[0-9]{1}(\d^\d|[a-z]| |$)/i', '$1_$2', $lt);
             if( $debug ) echo "<br />TITLE CLEAN-SXECUT 2d: " . $lt;
             $lt = str_ireplace( ' ', '%', $lt );
             $lt = trim( $lt, '_' );
@@ -1747,12 +1749,32 @@
             $lt = '%' . $lt . '%';
             if( $debug ) echo "<br />TITLE CLEAN-SXECUT 3: " . $lt;
             
-            $titles[] = $lt;
+            if( !in_array( $lt, $titles ) ){
+                $titles[] = $lt;
+            }
             if( $debug ) echo "<br />TITLE CLEAN TITLES-SXECUT: " . $lt;
         }
         
+        //extra no vocals type
+        $titles2 = array_reverse( $titles );
+        foreach( $titles2 AS $t ){
+            $titles[] = str_ireplace( array( 'a', 'e', 'i', 'o', 'u' ), '_', $t );
+        }
+        
         //add base title
-        $titles[] = $title;
+        if( !in_array( $title, $titles ) ){
+            $titles[] = $title;
+        }
+        
+        //remove year
+        $titles2 = array_reverse( $titles );
+        foreach( $titles2 AS $t ){
+            if( strlen( get_year( $t ) ) > 0 
+            && strlen( $t ) > 10
+            ){
+                $titles[] = str_replace( get_year( $t ), '',  $t );
+            }
+        }
         
         //add base title from imdb
         if( $imdb != FALSE
@@ -1773,8 +1795,10 @@
         
         if( $debug ) echo "<br />TITLES LIST: " . nl2br( print_r( $titles, TRUE ) );
         
+        $DRESULTS = array();
         foreach( $titles AS $title ){
-            //BASE MODE: string similarity by search
+            
+            //BASE MODE: string similarity by search for title
             if( ( 
                 ( $mediainfo = sqlite_mediainfo_search_title( $title, 5 ) ) != FALSE
                 || ( $mediainfo = sqlite_mediainfo_search_imdb( $title, 5 ) ) != FALSE
@@ -1782,7 +1806,7 @@
             && is_array( $mediainfo )
             && count( $mediainfo ) > 0
             ){
-                if( $debug ) echo "<br />MEDIAINFO FINDED: " . count( $mediainfo );
+                if( $debug ) echo "<br />(BASE TITLE MODE)MEDIAINFO FINDED: " . count( $mediainfo );
                 $similars = array();
                 $midata = array();
                 foreach( $mediainfo AS $mi ){
@@ -1818,40 +1842,76 @@
                             || (int)$mi[ 'year' ] - 1 == $year 
                             ){
                                 if( $debug ) echo "<br />MEDIAINFO FINDED YEAR CONFIRM: " . $mi[ 'year' ];
-                                $midata = $mi;
-                                break;
+                                $DRESULTS[ $pc ] = $mi;
                             }else{
                                 if( $debug ) echo "<br />MEDIAINFO FINDED YEAR NO-CONFIRM: " . $mi[ 'year' ] . ' ' . $year;
                             }
-                        }else{
-                            //set first on worst case
-                            if( $midatafirst == FALSE ){
-                                $midatafirst = $mi;
+                        }elseif( !is_numeric( $year ) ){
+                            $DRESULTS[ $pc - 10 ] = $mi;
+                        }
+                    }
+                }
+            }
+            
+            //BASE MODE: string similarity by search for file
+            if( ( 
+                ( $mediainfo = sqlite_mediainfo_search_file( $title, 5 ) ) != FALSE
+            )
+            && is_array( $mediainfo )
+            && count( $mediainfo ) > 0
+            ){
+                if( $debug ) echo "<br />(BASE FILE MODE)MEDIAINFO FINDED: " . count( $mediainfo );
+                $similars = array();
+                $midata = array();
+                foreach( $mediainfo AS $mi ){
+                    if( array_key_exists( 'idmediainfo', $mi ) 
+                    && (int)$mi[ 'idmediainfo' ] > 0
+                    ){
+                        if( $debug ) echo "<br />MEDIAINFO FINDED FILENAME: " . basename( $mi[ 'file' ] );
+                        
+                        //Similarity check
+                        $pc = strSimilarity( $title, basename( $mi[ 'file' ] ), $debug );
+                        if( ( $pc2 = strSimilarity( $titlebase, basename( $mi[ 'file' ] ), $debug ) ) > $pc ){
+                            $pc = $pc2;
+                        }
+                        if( ( $pc2 = strSimilarity( basename( $file ), basename( $mi[ 'file' ] ), $debug ) ) > $pc ){
+                            $pc = $pc2;
+                        }
+                        
+                        if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
+                        $similars[ $pc ] = $mi;
+                    }
+                }
+                krsort( $similars );
+                if( $debug ) echo "<br />FILES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
+                $midatafirst = FALSE;
+                foreach( $similars AS $pc => $mi ){
+                    if( $pc > $MIN_SIMILARITY_FILE ){
+                        if( $debug ) echo "<br />MEDIAINFO FINDED: " . $mi[ 'title' ];
+                        
+                        //check year if exist $titlebase
+                        $year = get_year( $titlebase );
+                        if( is_numeric( $year )
+                        && $mi[ 'year' ] > 0
+                        ){
+                            if( $mi[ 'year' ] == $year 
+                            //sometimes file published after
+                            || (int)$mi[ 'year' ] - 1 == $year 
+                            ){
+                                if( $debug ) echo "<br />MEDIAINFO FINDED YEAR CONFIRM: " . $mi[ 'year' ];
+                                $DRESULTS[ $pc ] = $mi;
+                            }else{
+                                if( $debug ) echo "<br />MEDIAINFO FINDED YEAR NO-CONFIRM: " . $mi[ 'year' ] . ' ' . $year;
                             }
+                        }elseif( !is_numeric( $year ) ){
+                            $DRESULTS[ $pc - 10 ] = $mi;
                         }
                     }
                 }
-                //Set first on no year confirm
-                if( $midatafirst != FALSE
-                && !array_key_exists( 'idmediainfo', $midata ) 
-                ){
-                    $midata = $midatafirst;
-                }
-                
-                if( array_key_exists( 'idmediainfo', $midata ) ){
-                    foreach( $result AS $rkey => $rvalue ){
-                        if( is_string( $rvalue ) ){
-                            $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
-                        }
-                    }
-                    $midata[ 'idmediainfo' ] = 'NULL';
-                    $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
-                    $midata[ 'season' ] = $season;
-                    $midata[ 'episode' ] = $episode;
-                    $midata[ 'titleepisode' ] = '';
-                    $result[ 'data' ] = $midata;
-                }
-            }elseif( $season !== FALSE ){
+            }
+            
+            //SEASON MODE
+            if( $season !== FALSE ){
                 //SERIES MODE SIMILARITY
                 $FINDED = FALSE;
                 //Check by title similarity ONLY SERIES
@@ -1859,7 +1919,7 @@
                 && is_array( $mediadata )
                 && count( $mediadata ) > 0
                 ){
-                    if( $debug ) echo "<br />MEDIA FINDED (TITLE): " . count( $mediadata );
+                    if( $debug ) echo "<br />(SERIES MODE) MEDIA FINDED (TITLE): " . count( $mediadata );
                     $similars = array();
                     $midata = array();
                     foreach( $mediadata AS $mi ){
@@ -1888,96 +1948,43 @@
                         //&& $pc < 100
                         ){
                             if( $debug ) echo "<br />MEDIA FINDED: " . $mi[ 'title' ];
-                            $midata = $mi;
-                            break;
+                            
+                            $DRESULTS[ $pc ] = $mi;
                         }
-                    }
-                    if( array_key_exists( 'idmediainfo', $midata ) 
-                    ){
-                        foreach( $result AS $rkey => $rvalue ){
-                            if( is_string( $rvalue ) ){
-                                $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
-                            }
-                        }
-                        $midata[ 'idmediainfo' ] = 'NULL';
-                        $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
-                        $midata[ 'season' ] = $season;
-                        $midata[ 'episode' ] = $episode;
-                        $midata[ 'titleepisode' ] = '';
-                        $result[ 'data' ] = $midata;
-                        $FINDED = TRUE;
                     }
                 }
-                
-                //Check by file similarity SERIES MODE
-                if( $FINDED == FALSE
-                && ( $betterword = get_word_better( basename( $file ) ) ) != FALSE
-                && is_string( $betterword )
-                && strlen( $betterword ) > 4 //at least 4 chars
-                && ( $mediadata = sqlite_media_getdata_file_search( $betterword ) ) != FALSE
-                && is_array( $mediadata )
-                && count( $mediadata ) > 0
+            }
+        }
+        
+        //Check finded similar
+        if( count( $DRESULTS ) > 0 ){
+            krsort( $DRESULTS );
+            if( $debug ){
+                echo "<br />FULL SIMILAR LIST: ";
+                var_dump( $DRESULTS );
+            }
+            foreach( $DRESULTS AS $midata ){
+                if( array_key_exists( 'idmediainfo', $midata ) 
+                && is_numeric( $midata[ 'idmediainfo' ] )
+                && $midata[ 'idmediainfo' ] > 0
+                && (
+                    //diff movies && series
+                    ( $season == FALSE && $midata[ 'season' ] == FALSE )
+                    || ( $season == TRUE && $midata[ 'season' ] == TRUE )
+                )
                 ){
-                    if( $debug ) echo "<br />MEDIA BETTERWORD (FILE2): " . $betterword;
-                    if( $debug ) echo "<br />MEDIA FINDED (FILE2): " . count( $mediadata );
-                    $similars = array();
-                    $midata = array();
-                    $f1 = clean_filename( basename( $file ) );
-                    foreach( $mediadata AS $mi ){
-                        if( array_key_exists( 'idmediainfo', $mi ) 
-                        && (int)$mi[ 'idmediainfo' ] > 0
-                        ){
-                            $f2 = clean_filename( basename( $mi[ 'file' ] ) );
-                            if( $debug ) echo "<br />MEDIA FINDED FILE1: " . $f1;
-                            if( $debug ) echo "<br />MEDIA FINDED FILE2: " . $f2;
-                            
-                            //Similarity check
-                            $pc = strSimilarity( $f1, $f2, $debug );
-                            if( ( $pc2 = strSimilarity( $titlebase, $f2, $debug ) ) > $pc ){
-                                $pc = $pc2;
-                            }
-                            
-                            if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
-                            
-                            if( $pc > $MIN_SIMILARITY_BWORD ){
-                                if( $debug ) echo "<br />MEDIA FINDED FILE: " . basename( $mi[ 'file' ] );
-                                if( $debug ) echo "<br />MEDIA SIMILARITY STRINGA: " . $f1;
-                                if( $debug ) echo "<br />MEDIA SIMILARITY STRINGB: " . $f2;
-                                if( $debug ) echo "<br />MEDIA SIMILARITY: " . $pc;
-                            }
-                            $similars[ $pc ] = $mi;
+                    foreach( $result AS $rkey => $rvalue ){
+                        if( is_string( $rvalue ) ){
+                            $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
                         }
                     }
-                    krsort( $similars );
-                    if( $debug ) echo "<br />TITLES SIMILARITY: " . nl2br( print_r( $similars, TRUE ) );
-                    $pcmin = $MIN_SIMILARITY_BWORD;
-                    if( $debug ) echo "<br />MEDIA PC NEEDED: " . $pcmin;
-                    foreach( $similars AS $pc => $mi ){
-                        if( $pc > $pcmin 
-                        ){
-                            if( $debug ) echo "<br />MEDIA FINDED: " . $mi[ 'title' ];
-                            $midata = $mi;
-                            break;
-                        }
-                    }
-                    if( array_key_exists( 'idmediainfo', $midata ) 
-                    && ( $midata = sqlite_mediainfo_getdata( $midata[ 'idmediainfo' ] )) != FALSE
-                    && is_array( $midata )
-                    && count( $midata ) > 0
-                    ){
-                        $midata = $midata[ 0 ];
-                        foreach( $result AS $rkey => $rvalue ){
-                            if( is_string( $rvalue ) ){
-                                $result[ $rkey ] = PPATH_MEDIAINFO . DS . $midata[ 'idmediainfo' ] . '.' . $rkey;
-                            }
-                        }
-                        $midata[ 'idmediainfo' ] = 'NULL';
-                        $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
-                        $midata[ 'season' ] = $season;
-                        $midata[ 'episode' ] = $episode;
-                        $midata[ 'titleepisode' ] = '';
-                        $result[ 'data' ] = $midata;
-                    }
+                    $midata[ 'idmediainfo' ] = 'NULL';
+                    $midata[ 'dateadded' ] = date( 'Y-m-d H:i:s' );
+                    $midata[ 'season' ] = $season;
+                    $midata[ 'episode' ] = $episode;
+                    $midata[ 'titleepisode' ] = '';
+                    $result[ 'data' ] = $midata;
+                    break;
                 }
             }
         }
