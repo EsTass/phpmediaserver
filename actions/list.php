@@ -27,13 +27,15 @@
         
         //premierer mode
         $premierfuncts = array(
-            //'sqlite_media_getdata_premiere',
-            'sqlite_media_getdata_premiere_ex',
-            'sqlite_media_getdata_premiere_ex2',
-            'sqlite_media_getdata_premiere_ex3',
-            'sqlite_media_getdata_premiere_ex4',
+            //get_msg( 'LIST_TITLE_PREMIERE', FALSE ) => 'sqlite_media_getdata_premiere',
+            get_msg( 'LIST_TITLE_PREMIERE', FALSE ) => 'sqlite_media_getdata_premiere_ex', //last in sorttitle
+            get_msg( 'LIST_TITLE_PREMIERE_BESTRAT', FALSE ) => 'sqlite_media_getdata_premiere_ex2', //last 3 months better rating
+            //get_msg( 'LIST_TITLE_PREMIERE_MOVIES', FALSE ) => 'sqlite_media_getdata_premiere_ex3', //last 3 months better rating only movies
+            //get_msg( 'LIST_TITLE_PREMIERE', FALSE ) => 'sqlite_media_getdata_premiere_ex4', //last 3 months rnd
+            get_msg( 'LIST_TITLE_PREMIERE_SERIES', FALSE ) => 'sqlite_media_getdata_premiere_ex5', //last 3 months series year + season + weeks*episode
         );
-        
+        /*
+        //Randomize 1 list
         $premierefunct = $premierfuncts[ mt_rand( 0, ( count( $premierfuncts ) - 1 ) ) ];
         //Premiere
         if( ( $edata = $premierefunct( O_LIST_MINI_QUANTITY ) ) != FALSE
@@ -42,6 +44,18 @@
             $TITLE = get_msg( 'LIST_TITLE_PREMIERE', FALSE );
             $urltitle = '?action=searcha&orderby=sorttitle';
             echo get_html_list( $edata, $TITLE, FALSE, FALSE, FALSE, $urltitle );
+        }
+        */
+        //All lists Premiere
+        foreach( $premierfuncts AS $t => $funct ){
+            if( ( $edata = $funct( O_LIST_MINI_QUANTITY ) ) != FALSE
+            && count( $edata ) > 0
+            ){
+                //$TITLE = get_msg( 'LIST_TITLE_PREMIERE', FALSE );
+                $TITLE = $t;
+                $urltitle = '?action=searcha&orderby=sorttitle';
+                echo get_html_list( $edata, $TITLE, FALSE, FALSE, FALSE, $urltitle );
+            }
         }
         
         //Continue

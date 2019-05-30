@@ -1492,6 +1492,45 @@
 		return $result;
 	}
 	
+	//last 3 months series year + season + weeks*episode
+	function sqlite_media_getdata_premiere_ex5( $limit = 1000, $months = 3 ){
+		//Vars
+		$result = FALSE;
+		
+		//min quantity
+		if( $limit < 100 ){
+            $limit2 = 100;
+		}else{
+            $limit2 = $limit;
+		}
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM media ';
+			$sql .= ' INNER JOIN mediainfo ON media.idmediainfo = mediainfo.idmediainfo ';
+			$sql .= ' WHERE media.idmediainfo > 0 ';
+			$strdate = date( 'Y-m-d', strtotime( 'NOW - ' . $months . ' months' ) );
+			$sql .= ' AND mediainfo.episode != \'\'';
+			$sql .= ' AND mediainfo.season != \'\'';
+			$sql .= ' AND ( mediainfo.sorttitle > \'' . $strdate . '\' ';
+			$sql .= '  OR ( date( date( mediainfo.sorttitle, printf( \'+%d years\', mediainfo.season ) ), printf( \'+%d days\', ( mediainfo.episode * 7 ) ) ) ) >  \'' . $strdate . '\' ) ' ;
+			$sql .= ' GROUP BY mediainfo.title ';
+			$sql .= ' ORDER BY mediainfo.sorttitle DESC, ';
+			$sql .= ' mediainfo.season DESC, ';
+			$sql .= ' mediainfo.episode DESC ';
+			$sql .= ' LIMIT ' . $limit2;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+			//Rearder array by rating
+            shuffle( $result );
+			//cut array
+			$result = array_slice($result, 0, $limit);
+		}
+		
+		return $result;
+	}
+	
 	//function reorder array mediainfo by rating
 	function sqlite_reorder_mediainfo(&$array, $key = 'rating') {
         $sorter=array();
