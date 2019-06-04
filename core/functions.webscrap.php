@@ -494,7 +494,7 @@
                         (
                             array_key_exists( 'urlvalidpreg', $epass ) != FALSE 
                             && strlen( $epass[ 'urlvalidpreg' ] ) > 0
-                            && preg_match( $scrapperdata[ 'passdata' ][ $epass ][ 'urlvalidpreg' ], $url ) !== FALSE
+                            && preg_match( $epass[ 'urlvalidpreg' ], $url ) !== FALSE
                         )
                     ){
                         $pass = $k;
