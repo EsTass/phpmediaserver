@@ -58,20 +58,26 @@
                             && inString( $href, $wsdata[ 'searchdata' ][ 'linksappend' ] )
                             ) || (
                             array_key_exists( 'urlbase', $wsdata[ 'searchdata' ] )
-                            && strlen( $wsdata[ 'searchdata' ][ 'urlbase' ] ) > 8
+                            && strlen( $wsdata[ 'searchdata' ][ 'urlbase' ] ) > 0
                             && inString( $href, $wsdata[ 'searchdata' ][ 'urlbase' ] )
                             ) || (
                             array_key_exists( 0, $wsdata[ 'passdata' ] )
                             && is_array( $wsdata[ 'passdata' ][ 0 ] )
                             && array_key_exists( 'linksappend', $wsdata[ 'passdata' ][ 0 ] )
-                            && strlen( $wsdata[ 'passdata' ][ 0 ][ 'linksappend' ] ) > 8
+                            && strlen( $wsdata[ 'passdata' ][ 0 ][ 'linksappend' ] ) > 0
                             && inString( $href, $wsdata[ 'passdata' ][ 0 ][ 'linksappend' ] )
                             ) || (
                             array_key_exists( 0, $wsdata[ 'passdata' ] )
                             && is_array( $wsdata[ 'passdata' ][ 0 ] )
-                            && array_key_exists( 'urlbase', $wsdata[ 'passdata' ][ 0 ] )
-                            && strlen( $wsdata[ 'passdata' ][ 0 ][ 'urlbase' ] ) > 8
-                            && inString( $href, $wsdata[ 'passdata' ][ 0 ][ 'urlbase' ] )
+                            && array_key_exists( 'urlvalid', $wsdata[ 'passdata' ][ 0 ] )
+                            && strlen( $wsdata[ 'passdata' ][ 0 ][ 'urlvalid' ] ) > 0
+                            && inString( $wsdata[ 'passdata' ][ 0 ][ 'urlvalid' ], $href )
+                            ) || (
+                            array_key_exists( 0, $wsdata[ 'passdata' ] )
+                            && is_array( $wsdata[ 'passdata' ][ 0 ] )
+                            && array_key_exists( 'urlvalidpreg', $wsdata[ 'passdata' ][ 0 ] )
+                            && strlen( $wsdata[ 'passdata' ][ 0 ][ 'urlvalidpreg' ] ) > 0
+                            && preg_match( $wsdata[ 'passdata' ][ 0 ][ 'urlvalidpreg' ], $href ) !== FALSE
                             )
                         )
                         ){
