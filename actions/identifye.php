@@ -16,6 +16,18 @@
 	$SEASON = FALSE;
     $EPISODE = FALSE;
 	
+	if( defined( 'MEDIA_CHAPTERS_MAXSEASON' ) ){
+        $maxseason = MEDIA_CHAPTERS_MAXSEASON;
+	}else{
+        $maxseason = 30;
+	}
+	
+	if( defined( 'MEDIA_CHAPTERS_MAXCHAPTER' ) ){
+        $maxchapter = MEDIA_CHAPTERS_MAXCHAPTER;
+	}else{
+        $maxchapter = 250;
+	}
+	
 	if( is_numeric( $IDMEDIA )
 	&& ( $media = sqlite_media_getdata( $IDMEDIA ) ) != FALSE 
 	&& count( $media ) > 0
@@ -241,7 +253,7 @@ function new_mediainfo(){
                 <select id='season' name='season'>
                     <option value=''><?php echo get_msg( 'MENU_SEASON' ); ?></option>
                     <?php
-                        for( $v = 1; $v < 30; $v++ ){
+                        for( $v = 1; $v <= $maxseason; $v++ ){
                             if( $SEASON == $v
                             ){
                                 $selected = 'selected';
@@ -258,7 +270,7 @@ function new_mediainfo(){
                 <select id='episode' name='episode'>
                     <option value=''><?php echo get_msg( 'MENU_EPISODE' ); ?></option>
                     <?php
-                        for( $v = 1; $v < 100; $v++ ){
+                        for( $v = 1; $v < $maxchapter; $v++ ){
                             if( $EPISODE == $v
                             ){
                                 $selected = 'selected';
