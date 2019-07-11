@@ -28,6 +28,8 @@
                 'searchfunction' => '',
                 //Web URL to search: 'torrents.com/?q='
                 'urlsearch' => '',
+                //string to url encode type function: FALSE, 'urlencode', 'rawurlencode'. Valid function string function( string )
+                'urlsearchparamencode' => FALSE,
                 //Web URL to baselist used for 0 search and cron autodownloads: 'torrents.com/'
                 'urlbase' => '',
                 //URL Append to links: add to links for incomplete URLs: domain.com/
@@ -1164,9 +1166,21 @@
             foreach( $post_data AS $k => $v ){
                 
             }
+            if( array_key_exists( 'urlsearchparamencode', $scrapper_data[ 'searchdata' ] ) 
+            && $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ] != FALSE
+            && function_exists( $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ] )
+            ){
+                $search = $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ]( $search );
+            }
             $post_data[ $k ] = $search;
             $result = file_get_contents_timed_post( $url, $post_data, $time, $sessionid, $debug );
         }else{
+            if( array_key_exists( 'urlsearchparamencode', $scrapper_data[ 'searchdata' ] ) 
+            && $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ] != FALSE
+            && function_exists( $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ] )
+            ){
+                $search = $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ]( $search );
+            }
             $result = file_get_contents_timed( $url . $search, $time, $sessionid, $debug );
         }
         
