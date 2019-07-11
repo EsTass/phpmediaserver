@@ -2079,7 +2079,7 @@
 			if( $idmediainfo ){
 				$sql .= ' WHERE idmediainfo = ' . $idmediainfo . ' ';
 			}
-			$sql .= ' GROUP BY title ORDER BY title ASC LIMIT ' . $limit;
+			$sql .= ' GROUP BY title, year ORDER BY title ASC LIMIT ' . $limit;
 			//die( $sql );
 			$result = sqlite_getarray( $dbhandle->query( $sql ) );
 			sqlite_db_close();
