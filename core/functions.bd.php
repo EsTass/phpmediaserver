@@ -1991,6 +1991,42 @@
 		return $result;
 	}
 	
+	function sqlite_mediainfo_getdata_duplys( $limit = 1000 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT *, count( idmediainfo ) AS num FROM mediainfo GROUP BY title, season, episode, year HAVING num > 1 ';
+			$sql .= ' ORDER BY idmediainfo DESC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_mediainfo_search_duplys( $title, $season, $episode, $year, $limit = 1000 ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM mediainfo ';
+            $sql .= ' WHERE title LIKE \'' . $dbhandle->escapeString( $title ) . '\' ';
+            $sql .= ' AND season = \'' . $dbhandle->escapeString( $season ) . '\' ';
+            $sql .= ' AND episode = \'' . $dbhandle->escapeString( $episode ) . '\' ';
+            $sql .= ' AND year = \'' . $dbhandle->escapeString( $year ) . '\' ';
+			$sql .= ' ORDER BY idmediainfo ASC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
 	function sqlite_mediainfo_search( $search = '', $limit = 1000 ){
 		//Vars
 		$result = FALSE;

@@ -525,86 +525,43 @@
 	function mediainfo_clean_duplicates( $echo = FALSE ){
         $result = TRUE;
         
-        if( ( $midata = sqlite_mediainfo_getdata( FALSE, 100000 ) ) ){
-            //movies
-            $inlist = array();
+        if( ( $midata = sqlite_mediainfo_getdata_duplys( 1000 ) ) ){
+            //all
+            if( $echo ) echo '<br >Duplicates found: ' . count( $midata );
             foreach( $midata AS $row ){
-                if( $row[ 'season' ] == '' ){
-                    if( array_key_exists( $row[ 'idmediainfo' ], $inlist ) ){
-                        if( $echo ) echo '<br />ID DUPLICATED???: ' . $row[ 'idmediainfo' ] . ' - ' . $row[ 'title' ];
-                    }elseif( in_array( $row[ 'title' ], $inlist ) ){
-                        if( $echo ) echo '<br />Title exist: ' . $row[ 'idmediainfo' ] . ' - ' . $row[ 'title' ];
-                        $previd = array_search( $row[ 'title' ], $inlist );
-                        if( $echo ) echo '<br />Prev: ' . $previd . ' - ' . $inlist[ $previd ];
-                        //remap old with new in media items
-                        $allok = TRUE;
-                        if( ( $m = sqlite_media_getdata_mediainfo( $row[ 'idmediainfo' ] ) ) != FALSE 
-                        && count( $m ) > 0
-                        ){
-                            foreach( $m AS $r ){
-                                if( $echo ) echo '<br >File in delete: ' . $r[ 'file' ];
-                                if( sqlite_media_update_mediainfo( $r[ 'idmedia' ], $previd ) ){
-                                    if( $echo ) echo '<br >File reasigned: ' . $r[ 'file' ] . ' -> ' . $previd;
-                                }else{
-                                    $allok = FALSE;
-                                    if( $echo ) echo '<br >Error reasign: ' . $r[ 'file' ] . ' -> ' . $previd;
-                                }
-                            }
-                        }
-                        if( $allok ){
-                            if( sqlite_mediainfo_delete( $row[ 'idmediainfo' ] ) ){
-                                if( $echo ) echo '<br >Duped mediainfo deleted: ' . $row[ 'idmediainfo' ] . ' -> ' . $previd;
-                            }else{
-                                if( $echo ) echo '<br >ERROR Duped mediainfo deleted: ' . $row[ 'idmediainfo' ] . ' -> ' . $previd;
-                            }
+                if( $row[ 'idmediainfo' ] > 0 
+                && ( $milist = sqlite_mediainfo_search_duplys( $row[ 'title' ], $row[ 'season' ], $row[ 'episode' ], $row[ 'year' ] ) ) != FALSE
+                && is_array( $milist )
+                && count( $milist ) > 1
+                ){
+                    if( $echo ) echo '<br >Duplicates: ' . $row[ 'idmediainfo' ] . '/' . $row[ 'title' ] . '/' . $row[ 'year' ] . '/' . $row[ 'num' ];
+                    $nowidmediainfo = 0;
+                    foreach( $milist AS $n => $row2 ){
+                        if( $n == 0 ){
+                            if( $echo ) echo '<br >Base idmediainfo: ' . $row2[ 'idmediainfo' ];
+                            $nowidmediainfo = $row2[ 'idmediainfo' ];
                         }else{
-                            if( $echo ) echo '<br >Not all OK, cant delete: ' . $row[ 'idmediainfo' ] . ' -> ' . $previd;
-                        }
-                    }else{
-                        $inlist[ $row[ 'idmediainfo' ] ] = $row[ 'title' ];
-                        //if( $echo ) echo '<br />+';
-                    }
-                }
-            }
-            //season episode
-            $inlist = array();
-            foreach( $midata AS $row ){
-                if( (int)$row[ 'season' ] > 0 ){
-                    $etitle = $row[ 'title' ] . '-' . $row[ 'season' ] . '-' . $row[ 'episode' ];
-                    if( array_key_exists( $row[ 'idmediainfo' ], $inlist ) ){
-                        if( $echo ) echo '<br />ID DUPLICATED???: ' . $row[ 'idmediainfo' ] . ' - ' . $row[ 'title' ];
-                    }elseif( in_array( $etitle, $inlist ) ){
-                        if( $echo ) echo '<br />Title exist: ' . $row[ 'idmediainfo' ] . ' - ' . $etitle;
-                        $previd = array_search( $etitle, $inlist );
-                        if( $echo ) echo '<br />Prev: ' . $previd . ' - ' . $inlist[ $previd ];
-                        //remap old with new in media items
-                        $allok = TRUE;
-                        if( ( $m = sqlite_media_getdata_mediainfo( $row[ 'idmediainfo' ] ) ) != FALSE 
-                        && count( $m ) > 0
-                        ){
-                            foreach( $m AS $r ){
-                                if( $echo ) echo '<br >File in delete: ' . $r[ 'file' ];
-                                if( sqlite_media_update_mediainfo( $r[ 'idmedia' ], $previd ) ){
-                                    if( $echo ) echo '<br >File reasigned: ' . $r[ 'file' ] . ' -> ' . $previd;
-                                }else{
-                                    $allok = FALSE;
-                                    if( $echo ) echo '<br >Error reasign: ' . $r[ 'file' ] . ' -> ' . $previd;
+                            if( ( $m = sqlite_media_getdata_mediainfo( $row2[ 'idmediainfo' ] ) ) != FALSE 
+                            && is_array( $m )
+                            && count( $m ) > 0
+                            ){
+                                foreach( $m AS $r ){
+                                    if( $echo ) echo '<br >File in delete: ' . $r[ 'file' ];
+                                    if( sqlite_media_update_mediainfo( $r[ 'idmedia' ], $nowidmediainfo ) ){
+                                        if( $echo ) echo '<br >File reasigned: ' . $r[ 'file' ] . ' -> ' . $nowidmediainfo;
+                                    }else{
+                                        if( $echo ) echo '<br >Error reasign: ' . $r[ 'file' ] . ' -> ' . $nowidmediainfo;
+                                    }
                                 }
-                            }
-                        }
-                        if( $allok ){
-                            if( sqlite_mediainfo_delete( $row[ 'idmediainfo' ] ) ){
-                                if( $echo ) echo '<br >Duped mediainfo deleted: ' . $row[ 'idmediainfo' ] . ' -> ' . $previd;
                             }else{
-                                if( $echo ) echo '<br >ERROR Duped mediainfo deleted: ' . $row[ 'idmediainfo' ] . ' -> ' . $previd;
+                                if( $echo ) echo '<br >No files for duplicated: ' . $row2[ 'idmediainfo' ];
                             }
-                        }else{
-                            if( $echo ) echo '<br >Not all OK, cant delete: ' . $row[ 'idmediainfo' ] . ' -> ' . $previd;
+                            if( sqlite_mediainfo_delete( $row2[ 'idmediainfo' ] ) ){
+                                if( $echo ) echo '<br >Duped mediainfo deleted: ' . $row2[ 'idmediainfo' ] . ' -> ' . $nowidmediainfo;
+                            }else{
+                                if( $echo ) echo '<br >ERROR Duped mediainfo deleted: ' . $row2[ 'idmediainfo' ] . ' -> ' . $nowidmediainfo;
+                            }
                         }
-                    }else{
-                        $inlist[ $row[ 'idmediainfo' ] ] = $row[ 'title' ];
-                        //if( $echo ) echo '<br />+';
-                        //if( $echo ) echo '<br />+' . $row[ 'idmediainfo' ] . ' - ' . $row[ 'title' ];
                     }
                 }
             }
