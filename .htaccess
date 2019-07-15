@@ -3,6 +3,8 @@ DirectoryIndex index.php
 RewriteEngine On
 RewriteRule ^.*js/(.+) js/$1 [L]
 RewriteRule ^.*imgs/(.+) imgs/$1 [L]
+#fix for dlna access bypass login
+RewriteRule ^.*dlna/(.+) dlna/$1 [L]
 RewriteRule ^.*/(.+) /index.php [L]
 
 #Order Allow,Deny 
