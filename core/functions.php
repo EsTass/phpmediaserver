@@ -765,11 +765,27 @@
         if( defined( 'O_SEND_EXT_MSG' ) 
         && ( $actions = O_SEND_EXT_MSG ) !== FALSE
         ){
-            $telegram_ip = '149.154.167.';
-            $telegram_ip_min = 197;
-            $telegram_ip_max = 233;
+            //'149.154.160.0' - '149.154.175.255'
+            $telegram_ip = '149.154.';
+            $telegram_ip_min = 160;
+            $telegram_ip_max = 175;
+            $telegram_ip_min2 = 0;
+            $telegram_ip_max2 = 255;
             for( $x = $telegram_ip_min; $x <= $telegram_ip_max; $x++ ){
-                $validips[] = $telegram_ip . $x;
+                for( $y = $telegram_ip_min2; $y <= $telegram_ip_max2; $y++ ){
+                    $validips[] = $telegram_ip . $x . '.' . $y;
+                }
+            }
+            //'91.108.4.0' - '91.108.7.255'
+            $telegram_ip = '91.108.';
+            $telegram_ip_min = 4;
+            $telegram_ip_max = 7;
+            $telegram_ip_min2 = 0;
+            $telegram_ip_max2 = 255;
+            for( $x = $telegram_ip_min; $x <= $telegram_ip_max; $x++ ){
+                for( $y = $telegram_ip_min2; $y <= $telegram_ip_max2; $y++ ){
+                    $validips[] = $telegram_ip . $x . '.' . $y;
+                }
             }
         }
 	}
