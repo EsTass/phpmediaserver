@@ -269,9 +269,9 @@
             $result .= "<div class='dBoxInfoE'>" . $mediainforow[ 'plot' ] . "</div>";
         }
         $in_list = array();
-        for( $s = 30; $s > -1; $s-- ){
+        for( $s = MEDIA_CHAPTERS_MAXSEASON; $s > -1; $s-- ){
             $temp_d = array();
-            for( $e = 0; $e < 100; $e++ ){
+            for( $e = 0; $e < MEDIA_CHAPTERS_MAXCHAPTER; $e++ ){
                 foreach( $data AS $el ){
                     if( !in_array( $el[ 'idmediainfo' ], $in_list )
                     && $el[ 'season' ] == $s
