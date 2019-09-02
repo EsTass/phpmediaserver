@@ -8,6 +8,10 @@
 
 [IMG1](http://i67.tinypic.com/33opaiv.png)
 
+## App version (portable exe)
+
+![gomediaserver](https://github.com/EsTass/gomediaserver)
+
 ## Description
 A bunch of utilities for:
  - Html5 web player with php7 + sqlite + jquery + ffmpeg
