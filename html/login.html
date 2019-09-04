@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+</head>
+
+<body>
+    <form method="POST" action="/login/" class="loginForm">
+        <fieldset>
+            
+			<table class='loginT'>
+                <tr>
+                    <td colspan=100 class="tCenter">
+                        <img src="/assets/logo/1.png" class="imgLogo" title="GoMediaServer Logo" />
+                    </td>
+                </tr>
+				<tr>
+					<td>
+						<label for='user'>User:</label>
+					</td>
+					<td>
+						<input type='text' name='user' id='user' class='textLogin ui-widget-content ui-corner-all' value="{{.User}}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label for='pass'>Password</label>
+					</td>
+					<td>
+						<input type="password" name="pass" id="pass" value="" class="textLogin ui-widget-content ui-corner-all" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+					</td>
+					<td>
+						<label for='bSend'></label>
+						<input type='submit' id='bSend' class='submit' value="Login" />
+					</td>
+				</tr>
+				<tr>
+					<td colspan=2 class='loginTMsg'>
+						<p>{{.Msginfo}}</p>
+					</td>
+				</tr>
+			</table>
+			
+        </fieldset>
+    </form>
+</body>
+</html>

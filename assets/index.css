@@ -1,0 +1,321 @@
+html, body
+{
+	width: 100%;
+	height: 100%;
+	font-family: Arial, sans-serif;
+    font-size: 0.9em;
+	margin: 0px;
+	border: 0px;
+	padding: 0px;
+	/* padding-top: 20px; */
+}
+body { 
+	width:100%; 
+	height:100%;
+	text-align: left;
+	font-size: 100%;
+	background-color: black;
+	color: white !important;
+	overflow-x: hidden;
+    background-image: url("/assets/bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+body a{
+	color: white;
+}
+input
+{
+	margin: 0px;
+	border: 1px solid gray;
+	padding: 0px;
+	border-color: #e8e8e8;
+	border-radius: 0 !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+}
+input[type="button"], input[type="submit"], button{
+	color: black;
+    padding: 5px 10px !important;
+    background-color: #F3F3F3;
+}
+fieldset
+{
+	margin: 0px;
+	border: 0px;
+	padding: 0px;
+}
+h2{
+    padding: 0px 4px;
+}
+
+/* GENERIC */
+
+.cursorPointer{
+	cursor: pointer !important;
+}
+.downLineSep{
+	border-bottom: 1px solid transparent;
+}
+
+.hidden{
+	display: none;
+}
+
+.tList{
+	width: 100%;
+	height: auto;
+	border: 0px;
+	margin: 0px;
+	background-color: Gainsboro;
+	color: black;
+    border-radius:6px;
+    border: 0px;
+}
+.tList tr:nth-child(even) {
+	background-color: #e9e9e9;
+}
+.tList tr{
+	padding: 0px;
+    border: 0px;
+    margin: 0px;
+    background-color: #bbbbbb;
+}
+.tList tr td{
+	padding: 5px;
+    border: 0px;
+    margin: 0px;
+}
+.tList tr th {
+	text-transform: uppercase;
+	font-weight: bold;
+	background-color: #6699bb;
+    text-align: center;
+    padding: 2px 0px;
+    margin: 0px;
+}
+.tList tr:hover{
+	/* background-color: white !important; */
+}
+.tCenter{
+    text-align: center;
+}
+.tLeft{
+    text-align: left;
+}
+.tRight{
+    text-align: right;
+}
+.widthFull{
+    width: 100%;
+}
+.heightFull{
+    height: 100%;
+}
+select {
+    padding:3px;
+    margin: 0;
+    -webkit-border-radius:4px;
+    -moz-border-radius:4px;
+    border-radius:4px;
+    -webkit-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+    -moz-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+    box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+    background: #f8f8f8;
+    color:#888;
+    border:none;
+    outline:none;
+    cursor:pointer;
+}
+input {
+    padding:3px;
+    margin: 0;
+    -webkit-border-radius:4px;
+    -moz-border-radius:4px;
+    border-radius:4px;
+    -webkit-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+    -moz-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+    box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+    background: #f8f8f8;
+    color:#888;
+    border:none;
+    outline:none;
+    cursor:pointer;
+}
+input:hover{
+    /* background-color: #6699bb; */
+}
+.button{
+    margin: 0px;
+	border: 1px solid gray;
+	padding: 0px;
+	border-color: #e8e8e8;
+	border-radius: 0 !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+	color: black;
+    padding: 5px 10px !important;
+    background-color: #F3F3F3;
+    text-decoration: none;
+}
+
+/* COLOR LIST */
+
+.eColors00{
+	background-color: #FFEBE5;
+}
+.eColors01{
+	background-color: #CCD9FF;
+}
+.eColors02{
+	background-color: #D9CCFF;
+}
+.eColors03{
+	background-color: #8FABFF;
+}
+.eColors04{
+	background-color: #FFD452;
+}
+.eColors05{
+	background-color: #D9FFCC;
+}
+.eColors06{
+	background-color: #F2CCFF;
+}
+.eColors07{
+	background-color: #527DFF;
+}
+.eColors08{
+	background-color: #FFE38F;
+}
+.eColors09{
+	background-color: #F2FFCC;
+}
+
+/* BASEBOX */
+
+.dBaseBox{
+    padding: 0px 1%;
+    background-color: rgba(0, 0, 0, 0.4);
+    min-width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+}
+
+/* LOADING */
+
+.boxLoadingOverlay{
+	display: none;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	max-width: 100%;
+	max-height: 100%;
+	background-color: black;
+	opacity: 0.7;
+	filter: alpha(opacity=70); /* For IE8 and earlier */
+	z-index: 99999;
+	background-image: url("/assets/l.gif");
+	background-repeat: no-repeat;
+	background-position: center;
+    background-size: 100%;
+	/*
+	-ms-background-size: cover;
+	-o-background-size: cover;
+	-moz-background-size: cover;
+	-webkit-background-size: cover;
+	background-size: cover;
+	*/
+}
+
+/* LOGO */
+
+.imgLogo{
+    width: 20%;
+    min-width: 40px;
+    max-width: 5%;
+    text-align: center;
+	vertical-align: middle;
+}
+
+/* LOGIN */
+
+.loginBox{
+	/* 
+	width:100%; 
+	height:100%;
+	*/
+	text-align: center;
+	margin: 0;
+	padding: 0;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+    left: 50%;
+	transform: translateX(-50%);
+	background-color: rgba(0,0,0,0.3);
+}
+.loginBoxIconUser{
+	margin: auto;
+	width: 80%;
+	display: table;
+	text-align: center;
+}
+.loginIconUser{
+	width: auto;
+	height: auto;
+	text-align: center;
+	margin: 0px;
+	padding: 0px;
+	border: 2px solid black;
+	color: black;
+	cursor: pointer;
+	display: table-cell;
+	/* background: url( '/assets/u.png' ) no-repeat left top; */
+}
+.loginIconUser img{
+	display: inline;
+	min-width: 100px;
+	min-height: 100px;
+	max-width: 10%;
+	max-height: 10%;
+	margin: 0;
+	padding: 0;
+	color: white;
+	cursor: pointer;
+	vertical-align: top;
+}
+.loginIconUser span{
+	display: block;
+}
+.loginForm{
+	/* display: inline-block; */
+	/* text-align: center; */
+	width: 40%;
+	margin: auto;
+}
+.loginForm label{
+	display: block;
+}
+.loginT{
+	padding: 10px;
+	text-align: left;
+	width: auto;
+	height: auto;
+	margin: auto;
+	background-color: rgba(0,0,0,0.3);
+}
+.loginT td{
+	padding: 5px;
+}
+.loginT input{
+	padding: 4px;
+}
+.loginTMsg{
+	text-align: center;
+	font-weight: bold;
+	font-size: 120%;
+	background-color: rgba(128,0,0,0.5);
+}

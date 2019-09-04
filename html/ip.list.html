@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    <div class='dBaseBox'>
+        <h1>{{.Title}}</h1>
+        <table class="tList tCenter">
+            {{if .MsgInfo}}
+            <tr>
+                <th colspan="100" style="background-color: red; text-align: center;font-size: 120%;">{{.MsgInfo}}</th>
+            </tr>
+            {{end}}
+            <tr>
+                <th style="width: 50%;">WHITE IP</th>
+                <th style="width: 50%;">BANS IP</th>
+            </tr>
+            <tr>
+                <td>
+                    <form class='' id='ipwl' action='/ip-wl-add/' method='post' autocomplete='off'>
+                        <table class="widthFull" style="background-color: gainsboro; text-align: center;font-size: 120%;">
+                        <tr>
+                            <td>
+                                New IP WHITELIST
+                            </td>
+                            <td>
+                                <input placeholder='ip' type='input' id='ip' name='ip' />
+                            </td>
+                            <td>
+                                <input type='submit' id='buseradd' value='Add' />
+                            </td>
+                        </tr>
+                        </table>
+                    </form>
+                </td>
+                <td>
+                    <form class='' id='ipbans' action='/ip-bans-add/' method='post' autocomplete='off'>
+                        <table class="widthFull" style="background-color: gainsboro; text-align: center;font-size: 120%;">
+                        <tr>
+                            <td>
+                                New IP BANS
+                            </td>
+                            <td>
+                                <input placeholder='ip' type='input' id='ip' name='ip' />
+                            </td>
+                            <td>
+                                <input type='submit' id='buseradd' value='Add' />
+                            </td>
+                        </tr>
+                        </table>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="margin: auto;float:left;width: 99%;height:70vh;max-height:70vh;overflow:auto;border: 1px solid white;background-color: gainsboro;">
+                        <div>
+                            <table class="widthFull" style="background-color: gainsboro; text-align: center;font-size: 120%;">
+                                {{range .Todos}}
+                                <tr>
+                                    <td>
+                                        {{.date}}
+                                    </td>
+                                    <td>
+                                        {{.ip}}
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="location.href='/ip-wl-remove/?ip={{.ip}}';" value="DELETE" />
+                                    </td>
+                                </tr>
+                                {{end}}
+                            </table>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div style="margin: auto;float:left;width: 99%;height:70vh;max-height:70vh;overflow:auto;border: 1px solid white;background-color: gainsboro;">
+                        <div>
+                            <table class="widthFull" style="background-color: gainsboro; text-align: center;font-size: 120%;">
+                                {{range .Todos1}}
+                                <tr>
+                                    <td>
+                                        {{.date}}
+                                    </td>
+                                    <td>
+                                        {{.ip}}
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="location.href='/ip-bans-remove/?ip={{.ip}}';" value="DELETE" />
+                                    </td>
+                                </tr>
+                                {{end}}
+                            </table>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>

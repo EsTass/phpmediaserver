@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    <div class='dBaseBox'>
+        
+        <br />
+        
+        <div id="dResult" class="tList widthFull" style="text-align: center;padding: 10px 0px;"></div>
+        
+        <br />
+        
+        <h1>{{.Title2}}</h1>
+        
+        <br />
+        
+        <table class="tList">
+            <tr>
+                <th>Poster</th>
+                <th>Date</th>
+                <th>IDMEDIA</th>
+                <th>IDMEDIAINFO</th>
+                <th>USERNAME</th>
+                <th>Title</th>
+                <th>Season</th>
+                <th>Episode</th>
+                <th>Year</th>
+                <th>Mode</th>
+                <th>PID</th>
+                <th>Actions</th>
+            </tr>
+            {{range .Todos2}}
+            <tr>
+                <td>
+                    <img class='listElementImgMS listElementImgMini' src='/mediainfo-img/?id={{.idmediainfo}}' title='{{.title}}' />
+                </td>
+                <td>{{.date}}</td>
+                <td>{{.idmedia}}</td>
+                <td>{{.idmediainfo}}</td>
+                <td>{{.user}}</td>
+                <td>{{.title}}</td>
+                <td>{{.season}}</td>
+                <td>{{.episode}}</td>
+                <td>{{.year}}</td>
+                <td>{{.mode}}</td>
+                <td>{{.pid}}</td>
+                <td>
+                    <input type="button" onclick="g_get( '/playing-e-delete/?id={{.idmedia}}&user={{.user}}', 'dResult' );" value="DELETE" />
+                </td>
+            </tr>
+            {{end}}
+        </table>
+        
+        <br />
+        
+        <h1>{{.Title}}</h1>
+        
+        <br />
+        
+        <table class="tList">
+            <tr>
+                <th>Poster</th>
+                <th>Date</th>
+                <th>IDMEDIA</th>
+                <th>IDMEDIAINFO</th>
+                <th>USERNAME</th>
+                <th>Title</th>
+                <th>Season</th>
+                <th>Episode</th>
+                <th>Year</th>
+                <th>Now</th>
+                <th>Max</th>
+                <th>Actions</th>
+            </tr>
+            {{range .Todos}}
+            <tr>
+                <td>
+                    <img class='listElementImgMS listElementImgMini' src='/mediainfo-img/?id={{.idmediainfo}}' title='{{.title}}' />
+                </td>
+                <td>{{.date}}</td>
+                <td>{{.idmedia}}</td>
+                <td>{{.idmediainfo}}</td>
+                <td>{{.user}}</td>
+                <td>{{.title}}</td>
+                <td>{{.season}}</td>
+                <td>{{.episode}}</td>
+                <td>{{.year}}</td>
+                <td>{{.now}}</td>
+                <td>{{.max}}</td>
+                <td>
+                    <input type="button" onclick="g_get( '/played-e-delete/?id={{.idmedia}}&user={{.user}}', 'dResult' );" value="DELETE" />
+                </td>
+            </tr>
+            {{end}}
+        </table>
+    </div>
+
+</body>
+</html>

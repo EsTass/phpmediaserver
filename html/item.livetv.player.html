@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    {{range .Todos}}
+            
+    <video class="videoplayer" controls
+	preload="auto"
+	poster="/mediainfo-img/?id={{.idmedialive}}&type=livetv"
+	autoplay
+           >
+      <source src="/livetv-play-time/?id={{.idmedialive}}&mode=livetv" type="video/webm" preload="auto">
+        Your browser does not support the video tag.
+    </video> 
+    
+    {{end}}
+
+</body>
+</html>

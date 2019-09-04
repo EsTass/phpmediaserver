@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    <div class='dBaseBox'>
+        <h1>{{.Title}}</h1>
+        <table class="tList tCenter">
+            <tr>
+                <th style="width: 50%;">Cron Short Log</th>
+                <th style="width: 50%;">Cron Long Log</th>
+            </tr>
+            <tr>
+                <td>
+                    <div style="margin: auto;float:left;width: 99%;height:70vh;max-height:70vh;overflow:auto;border: 1px solid white;background-color: gainsboro;"><div>{{.CronShort}}</div></div>
+                </td>
+                <td>
+                    <div style="margin: auto;float:left;width: 99%;height:70vh;max-height:70vh;overflow:auto;border: 1px solid white;background-color: gainsboro;"><div>{{.CronLong}}</div></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>

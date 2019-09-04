@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    <div class='dBaseBox'>
+        
+        {{if .Todos1}}
+        
+        <div class='boxList'>
+            <h2>{{.Title1}}</h2>
+            
+            {{range .Todos1}}
+            <div class='listElement'>
+                {{if .Tags}}
+                <div style="position:absolute;top:1;right:0;background-color: blue !important;">
+                    {{.Tags}}
+                </div>
+                {{end}}
+                <a href='/mediainfo/?id={{.idmediainfo}}' title='{{.title}}'><img title='{{.title}}: {{.plot}}' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id={{.idmediainfo}}' /><span class=''>{{.title}}  {{if .season}} {{.season}}x{{printf "%02s" .episode}} {{end}} ({{.year}})</span></a>
+            </div>
+            {{end}}
+
+            {{if .PageNext1 }}
+            <div class='listElement'>
+                <a href='?page={{.PageNext1}}' title='Back'><img title='Next' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id=next' /><span class=''>NEXT</span></a>
+            </div>
+            {{end}}
+            
+        </div>
+        
+        {{end}}
+        
+        {{if .Todos2}}
+        
+        <div class='boxList'>
+            <h2>{{.Title2}}</h2>
+            
+            {{range .Todos2}}
+            <div class='listElement'>
+                {{if .Tags}}
+                <div style="position:absolute;top:1;right:0;background-color: blue !important;">
+                    {{.Tags}}
+                </div>
+                {{end}}
+                <a href='/mediainfo/?id={{.idmediainfo}}' title='{{.title}}'><img title='{{.title}}: {{.plot}}' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id={{.idmediainfo}}' /><span class=''>{{.title}}  {{if .season}} {{.season}}x{{printf "%02s" .episode}} {{end}} ({{.year}})</span></a>
+            </div>
+            {{end}}
+
+            {{if .PageNext2 }}
+            <div class='listElement'>
+                <a href='?page={{.PageNext2}}' title='Back'><img title='Next' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id=next' /><span class=''>NEXT</span></a>
+            </div>
+            {{end}}
+            
+        </div>
+        
+        {{end}}
+        
+        {{if .Todos3}}
+        
+        <div class='boxList'>
+            <h2>{{.Title3}}</h2>
+            
+            {{range .Todos3}}
+            <div class='listElement'>
+                {{if .Tags}}
+                <div style="position:absolute;top:1;right:0;background-color: blue !important;">
+                    {{.Tags}}
+                </div>
+                {{end}}
+                <a href='/mediainfo/?id={{.idmediainfo}}' title='{{.title}}'><img title='{{.title}}: {{.plot}}' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id={{.idmediainfo}}' /><span class=''>{{.title}}  {{if .season}} {{.season}}x{{printf "%02s" .episode}} {{end}} ({{.year}})</span></a>
+            </div>
+            {{end}}
+
+            {{if .PageNext3 }}
+            <div class='listElement'>
+                <a href='?page={{.PageNext3}}' title='Back'><img title='Next' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id=next' /><span class=''>NEXT</span></a>
+            </div>
+            {{end}}
+            
+        </div>
+        
+        {{end}}
+        
+        {{if .Todos4}}
+        
+        <div class='boxList'>
+            <h2>{{.Title4}}</h2>
+            
+            {{range .Todos4}}
+            <div class='listElement'>
+                {{if .Tags}}
+                <div style="position:absolute;top:1;right:0;background-color: blue !important;">
+                    {{.Tags}}
+                </div>
+                {{end}}
+                <a href='/mediainfo/?id={{.idmediainfo}}' title='{{.title}}'><img title='{{.title}}: {{.plot}}' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id={{.idmediainfo}}' /><span class=''>{{.title}}  {{if .season}} {{.season}}x{{printf "%02s" .episode}} {{end}} ({{.year}})</span></a>
+            </div>
+            {{end}}
+
+            {{if .PageNext4 }}
+            <div class='listElement'>
+                <a href='?page={{.PageNext4}}' title='Back'><img title='Next' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id=next' /><span class=''>NEXT</span></a>
+            </div>
+            {{end}}
+            
+        </div>
+        
+        {{end}}
+        
+        {{if .Todos5}}
+        
+        <div class='boxList'>
+            <h2><a href='/livetv/' title="LiveTV List">{{.Title5}}</a></h2>
+            
+            {{range .Todos5}}
+            <div class='listElement'>
+                {{if .Tags}}
+                <div style="position:absolute;top:1;right:0;background-color: blue !important;">
+                    {{.Tags}}
+                </div>
+                {{end}}
+                <a href='/mediainfo/?id={{.idmediainfo}}' title='{{.title}}'><img title='{{.title}}: {{.plot}}' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id={{.idmediainfo}}' /><span class=''>{{.title}}  {{if .season}} {{.season}}x{{printf "%02s" .episode}} {{end}} ({{.year}})</span></a>
+            </div>
+            {{end}}
+
+            {{if .PageNext5 }}
+            <div class='listElement'>
+                <a href='?page={{.PageNext5}}' title='Back'><img title='Next' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id=next' /><span class=''>NEXT</span></a>
+            </div>
+            {{end}}
+            
+        </div>
+        
+        {{end}}
+        
+        {{if .Todos6}}
+        
+        <div class='boxList'>
+            <h2>{{.Title6}}</h2>
+            
+            {{range .Todos6}}
+            <div class='listElement'>
+                {{if .Tags}}
+                <div style="position:absolute;top:1;right:0;background-color: blue !important;">
+                    {{.Tags}}
+                </div>
+                {{end}}
+                <a href='/mediainfo/?id={{.idmediainfo}}' title='{{.title}}'><img title='{{.title}}: {{.plot}}' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id={{.idmediainfo}}' /><span class=''>{{.title}}  {{if .season}} {{.season}}x{{printf "%02s" .episode}} {{end}} ({{.year}})</span></a>
+            </div>
+            {{end}}
+
+            {{if .PageNext6 }}
+            <div class='listElement'>
+                <a href='?page={{.PageNext6}}' title='Back'><img title='Next' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id=next' /><span class=''>NEXT</span></a>
+            </div>
+            {{end}}
+            
+        </div>
+        
+        {{end}}
+        
+        {{if .Todos7}}
+        
+        <div class='boxList'>
+            <h2>{{.Title7}}</h2>
+            
+            {{range .Todos7}}
+            <div class='listElement'>
+                {{if .Tags}}
+                <div style="position:absolute;top:1;right:0;background-color: blue !important;">
+                    {{.Tags}}
+                </div>
+                {{end}}
+                <a href='/mediainfo/?id={{.idmediainfo}}' title='{{.title}}'><img title='{{.title}}: {{.plot}}' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id={{.idmediainfo}}' /><span class=''>{{.title}}  {{if .season}} {{.season}}x{{printf "%02s" .episode}} {{end}} ({{.year}})</span></a>
+            </div>
+            {{end}}
+
+            {{if .PageNext7 }}
+            <div class='listElement'>
+                <a href='?page={{.PageNext7}}' title='Back'><img title='Next' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id=next' /><span class=''>NEXT</span></a>
+            </div>
+            {{end}}
+            
+        </div>
+        
+        {{end}}
+        
+    </div>
+
+</body>
+</html>

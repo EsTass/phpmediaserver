@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    <div class='dBaseBox'>
+        
+        <h1>{{.Title}}</h1>
+        
+        <br />
+        
+        <div id="dResult" class="tList widthFull" style="text-align: center;padding: 10px 0px;"></div>
+        
+        <br />
+        
+        <div id="dAdd" class="tList widthFull">
+            <form class='' id='medialiveadd' action='/livetv-e-add/' method='post' autocomplete='off'>
+                <table class="widthFull" style="background-color: gainsboro; text-align: center;font-size: 120%;">
+                    <tr>
+                        <th colspan='100'>
+                            Add URLS
+                        </th>
+                    </tr>
+                    <tr>
+                        <td style='width: 80vw;'>
+                            <textarea style="width: 100%;height: 20vh;" id="data" name="data" placeholder="URL list or mp3u8 format">#EXTINF:-1 tvg-logo="URL-LOGO" group-title="CATEGORY", TITLE
+URL_TS_MP3U</textarea>
+                        </td>
+                        <td style='vertical-align: top;'>
+                            <input type='button' onclick="g_post_form( '/livetv-e-add/', 'medialiveadd', 'dResult' );" id='bmliveadd' value='Add List' />
+                            <br />
+                            <br />
+                            <input type="button" onclick="g_get( '/livetv-all-check/', 'dResult' );" value="CHECK-ALL" />
+                            <br />
+                            <br />
+                            <input type="button" onclick="g_get( '/livetv-all-check/?clean=1', 'dResult' );" value="CHECK&CLEAN-ALL" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        
+        <br />
+        
+        <table class="tList">
+            <tr>
+                <th>Poster</th>
+                <th>Date Added</th>
+                <th>IDMEDIALIVE</th>
+                <th>Title</th>
+                <th style='max-width: 30vw;'>URL</th>
+                <th style='max-width: 30vw;'>Poster</th>
+                <th>Actions</th>
+            </tr>
+            {{range .Todos}}
+            <tr>
+                <td>
+                    <img class='listElementImgMS listElementImgMini' src='/mediainfo-img/?id={{.idmediainfo}}&type=livetv' title='{{.title}}' />
+                </td>
+                <td>{{.datea}}</td>
+                <td>{{.idmedialive}}</td>
+                <td>{{.title}}</td>
+                <td style='max-width: 30vw;word-wrap: break-word;'>{{.url}}</td>
+                <td style='max-width: 30vw;word-wrap: break-word;'>{{.poster}}</td>
+                <td>
+                    <input type="button" onclick="g_get( '/livetv-e-delete/?id={{.idmedialive}}', 'dResult' );" value="DELETE" />
+                    <input type="button" onclick="openTab( '/livetv-player/?id={{.idmedialive}}' );" value="OPEN" />
+                    <input type="button" onclick="g_get( '/livetv-e-check/?id={{.idmedialive}}', 'dResult' );" value="CHECK" />
+                    <input type="button" onclick="g_get( '/livetv-e-check/?id={{.idmedialive}}&clean=1', 'dResult' );" value="CHECK&CLEAN" />
+                </td>
+            </tr>
+            {{end}}
+        </table>
+    </div>
+
+</body>
+</html>

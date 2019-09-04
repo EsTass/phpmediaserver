@@ -1,0 +1,63 @@
+
+<form method="post" id="fMediaIdent">
+    <table class="tList widthFull" style="">
+        {{if .MsgInfo}}
+        <tr>
+            <td>
+                {{.MsgInfo}}
+            </td>
+        </tr>
+        {{else}}
+        <tr>
+            <th>FILE</th>
+            <th>TITLE</th>
+            <th>SEASON</th>
+            <th>EPISODE</th>
+            <th>IMDBID</th>
+            <th>FILESCRAPPER</th>
+            <th>ACTIONS</th>
+        </tr>
+        <tr>
+            <td style="width:20vw;">
+                {{.BaseFile}}
+            </td>
+            <td style="width:20vw;">
+                <input type='hidden' id='idmedia' name='idmedia' value="{{.Idmedia}}" />
+                <input style="width: 90%;" placeholder='Title' type='input' id='ftitle' name='ftitle' value="{{.FTitle}}" />
+            </td>
+            <td style="width:10vw;">
+                <select style="width: 90%;" id="season" name="season">
+                    <option value="">No</option>
+                    {{range .MaxSeason}}
+                        <option value="{{.}}" {{if eq $.Season .}}selected{{end}}>{{.}}</option>
+                    {{end}}
+                </select>
+            </td>
+            <td style="width:10vw;">
+                <select style="width: 90%;" id="episode" name="episode">
+                    <option value="">No</option>
+                    {{range .MaxEpisode}}
+                        <option value="{{.}}" {{if eq $.Episode .}}selected{{end}}>{{.}}</option>
+                    {{end}}
+                </select>
+            </td>
+            <td style="width:10vw;">
+                <input style="width: 90%;" placeholder='IMDBid/OMDBID/THETVDBID' type='input' id='imdb' name='imdb' value="" />
+            </td>
+            <td style="width:10vw;">
+                <select style="width: 90%;" id="fscrapper" name="fscrapper">
+                    {{range .Scrappers}}
+                        <option value="{{.}}">{{.}}</option>
+                    {{end}}
+                </select>
+            </td>
+            <td style="width:30vw;">
+                <input onclick="g_post_form( '/identify-e-assign/', 'fMediaIdent', 'dResult2' );" type='button' id='bMediaIdent' value='Assign' title='Assign Title-Season-Episode searching with selected scrapper to file' />
+                <input onclick="g_post_form( '/identify-e-assignd/', 'fMediaIdent', 'dResult2' );" type='button' id='bMediaIdentExist' value='Assign to Title' title='Assign Title-Season-Episode to DB if Title Exist' />
+                <input onclick="g_post_form( '/identify-e-search/', 'fMediaIdent', 'dResultSearch' );" type='button' id='bMediaSearch' value='Search Titles' title='WebSearch title and show Similars' />
+                <input onclick="g_post_form( '/identify-e-clean/', 'fMediaIdent', 'dResult2' );" type='button' id='bMediaCleanMI' value='Clean MediaInfo' title='Clean File Mediainfo and set to search on next cron' />
+            </td>
+        </tr>
+        {{end}}
+    </table>
+</form>

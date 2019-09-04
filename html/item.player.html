@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+    <head>
+
+        <title>GMS</title>
+
+        <base href="">
+
+        <meta charset="utf-8">
+        <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+        <meta http-equiv='X-UA-Compatible' content='IE=8' />
+        <meta http-equiv='Pragma' content='no-cache' />
+        <meta http-equiv='Expires' content='-1' />
+        <meta name="referrer" content="no-referrer" />
+
+        <meta name='Keywords' content='' />
+        <meta name='Description' content='' />
+        <meta name='robots' content='nofollow' />
+        <meta name='author' content='GMS' />
+
+        <script src="/assets/jquery-3.2.1.min.js"></script>
+        <script src="/assets/init.js"></script>
+        <script src="/assets/init.player.js"></script>
+
+        <link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+
+        <link rel="stylesheet" href="/assets/index.css" />
+        <link rel="stylesheet" href="/assets/index_extra.css" />
+    </head>
+    <body>
+        
+
+    <script>
+
+    //VARS
+
+    {{range .Todos}}
+    var idmedia = {{.idmedia}}
+    {{end}}
+    var DEBUG = true
+    var g_debug = true;
+    var mousemovetimeout = null;
+
+    //CHECK VIDEO
+
+    var retrytimer = false;
+    var playedtotaltime = {{.PrevPlayed}}; //set to prevtimedplayed
+    var playererrors = 0;
+    var playererrors_max = 3;
+    var playerskiptime = 10;
+    var totaltime = {{.FileTime}}; //set to total time
+    var audiotracknow = 0; //ser audop tracks ??
+    var subtracknow = -1;
+    var qualitynow = 'sd';
+
+    </script>
+
+<style type='text/css'>
+html, body
+{
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0px !important;
+    padding: 0px !important;
+    border: 0px !important;
+    overflow: hidden;
+}
+.dBaseBox{
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0px !important;
+    padding: 0px !important;
+    border: 0px !important;
+    background-color: black !important;
+}
+</style>
+	
+        {{.Menu}}
+
+        {{range .Todos}}
+
+	<video id="my-player" class="videoplayer"
+	width="100%" height="100%"
+	preload="auto"
+	poster="/mediainfo-img/?id={{.idmediainfo}}&type=landscape"
+	autoplay
+	>
+        {{ $save := . }}
+        {{ range $a, $b := $.Codecs }}
+        <source id='my-player-source' src="/media-play-time/?id={{$save.idmedia}}&mode={{ $a }}&timeplayed={{$.PrevPlayed}}&audiotrack=0&subtrack=-1" type="{{ $b }}" preload="auto" >
+        {{ end }}
+        <source id='my-player-source' src="/media-play-time/?id={{.idmedia}}&mode=webm&timeplayed={{$.PrevPlayed}}&audiotrack=0&subtrack=-1" type="video/webm" data-last='1' preload="auto" >
+        Your browser does not support the video tag.
+	</video>
+	
+    <div id="subOverlay" class="subOverlay">
+        
+    </div>
+	
+	<div id='playerBoxC' class='playerBoxControls'>
+        <div class='playerBoxBarInfo'>
+            <img class='playerInfoImg' src='/mediainfo-img/?id={{.idmediainfo}}&type=landscape' title='{{.Title}}' />
+        </div>
+        <div class='playerBoxBarControls'>
+            <div class='playerBoxBarControlsTitle'>
+                <span>{{.Title}} ({{.Year}}) &#x2605;{{.Rating}}</span>
+            </div>
+            <div class='playerBoxBarControlsTimeBar'>
+                <div class='tRow'>
+                    <div class='tbTimer'>
+                        <span class='playerControlTimeNowData'>00:00</span>/<span id='playerControlTimeTotalData'>01:00:00</span>
+                    </div>
+                    <div class='tbSlider'>
+                        <input class='hidden playerBoxBarControlsTimeBarSlide slider' id="slideTime" type="range" min="0" max="7200" step="1" value="0" onchange="playerTimeChanged( this.value ); return false;" />
+                        <div class='dSlider'>
+                            <div class='dSliderInner'>
+                                <span class='playerControlTimeNowData'>00:00</span>&nbsp;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class='playerBoxBarControlsActions basecontrols'>
+                <div class='tRow'>
+                    <div class='playerBoxBarControlsButton'><a href='/mediainfo-next/?id={{.idmediainfo}}' title='Back File' id='aBackFile'>&#8920;</a></div>
+                    <div id='playerControlPlayBack' class='playerBoxBarControlsButton' title='Time Back'>&#8810;</div>
+                    <div id='playerControlPause' class='playerBoxBarControlsButton'>&#10073;&#10073;</div>
+                    <div id='playerControlPlay' class='playerBoxBarControlsButton'>&#x25B7;</div>
+                    <div id='playerControlStop' class='playerBoxBarControlsButton'>&#9724;</div>
+                    <div id='playerControlPlayFor' class='playerBoxBarControlsButton' title='Time Next'>&#8811;</div>
+                    <div class='playerBoxBarControlsButton'><a href='/mediainfo-next/?id={{.idmediainfo}}' title='Next File' id='aNextFile'>&#8921;</a></div>
+                    <div id='playerControlQuality' class='playerBoxBarControlsButton' title='Quality'>SD</div>
+                    <div id='playerControlFullScreenIco' class='playerBoxBarControlsButton' title='Full Screen' onclick="toggleFullScreen();">&#9633;</div>
+                    <div id='playerControlVolume' class='playerBoxBarControlsButton' title='Volume'>
+                        &#x266A;
+                    </div>
+                    <div id='playerControlVolume' class='playerBoxBarControlsButton' title='Volume'>
+                        <input class='playerBoxBarControlsVolumeSlide slider' id="slideVolume" type="range" min="0" max="100" step="5" value="50" 
+                            onchange="playerSoundChanged( this.value ); return false;" />
+                    </div>
+                    <div class='playerBoxBarControlsButton videoinfo'>1080x720 WEBM AAC</div>
+                </div>
+            </div>
+            <hr />
+                
+            <div class='playerBoxBarControlsActions playerControlAudioList'>
+                <div class='tRow'>
+                    <div class='playerBoxBarControlsButton text120'>
+                        &#x266B; Audio: 
+                    </div>
+                    {{$nowsel := 0}}
+                    {{range $.TracksAudio}}
+                    <div class='playerBoxBarControlsButton text120 {{if eq $nowsel 0}}{{$nowsel = 1}}playerBoxBarControlsButtonSelected{{end}}' onclick='setAudioTrack( this, {{.Index}} );'>{{if .Tags.Title}}{{.Tags.Title}}{{end}}/{{if .Tags.Language}}{{.Tags.Language}}{{end}}</div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    {{end}}
+                    <div class='playerBoxBarControlsButton text120'>
+                        &#x225F; Subs: 
+                    </div>
+                    {{range $.TracksSubs}}
+                    <div class='playerBoxBarControlsButton text120 subsTracks' onclick='loadSubTrack( this, {{.Index}} );'>{{if .Tags.Title}}{{.Tags.Title}}/{{end}}{{if .Tags.Language}}{{.Tags.Language}}{{end}}</div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    {{end}}
+                    <!--
+                    {{range $.TracksSubsL}}
+                    <div class='playerBoxBarControlsButton text120 subsTracks' onclick='setSubTrack( this, {{.Index}} );'>{{if .Tags.Title}}{{.Tags.Title}}/{{end}}{{if .Tags.Language}}{{.Tags.Language}}{{end}}</div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    {{end}}
+                    -->
+                </div>
+            </div>
+        </div>
+	</div>
+        {{end}}
+
+    </body>
+</html>

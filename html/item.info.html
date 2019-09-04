@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    <div class='dBaseBox'>
+        <div class='boxList'>
+            
+            {{range .Todos}}
+            
+            <div class='boxInfo'>
+
+                <br />
+                <table class='tListInfo'>
+                    <tr class='tListInfoTRImgMS'>
+                        <td colspan='100'>
+                            <div class='tListInfoImgMS'>
+                                <img class='listElementImgMS listElementImgInfoPoster' src='/mediainfo-img/?id={{.idmediainfo}}' 
+                                title='{{.title}}' 
+                                />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan='10' class='tListInfoTDImg'>
+                            <div class='tListInfoImg'>
+                                <img class='listElementImg listElementImgInfoPoster' src='/mediainfo-img/?id={{.idmediainfo}}' 
+                                title='{{.title}}' 
+                                />
+                            </div>
+                        </td>
+                        <th class='tListInfoTitle'>
+                            <div>
+                                &nbsp;&nbsp;
+                                {{.title}}
+                                &nbsp;&nbsp;
+                                {{if .season}} {{.season}}x{{printf "%02s" .episode}} {{end}}
+                                &nbsp;&nbsp;
+                                {{.titleepisode}}
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span>
+                                {{.year}}
+                            </span>
+                            {{if .runtime}}
+                            &nbsp;
+                            <span>
+                                {{.runtime}} mins
+                            </span>
+                            {{end}}
+                            &nbsp;
+                            &#x2605;
+                            <span>
+                                {{.rating}}
+                            </span>
+                            &nbsp;
+                            <span>
+                                {{.mpaa}}
+                            </span>
+                            {{if .runtime}}
+                            &nbsp;
+                            <span>
+                                END: {{$.TimeEnd}}
+                            </span>
+                            {{end}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;&nbsp;
+                            <span style='background-color: lightgreen !important;'>
+                                <a href='/media-player/?id={{.idmediainfo}}'>&#x25B7;&nbsp;PLAY</a>
+                            </span>
+                            &nbsp;
+                            <span style='background-color: orange !important;'>
+                                <a href='/mediainfo-next/?id={{.idmediainfo}}'>NEXT</a>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            &nbsp;&nbsp;
+                            <span style='background-color: lightgreen !important;'>
+                                <a href='/mediainfo-playlater/?id={{.idmediainfo}}'>&#x25B7;&nbsp;PLAY LATER</a>
+                            </span>
+                            &nbsp;
+                            <span style='background-color: lightblue !important;'>
+                                <a href='/mediainfo-download/?id={{.idmediainfo}}'>&#x21E3;&nbsp;DOWNLOAD</a>
+                            </span>
+                            {{if .season}}
+                            &nbsp;
+                            <span style='background-color: DarkKhaki !important;'>
+                                <a href='/mediainfo-chapters/?id={{.idmediainfo}}'>CHAPTER LIST</a>
+                            </span>
+                            {{end}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{range $.Genres}}
+                            <span>
+                                <a href='/list/?genre={{urlquery .name}}'>{{.name}}</a>
+                            </span>
+                            {{end}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{range $.Tags}}
+                            <span>
+                                <a>{{.}}</a>
+                            </span>
+                            {{end}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                {{.tagline}}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                {{.plot}}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{if .width}}
+                            <span>{{.width}}x{{.height}} HD</span>
+                            &nbsp;
+                            {{end}}
+                            {{if .codec}}
+                            <span>{{.codec}}</span>
+                            {{end}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{if .imdbid}}
+                                &nbsp;<span><a href='http://www.imdb.com/title/{{.imdbid}}' title='{{.title}}' target='_blank'>IMDb</a></span>&nbsp;
+                            {{end}}
+                            {{if .tmdbid}}
+                                &nbsp;<span><a href='https://www.themoviedb.org/movie/{{.tmdbid}}' title='{{.title}}' target='_blank'>TheMovieDb</a></span>&nbsp;
+                            {{end}}
+                            {{if .tvdbid}}
+                                &nbsp;<span><a href='https://thetvdb.com/index.php?tab=episode&id={{.tvdbid}}' title='{{.title}}' target='_blank'>TheTVDB</a></span>&nbsp;
+                            {{end}}
+                        </td>
+                    </tr>
+                </table>
+
+                {{end}}
+
+                <!-- RELATED -->
+                
+                <div class='boxList'>
+                    
+                    <h2>RELATED</h2>
+
+                    {{range .Related}}
+
+                    <div class='listElement'>
+                        <a href='/mediainfo/?id={{.idmediainfo}}' title='{{.title}}'><img title='{{.title}}: {{.plot}}' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id={{.idmediainfo}}' /><span class=''>{{.title}} {{if .season}} {{.season}}x{{printf "%02s" .episode}} {{end}} ({{.year}})</span></a>
+                    </div>
+                    
+                    {{end}}
+
+                </div>
+
+                <!-- ACTORS -->
+                
+                <div class='boxList'>
+                    <h2>ACTORS</h2>
+                    
+                    <div class='tListInfoActors'>
+
+                    {{range .Actors}}
+                        <div class='tListInfoActorsE eColors00' >
+                            <a href='/list/?actor={{urlquery .name}}' title='{{.name}}'>
+                                <img class='lazy' src='/actor-img/?id={{urlquery .name}}' />
+                            </a>
+                            <span>{{.name}}</span>
+                        </div>
+                    {{end}}
+                    
+                    </div>
+                    
+                </div>
+                
+            </div>
+            
+        </div>
+    </div>
+
+</body>
+</html>

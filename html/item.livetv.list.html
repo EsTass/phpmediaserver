@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    <div class='dBaseBox'>
+        <div class='boxList'>
+            <h2>{{.Title}}</h2>
+
+            {{range .Todos}}
+            <div class='listElement'>
+                {{if .Tags}}
+                <div style="position:absolute;top:1;right:0;background-color: blue !important;">
+                    {{.Tags}}
+                </div>
+                {{end}}
+                <a href='/livetv-player/?id={{.idmedialive}}' title='{{.title}}'><img title='{{.title}}' class='listElementImg lazy' data-src='' src='/mediainfo-img/?id={{.idmedialive}}&type=livetv' /><span class=''>{{.title}}</span></a>
+            </div>
+            {{end}}
+            
+        </div>
+    </div>
+
+</body>
+</html>

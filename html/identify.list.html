@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    <div class='dBaseBox'>
+        <h1>{{.Title}}</h1>
+        
+        <br />
+        
+        <div id="dResultSearch" style="text-align: center"></div>
+
+        <div id="dResult2" class="tList widthFull" style="text-align: center;padding: 10px 0px;"></div>
+
+        <div id="dResult" style="text-align: center"></div>
+        
+        <br />
+        
+        <table class="tList">
+            <tr>
+                <th>Poster</th>
+                <th>IDMEDIA</th>
+                <th>File</th>
+                <th>IDMEDIAINFO</th>
+                <th>Title</th>
+                <th>Season</th>
+                <th>Episode</th>
+                <th>Year</th>
+                <th>Actions</th>
+            </tr>
+            {{range $i, $list := .Todos}}
+            <tr>
+                <td>
+                    <img class='listElementImgMS listElementImgMini' src='/mediainfo-img/?id={{.idmediainfo}}' title='{{.title}}' />
+                </td>
+                <td>{{$list.idmedia}}</td>
+                <td>{{$list.file}}</td>
+                <td>{{$list.idmediainfo}}</td>
+                <td>{{$list.title}}</td>
+                <td>{{$list.season}}</td>
+                <td>{{$list.episode}}</td>
+                <td>{{$list.year}}</td>
+                <td>
+                    <input type="button" onclick="g_get( '/identify-e-show/?id={{.idmedia}}', 'dResult' );" value="Show Ident" />
+                    <br />
+                    <br />
+                    <input type="button" onclick="g_get( '/identify-e-delete/?id={{.idmedia}}', 'dResult' );" value="DELETE" />
+                </td>
+            </tr>
+            {{end}}
+        </table>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+
+<!-- <div class='body-bg'></div> -->
+<div class='boxLoadingOverlay'></div>
+<div class='boxInfoOverlay boxInfoOverlayBg'></div>
+<div class='boxInfoOverlay'></div>
+
+<div class='menuBoxContainer'>
+    
+    <div class='menuBox'>
+        <div class='dRow'>
+            <div class='listMenuElement'>
+                <a href='?'><img src="/assets/logo/3.png" class="imgLogo" title="GoMediaServer Logo" />{{.Title}}</a>
+            </div>
+            
+            {{range .Todos}}
+            
+                {{if .admin}}
+            <div class='listMenuElementAdmin'>
+                <a href='{{.url}}'>{{.title}}</a>
+            </div>
+                {{else}}
+            <div class='listMenuElement'>
+                <a href='{{.url}}'>{{.title}}</a>
+            </div>
+                {{end}}
+            {{end}}
+            
+            &nbsp;
+            
+            <div class='listMenuElement'>
+                <form method='get' autocomplete="off">
+                    <input name="search" type="search" placeholder="Search" list="search-list" autocomplete="off" value="{{.Search}}" />
+                    <datalist id="search-list"></datalist>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class='eMenuBox'>
+        <div class='dRow'>
+            <div class='listMenuElement'>
+                <a href='?'><img src="/assets/logo/3.png" class="imgLogo" title="GoMediaServer Logo" />{{.Title}}</a>
+            </div>
+            
+            {{range .Todos}}
+            
+                {{if .admin}}
+            <div class='listMenuElementAdmin'>
+                <a href='{{.url}}'>{{.title}}</a>
+            </div>
+                {{else}}
+            <div class='listMenuElement'>
+                <a href='{{.url}}'>{{.title}}</a>
+            </div>
+                {{end}}
+            {{end}}
+            
+        </div>
+    </div>
+</div>

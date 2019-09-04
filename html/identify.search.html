@@ -1,0 +1,21 @@
+
+    <table class="tList widthFull" style="">
+        {{if .MsgInfo}}
+        <tr>
+            <td>
+                {{.MsgInfo}}
+            </td>
+        </tr>
+        {{else}}
+        <tr>
+            <th>SEARCH RESULTS</th>
+        </tr>
+            {{range .Todos}}
+        <tr>
+            <td>
+                <a style="color:black;" href="#" onclick='$( "#ftitle" ).val( "{{.Title}}" );$( "#imdb" ).val( "{{.Idsearch}}" );'>{{.Title}}</a>
+            </td>
+        </tr>
+            {{end}}
+        {{end}}
+    </table>

@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'>
+<html lang='En' xml:lang='En' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+	
+	<title>GMS</title>
+
+	<base href="">
+	
+	<meta charset="utf-8">
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+	<meta http-equiv='X-UA-Compatible' content='IE=8' />
+	<meta http-equiv='Pragma' content='no-cache' />
+	<meta http-equiv='Expires' content='-1' />
+    <meta name="referrer" content="no-referrer" />
+	
+	<meta name='Keywords' content='' />
+	<meta name='Description' content='' />
+	<meta name='robots' content='nofollow' />
+	<meta name='author' content='GMS' />
+	
+	<script src="/assets/jquery-3.2.1.min.js"></script>
+    <script src="/assets/init.js"></script>
+    
+	<link type='image/x-icon' href='/assets/favicon.ico' rel='shortcut icon' />
+	
+	<link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index_extra.css" />
+</head>
+
+<body>
+    
+    {{.Menu}}
+    
+    <div class='dBaseBox'>
+        <h1>{{.Title}}</h1>
+        <table class="tList tCenter">
+            {{if .MsgInfo}}
+            <tr>
+                <th colspan="100" style="background-color: red; text-align: center;font-size: 120%;">{{.MsgInfo}}</th>
+            </tr>
+            {{end}}
+            <tr>
+                <td colspan="100">
+                    <form class='' id='usersadd' action='/users-add/' method='post' autocomplete='off'>
+                        <table class="widthFull" style="background-color: gainsboro; text-align: center;font-size: 120%;">
+                        <tr>
+                            <td>
+                                New User
+                            </td>
+                            <td>
+                                <input placeholder='username' type='input' id='username' name='username' />
+                            </td>
+                            <td>
+                                <input placeholder='password1' type='password' id='pass1' name='pass1' />
+                                <input placeholder='password2' type='password' id='pass2' name='pass2' />
+                            </td>
+                            <td>
+                                <input type="checkbox" name="useradmin" id="useradmin" value="1" />Admin
+                            </td>
+                            <td>
+                                <input type='submit' id='buseradd' value='Add' />
+                            </td>
+                        </tr>
+                        </table>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <th>User</th>
+                <th>NewPass</th>
+                <th>Delete</th>
+                <th>Admin</th>
+            </tr>
+            {{range .Todos}}
+            <tr>
+                <td>{{.username}}</td>
+                <td>
+                    <form class='' id='userschangepass' action='/users-change-pass/' method='post' autocomplete='off'>
+                        <input placeholder='username' type='hidden' id='username' name='username' value="{{.username}}" />
+                        <input placeholder='password1' type='password' id='pass1' name='pass1' />
+                        <input placeholder='password2' type='password' id='pass2' name='pass2' />
+                        <input type='submit' id='buserschangepass' value='Change' />
+                    </form>
+                </td>
+                <td>
+                    <form class='' id='usersdelete' action='/users-delete/' method='post' autocomplete='off'>
+                        <input placeholder='username' type='hidden' id='username' name='username' value="{{.username}}" />
+                        <input type='submit' id='buserdelete' value='Delete' />
+                    </form>
+                </td>
+                {{if .admin}}
+                <td>
+                    <form class='' id='usersnoadmin' action='/users-deladmin/' method='post' autocomplete='off'>
+                        <input placeholder='username' type='hidden' id='username' name='username' value="{{.username}}" />
+                        <input type='submit' id='busersnoadmin' value='- ADMIN' />
+                    </form>
+                </td>
+                {{else}}
+                <td>
+                    <form class='' id='usersnoadmin' action='/users-setadmin/' method='post' autocomplete='off'>
+                        <input placeholder='username' type='hidden' id='username' name='username' value="{{.username}}" />
+                        <input type='submit' id='busersnoadmin' value='+ ADMIN' />
+                    </form>
+                </td>
+                {{end}}
+            </tr>
+            {{end}}
+        </table>
+    </div>
+
+</body>
+</html>
