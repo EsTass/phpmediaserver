@@ -59,6 +59,20 @@ function ident_identify_media( idmedia ){
     
     return false;
 }
+function ident_rs_media( idmedia ){
+    var url = '<?php getURL(); ?>';
+    url += '?r=r&action=identifyrs';
+    url += '&idmedia=' + idmedia;
+    loading_show();
+    $.get( url )
+    .done( function( data ){
+        scrolltop();
+        $( '#dResultIdent' ).html( data );
+        loading_hide();
+    });
+    
+    return false;
+}
 function ident_autoset_idmedia( idmedia ){
     var url = '<?php getURL(); ?>';
     url += '?r=r&action=identifyauto&idmedia=' + idmedia;
@@ -88,6 +102,7 @@ function ident_preview_media( idmedia, starttime ){
 </script>
 
 <div id='dResultIdent'></div>
+<div id='dResultidentS'></div>
 
 <br />
 
@@ -134,6 +149,7 @@ function ident_preview_media( idmedia, starttime ){
                 ?>
             <td>
                 <input onclick='ident_identify_media( <?php echo $lrow[ 'idmedia' ]; ?> );' type='button' id='bIdentify' name='bIdentify' value='<?php echo get_msg( 'MENU_IDENTIFY', FALSE ); ?>' />
+                <input onclick='ident_rs_media( <?php echo $lrow[ 'idmedia' ]; ?> );' type='button' id='bIdentifyRS' name='bIdentifyRS' value='Bulk <?php echo get_msg( 'MENU_IDENTIFY', FALSE ); ?>' />
                 <input onclick='ident_preview_media( <?php echo $lrow[ 'idmedia' ]; ?>, 0 );' type='button' id='bIdentifyP' name='bIdentifyP' value='Preview' />
                 <input onclick='ident_autoset_idmedia( <?php echo $lrow[ 'idmedia' ]; ?> );' type='button' id='bSetAutoIdMedia' name='bSetAutoIdMedia' value='<?php echo get_msg( 'MENU_IDENTIFY_AUTO', FALSE ); ?>' />
                 <input onclick='log_delete_media( <?php echo $lrow[ 'idmedia' ]; ?> );' type='button' id='bLogDelete' name='bLogDelete' value='<?php echo get_msg( 'MENU_DELETE', FALSE ); ?>' />
