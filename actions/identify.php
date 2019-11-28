@@ -102,7 +102,7 @@ function ident_preview_media( idmedia, starttime ){
 </script>
 
 <div id='dResultIdent'></div>
-<div id='dResultidentS'></div>
+<div id='dResultidentS' style='width:100%;margin: auto;'></div>
 
 <br />
 

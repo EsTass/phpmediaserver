@@ -167,6 +167,15 @@ function ident_rs(){
                     <option value='SFixed<?php echo $x; ?>'>Fixed <?php echo $x; ?></option>
                     <?php } ?>
                 </select>
+                <br />
+                <br />
+                <input list="seasonrel" type='text' id='seasonre' name='seasonre' value='' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" placeholder="Forced RegExp" />
+                <datalist id="seasonrel">
+                    <option value="[sS]()\d{1,2})[xXeE]\d{1,2}">
+                    <option value="Season.(\d{2})">
+                    <option value="S.{1,5}\d{1}(\d{2})">
+                    <option value="Season.{1,2}(\d{2})">
+                </datalist>
             </td>
             <td>
                 <select id='episode' name='episode'>
@@ -187,6 +196,15 @@ function ident_rs(){
                     <option value='EFixed<?php echo $x; ?>'>Fixed <?php echo $x; ?></option>
                     <?php } ?>
                 </select>
+                <br />
+                <br />
+                <input list="episoderel" type='text' id='episodere' name='episodere' value='' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" placeholder="Forced RegExp" />
+                <datalist id="episoderel">
+                    <option value="[sS]\d{1,2}[xXeE](\d{1,2})">
+                    <option value="Cap\.(\d{2})">
+                    <option value="Cap\.\d{1}(\d{2})">
+                    <option value="Episode.{1,2}(\d{2})">
+                </datalist>
             </td>
             <td>
                 <input onclick='ident_rs_preview();' type='button' id='bPreview' name='bPreview' value='Preview' />

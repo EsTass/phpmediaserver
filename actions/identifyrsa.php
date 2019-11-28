@@ -9,7 +9,9 @@
 	//atitle
 	//preview
 	//season
+	//seasonre
 	//episode
+	//seasonre
 	
 	if( array_key_exists( 'idmedia', $G_DATA ) ){
         $IDMEDIA = $G_DATA[ 'idmedia' ];
@@ -52,12 +54,28 @@
         $BSEASON = FALSE;
 	}
 	
+	if( array_key_exists( 'seasonre', $G_DATA ) 
+	&& strlen( $G_DATA[ 'seasonre' ] ) > 0
+	){
+        $BSEASONRE = $G_DATA[ 'seasonre' ];
+	}else{
+        $BSEASONRE = FALSE;
+	}
+	
 	if( array_key_exists( 'episode', $G_DATA ) 
 	&& strlen( $G_DATA[ 'episode' ] ) > 2
 	){
         $BEPISODE = $G_DATA[ 'episode' ];
 	}else{
         $BEPISODE = FALSE;
+	}
+	
+	if( array_key_exists( 'episodere', $G_DATA ) 
+	&& strlen( $G_DATA[ 'episodere' ] ) > 2
+	){
+        $BEPISODERE = $G_DATA[ 'episodere' ];
+	}else{
+        $BEPISODERE = FALSE;
 	}
 	
 	if( array_key_exists( 'imdb', $G_DATA )
@@ -70,6 +88,7 @@
 	}
 	
 	//HELPERS
+	
 	function get_numerics( $str, $size = 1 ){
         $result = array();
         if( $size > 0 ){
@@ -91,6 +110,25 @@
         return $result;
     }
 	
+	function get_regexp_num( $str, $re ){
+        $result = array();
+        $re = '/' . $re . '/';
+        
+        //preg_match_all( $re, $str, $matches, PREG_SET_ORDER, 0 );
+        preg_match_all( $re, $str, $matches, PREG_PATTERN_ORDER, 0 );
+        if( is_array( $matches ) 
+        && array_key_exists( 1, $matches )
+        && is_array( $matches[ 1 ] ) 
+        && array_key_exists( 0, $matches[ 0 ] )
+        && is_numeric( $matches[ 1 ][ 0 ] )
+        ){
+            $result = $matches[ 1 ][ 0 ];
+        }
+        
+        echo "<br />SEARCH RESULT: " . print_r( $matches, TRUE );
+        return $result;
+    }
+	
 	//Check filenames
 	//get bad idents, not idents and last elements added
 	if( ( $edata = sqlite_media_getdata_identify_orderer( $FILENAME ) ) ){
@@ -101,8 +139,22 @@
                 //echo get_msg( 'IDENT_DETECTED' ) . $mdata[ 'title' ] . ' ' . $mdata[ 'year' ];
             }else{
                 echo '<br />File: ' . basename( $mdata[ 'file' ] );
+                
+                //SEASON
+                
                 //Extract season if needed
-                if( $BSEASON != FALSE ){
+                if( $BSEASONRE != FALSE ){
+                    //Forced RegExp
+                    if( ( $td = get_regexp_num( $mdata[ 'file' ], $BSEASONRE ) ) != FALSE ){
+                        $SEASON = (int)$td;
+                    }else{
+                        echo get_msg( 'IDENT_DETECTEDKO' ) . ': SEASON NOT FOUND - RE:' . $BSEASONRE . '- !';
+                        echo "<br />";
+                        var_dump( $td );
+                        //break;
+                        continue;
+                    }
+                }elseif( $BSEASON != FALSE ){
                     $pos = FALSE;
                     //SFixedX
                     if( startsWith( $BSEASON, 'SFixed' ) ){
@@ -142,14 +194,29 @@
                         }else{
                             echo get_msg( 'IDENT_DETECTEDKO' ) . ': SEASON NOT FOUND!';
                             var_dump( $nl );
-                            break;
+                            //break;
+                            continue;
                         }
                     }
                 }else{
                     $SEASON = FALSE;
                 }
+                
+                //EPISODES
+                
                 //Extract episode if needed
-                if( $BEPISODE != FALSE ){
+                if( $BEPISODERE != FALSE ){
+                    //Forced RegExp
+                    if( ( $td = get_regexp_num( $mdata[ 'file' ], $BEPISODERE ) ) != FALSE ){
+                        $EPISODE = (int)$td;
+                    }else{
+                        echo get_msg( 'IDENT_DETECTEDKO' ) . ': EPISODE NOT FOUND - RE:' . $BEPISODERE . ' - !';
+                        echo "<br />";
+                        var_dump( $td );
+                        //break;
+                        continue;
+                    }
+                }elseif( $BEPISODE != FALSE ){
                     $pos = FALSE;
                     //SFixedX
                     if( startsWith( $BEPISODE, 'SFixed' ) ){
@@ -189,7 +256,8 @@
                         }else{
                             echo get_msg( 'IDENT_DETECTEDKO' ) . ': EPISODE NOT FOUND!';
                             var_dump( $nl );
-                            break;
+                            //break;
+                            continue;
                         }
                     }
                 }else{
