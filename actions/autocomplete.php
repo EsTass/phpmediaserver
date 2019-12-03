@@ -34,6 +34,20 @@
         }
         header( 'Content-Type: application/json; charset=UTF-8' );
         echo json_encode( $data );
+    }elseif( strlen( $SEARCH ) > 2
+	&& $FIELD == 'atitle'
+	&& ( $datas = sqlite_media_getdata_filtered( $SEARCH, 20 ) )
+	){
+        $data = array();
+        $inlist = array();
+        foreach( $datas AS $row ){
+            if( !in_array( $row[ 'title' ], $data ) ){
+                $data[ $row[ 'idmedia' ] ] = str_replace( '"', '', $row[ 'title' ] );
+                $inlist[] = $row[ 'title' ] . ' ' . $row[ 'year' ];
+            }
+        }
+        header( 'Content-Type: application/json; charset=UTF-8' );
+        echo json_encode( $data );
     }
 
 ?>

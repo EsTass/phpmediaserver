@@ -82,6 +82,10 @@
                 //$TITLE .= ' ' . $SEASON . 'x' . sprintf( '%02d', $EPISODE );
             }
             
+            //Combo data
+            $combo_seasons_rules = scrapp_irules_seasons_list( $maxseason );
+            $combo_episodes_rules = scrapp_irules_episodes_list( $maxchapter );
+            
 ?>
 <script type="text/javascript">
 $(function () {
@@ -91,13 +95,13 @@ function ident_rs_preview(){
     //$( '#fElementIdentRS #action' ).val( 'identifyrsa' );
     $( '#fElementIdentRS #preview' ).val( '1' );
     var url = '<?php getURL(); ?>?' + $( '#fElementIdentRS' ).serialize();
-    $( '#dResultidentS' ).html( '' );
+    $( '#fElementIdentRSR' ).html( '' );
     $( '#dResultidentE' ).html( '' );
     loading_show();
     $.get( url )
     .done( function( data ){
         scrolltop();
-        $( '#dResultidentS' ).html( data );
+        $( '#fElementIdentRSR' ).html( data );
         loading_hide();
     });
     
@@ -107,13 +111,13 @@ function ident_rs(){
     //$( '#fElementIdentRS #action' ).val( 'identifyrsa' );
     $( '#fElementIdentRS #preview' ).val( '0' );
     var url = '<?php getURL(); ?>?' + $( '#fElementIdentRS' ).serialize();
-    $( '#dResultidentS' ).html( '' );
+    $( '#fElementIdentRSR' ).html( '' );
     $( '#dResultidentE' ).html( '' );
     loading_show();
     $.get( url )
     .done( function( data ){
         scrolltop();
-        $( '#dResultidentS' ).html( data );
+        $( '#fElementIdentRSR' ).html( data );
         loading_hide();
     });
     
@@ -136,35 +140,29 @@ function ident_rs(){
         </tr>
         <tr>
             <th>Search Filename</th>
-            <th>Assign Title (my_db)</th>
+            <th>Assign Title/imdbid (my_db)</th>
             <th>Season</th>
             <th>Episode</th>
             <th><?php echo get_msg( 'MENU_ACTION', FALSE ); ?></th>
         </tr>
         <tr>
             <td>
+                <p><?php echo $FILENAME; ?></p>
                 <input type='text' id='filename' name='filename' value='<?php echo $FILENAME; ?>' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" />
             </td>
             <td>
-                <input type='text' id='atitle' name='atitle' value='<?php echo $TITLE; ?>' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" />
+                <input type='text' id='atitle' name='atitle' value='<?php echo $TITLE; ?>' 
+                style='width:80%;height:60%;' 
+                onkeyup="autocomplete_search( this, 'atitle-dlist' );return false;"
+                list="atitle-dlist"
+                autocomplete="off"
+                />
+                <datalist id="atitle-dlist"></datalist>
             </td>
             <td>
                 <select id='season' name='season'>
-                    <option value=''>Movie (no season)</option>
-                    <option value='firstnumber1'>First Number (0)</option>
-                    <option value='firstnumber2'>First Number (00)</option>
-                    <option value='firstnumber3'>First Number (000)</option>
-                    <option value='firstnumber0'>First Number (XX0)</option>
-                    <option value='secondnumber1'>Second Number (0)</option>
-                    <option value='secondnumber2'>Second Number (00)</option>
-                    <option value='secondnumber3'>Second Number (000)</option>
-                    <option value='secondnumber0'>Second Number (XX0)</option>
-                    <option value='thirdlynumber1'>Thirdly Number (0)</option>
-                    <option value='thirdlynumber2'>Thirdly Number (00)</option>
-                    <option value='thirdlynumber3'>Thirdly Number (000)</option>
-                    <option value='thirdlynumber0'>Thirdly Number (XX0)</option>
-                    <?php for( $x = 1; $x < $maxseason; $x++ ){  ?>
-                    <option value='SFixed<?php echo $x; ?>'>Fixed <?php echo $x; ?></option>
+                    <?php foreach( $combo_seasons_rules AS $k => $t ){  ?>
+                    <option value='<?php echo $k; ?>'><?php echo $t; ?></option>
                     <?php } ?>
                 </select>
                 <br />
@@ -175,25 +173,13 @@ function ident_rs(){
                     <option value="Season.(\d{2})">
                     <option value="S.{1,5}\d{1}(\d{2})">
                     <option value="Season.{1,2}(\d{2})">
+                    <option value="(\d{1})\d{2}">
                 </datalist>
             </td>
             <td>
                 <select id='episode' name='episode'>
-                    <option value=''>Movie (no chapter)</option>
-                    <option value='firstnumber1'>First Number (0)</option>
-                    <option value='firstnumber2'>First Number (00)</option>
-                    <option value='firstnumber3'>First Number (000)</option>
-                    <option value='firstnumber0'>First Number (XX0)</option>
-                    <option value='secondnumber1'>Second Number (0)</option>
-                    <option value='secondnumber2'>Second Number (00)</option>
-                    <option value='secondnumber3'>Second Number (000)</option>
-                    <option value='secondnumber0'>Second Number (XX0)</option>
-                    <option value='thirdlynumber1'>Thirdly Number (0)</option>
-                    <option value='thirdlynumber2'>Thirdly Number (00)</option>
-                    <option value='thirdlynumber3'>Thirdly Number (000)</option>
-                    <option value='thirdlynumber0'>Thirdly Number (XX0)</option>
-                    <?php for( $x = 1; $x < $maxchapter; $x++ ){  ?>
-                    <option value='EFixed<?php echo $x; ?>'>Fixed <?php echo $x; ?></option>
+                    <?php foreach( $combo_episodes_rules AS $k => $t ){  ?>
+                    <option value='<?php echo $k; ?>'><?php echo $t; ?></option>
                     <?php } ?>
                 </select>
                 <br />
@@ -204,12 +190,19 @@ function ident_rs(){
                     <option value="Cap\.(\d{2})">
                     <option value="Cap\.\d{1}(\d{2})">
                     <option value="Episode.{1,2}(\d{2})">
+                    <option value="\d{1}(\d{2})">
                 </datalist>
             </td>
             <td>
                 <input onclick='ident_rs_preview();' type='button' id='bPreview' name='bPreview' value='Preview' />
                 <input onclick='ident_rs();' type='button' id='bActionRS' name='bActionRS' value='Identify' />
             </td>
+        </tr>
+        <tr>
+            <td colspan='100'><div id='fElementIdentRSR'></div></td>
+        </tr>
+        <tr>
+            <td colspan='100'></td>
         </tr>
     </table>
        

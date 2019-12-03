@@ -45,7 +45,8 @@
         $HTMLRESULT = get_msg( 'DEF_NOTEXIST' );
 	}
 	
-	if( ( $edata = sqlite_media_getdata_chapters( $MEDIAINFO[ 'title' ] ) ) != FALSE 
+	if( is_array( $MEDIAINFO )
+	&& ( $edata = sqlite_media_getdata_chapters( $MEDIAINFO[ 'title' ] ) ) != FALSE 
 	&& count( $edata ) > 0
 	){
         echo get_html_list_chapters( $edata, $MEDIAINFO );
