@@ -42,6 +42,9 @@
 	//Countrys allowed (http://www.geoplugin.net)
 	define( 'O_COUNTRYALLOWED', array( '' ) );
 	
+	//ipgeolocation.io APIKEY
+	define( 'O_IPGEOLOCATIONIO_APIKEY', '' );
+	
 	//Max size of Media Images (reduction disabled = 0): 250k
 	define( 'O_MAX_IMG_FILES', 250 * 1024 );
 	
