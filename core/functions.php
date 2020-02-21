@@ -106,6 +106,11 @@
             $result = TRUE;
         }elseif( checkWhitedIP( $IP ) ){
             $result = TRUE;
+        }elseif( ( $ipcountry = ip_info2( $IP, 'country' ) ) != FALSE 
+        && in_array( $ipcountry, $COUNTRY )
+        ){
+            addWhitedIP( $IP );
+            $result = TRUE;
         }elseif( ( $ipcountry = ip_info( $IP, 'country' ) ) != FALSE 
         && in_array( $ipcountry, $COUNTRY )
         ){
@@ -187,7 +192,58 @@
         
         return $output;
     }
-	
+    
+	function ip_info2($ip = NULL, $purpose = "location", $deep_detect = TRUE) {
+        $output = NULL;
+        $apiKey = O_IPGEOLOCATIONIO_APIKEY;
+        $lang = "en";
+        //$fields = "*";
+        $fields = "country_name,country_code2";
+        $excludes = "";
+        
+        if( !is_string( $apiKey ) 
+        || strlen( $apiKey ) <= 0
+        ){
+            return $output;
+        }
+        
+        if( filter_var($ip, FILTER_VALIDATE_IP) === FALSE ) {
+            $ip = $_SERVER["REMOTE_ADDR"];
+            if ($deep_detect) {
+                if (filter_var(@$_SERVER['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP))
+                    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+                if (filter_var(@$_SERVER['HTTP_CLIENT_IP'], FILTER_VALIDATE_IP))
+                    $ip = $_SERVER['HTTP_CLIENT_IP'];
+            }
+        }
+        
+        $url = "https://api.ipgeolocation.io/ipgeo?apiKey=".$apiKey."&ip=".$ip."&lang=".$lang."&fields=".$fields."&excludes=".$excludes;
+        $cURL = curl_init();
+
+        curl_setopt($cURL, CURLOPT_URL, $url);
+        curl_setopt($cURL, CURLOPT_HTTPGET, true);
+        curl_setopt($cURL, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($cURL, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Accept: application/json'
+        ));
+        //return curl_exec($cURL);
+        $location = curl_exec($cURL);
+        $decodedLocation = json_decode($location, true);
+        
+        if( ( $location = curl_exec($cURL) ) != FALSE 
+        && ( $decodedLocation = json_decode($location, true) ) != FALSE
+        ){
+            if( array_key_exists( 'country_name', $decodedLocation ) ){
+                $output = $decodedLocation[ 'country_name' ];
+            }elseif( array_key_exists( 'country_name', $decodedLocation ) ){
+                $output = $decodedLocation[ 'country_code2' ];
+            }
+        }
+        
+        return $output;
+    }
+    
 	//GET POST DATA
 	
 	function init_get_post(){
