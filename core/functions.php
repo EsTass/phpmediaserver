@@ -102,6 +102,9 @@
         //Add external msg server ips if needed
         msgExternalIPs( $VALID_IPs );
         
+        $ipcountry = '';
+        $ipcountry2 = '';
+        
         if( inString( $IP, $VALID_IPs ) ){
             $result = TRUE;
         }elseif( checkWhitedIP( $IP ) ){
@@ -111,12 +114,13 @@
         ){
             addWhitedIP( $IP );
             $result = TRUE;
-        }elseif( ( $ipcountry = ip_info( $IP, 'country' ) ) != FALSE 
-        && in_array( $ipcountry, $COUNTRY )
+        }elseif( ( $ipcountry2 = ip_info( $IP, 'country' ) ) != FALSE 
+        && in_array( $ipcountry2, $COUNTRY )
         ){
             addWhitedIP( $IP );
             $result = TRUE;
         }else{
+            $ipcountry .= $ipcountry2;
             if( addBannedIP( $IP, ' COUNTRY: ' . $ipcountry, ( 24 * 365 ) ) ){
             
             }else{
