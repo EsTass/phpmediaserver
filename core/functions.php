@@ -110,17 +110,22 @@
         }elseif( checkWhitedIP( $IP ) ){
             $result = TRUE;
         }elseif( ( $ipcountry = ip_info2( $IP, 'country' ) ) != FALSE 
+        && is_string( $ipcountry )
+        && strlen( $ipcountry ) > 0
         && in_array( $ipcountry, $COUNTRY )
         ){
             addWhitedIP( $IP );
             $result = TRUE;
         }elseif( ( $ipcountry2 = ip_info( $IP, 'country' ) ) != FALSE 
+        && is_string( $ipcountry2 )
+        && strlen( $ipcountry2 ) > 0
         && in_array( $ipcountry2, $COUNTRY )
         ){
+            $ipcountry = $ipcountry2;
             addWhitedIP( $IP );
             $result = TRUE;
         }else{
-            $ipcountry .= $ipcountry2;
+            //$ipcountry .= $ipcountry2;
             if( addBannedIP( $IP, ' COUNTRY: ' . $ipcountry, ( 24 * 365 ) ) ){
             
             }else{
