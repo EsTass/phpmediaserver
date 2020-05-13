@@ -172,8 +172,8 @@
         
         if( ( filter_var( $file, FILTER_VALIDATE_URL )  || file_exists( $file ) )
         && ( $data = runExtCommand( $cmd ) ) != FALSE
+        && ( $info = new SimpleXMLElement( $data ) ) != FALSE
         ){
-            $info = new SimpleXMLElement( $data );
             if( $debug ){
                 echo "<br />CMD: " . $cmd . "\n";
                 echo "<br />Video duration: " . $info->format['duration'] . "\n";
