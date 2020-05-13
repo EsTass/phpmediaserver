@@ -6,7 +6,9 @@
 
 ![phpmediaserver](https://media.giphy.com/media/kBkna0rSjksQyQlfZ3/source.gif)
 
-[IMG1](http://i67.tinypic.com/33opaiv.png)
+[IMG1](https://i.postimg.cc/d1DTSmDV/1.png)
+[IMG2](https://i.postimg.cc/yxZ371mq/2.png)
+[IMG3](https://i.postimg.cc/DZDbVJbd/3.png)
 
 ## App version (portable exe)
 
