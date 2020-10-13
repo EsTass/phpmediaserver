@@ -272,7 +272,7 @@
             }
             $result = array(
                 'codec' => (string)$info->streams->stream[0]['codec_name'],
-                'acodec' => (string)$info->streams->stream[1]['codec_name'],
+                'acodec' => ( (string)@$info->streams->stream[1]['codec_name'] || '' ),
                 'width' => (int)$info->streams->stream[0]['width'],
                 'height' => (int)$info->streams->stream[0]['height'],
                 'duration' => (int)$duration,
