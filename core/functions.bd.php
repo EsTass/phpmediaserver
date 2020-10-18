@@ -9,6 +9,7 @@
         'medialive' => "CREATE TABLE 'medialive' ('idmedialive' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'title' TEXT, 'url' TEXT, 'poster' TEXT, 'date' DATETIME)",
         'medialiveurls' => "CREATE TABLE 'medialiveurls' ('idmedialiveurls' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'title' TEXT, 'url' TEXT, 'date' DATETIME)",
         'playing' => "CREATE TABLE 'playing' ('idplaying' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'user' TEXT, 'idmedia' INTEGER DEFAULT 0, 'date' DATETIME, 'mode' TEXT, 'pid' TEXT)",
+        'idents' => "CREATE TABLE 'idents' ('ididents' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'file' TEXT, 'title' TEXT, 'imdbid' TEXT, 'type' TEXT, 'season' TEXT,'episode' TEXT, 'bulk' BOOLEAN DEFAULT 0)",
 	);
 	
 	$G_DB = FALSE;
@@ -2734,5 +2735,240 @@
 		
         return $result;
     }
+    
+    //PREV ASSIGNs DATA TO NEW INDENTIFYs
+    
+	function sqlite_idents_getdata( $id = FALSE, $limit = 1000, $filterbulk = FALSE ){
+		//Vars
+		$result = FALSE;
+		$whereadded = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM idents ';
+			if( $id != FALSE
+			&& is_numeric( $id )
+			&& (int)$id > 0
+			){
+				$sql .= ' WHERE ididents = ' . $id . ' ';
+				$whereadded = TRUE;
+			}
+			if( $filterbulk === 1
+			){
+                if( $whereadded ){
+                    $sql .= ' AND bulk = 1 ';
+                }else{
+                    $sql .= ' WHERE bulk = 1 ';
+                }
+			}elseif( $filterbulk === 0
+			){
+                if( $whereadded ){
+                    $sql .= ' AND bulk = 0 ';
+                }else{
+                    $sql .= ' WHERE bulk = 0 ';
+                }
+			}
+			$sql .= ' ORDER BY ididents DESC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_idents_getdata_e( $id = FALSE, $limit = 1000, $filterbulk = FALSE ){
+		//Vars
+		$result = FALSE;
+		$whereadded = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			
+			$sql = 'SELECT * FROM idents ';
+			if( $id != FALSE
+			&& is_numeric( $id )
+			&& (int)$id > 0
+			){
+				$sql .= ' WHERE ididents = ' . $id . ' ';
+				$whereadded = TRUE;
+			}
+			if( $filterbulk === 1
+			){
+                if( $whereadded ){
+                    $sql .= ' AND bulk = 1 ';
+                }else{
+                    $sql .= ' WHERE bulk = 1 ';
+                }
+			}elseif( $filterbulk === 0
+			){
+                if( $whereadded ){
+                    $sql .= ' AND bulk = 0 ';
+                }else{
+                    $sql .= ' WHERE bulk = 0 ';
+                }
+			}
+			$sql .= ' ORDER BY imdbid DESC, ididents DESC LIMIT ' . $limit;
+			//die( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_idents_insert( $data ){
+		//Vars
+		$result = FALSE;
+		$ididents = 0;
+		
+		$fields = array(
+            'ididents',
+            'file',
+            'title',
+            'imdbid',
+            'type',
+            'season',
+            'episode',
+            'bulk',
+		);
+		foreach( $fields AS $f ){
+            if( !array_key_exists( $f, $data ) ){
+                $data[ $f ] = '';
+            }
+		}
+		
+		//Check BOOLEAN
+		if( $data[ 'bulk' ] == TRUE ){
+            $data[ 'bulk' ] = '1';
+		}else{
+            $data[ 'bulk' ] = '0';
+		}
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'INSERT INTO idents VALUES(';
+			$sql .= '';
+			$sql .= ' NULL, ';
+			$sql .= ' "' . $dbhandle->escapeString( $data[ 'file' ] ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $data[ 'title' ] ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $data[ 'imdbid' ] ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $data[ 'type' ] ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $data[ 'season' ] ) . '", ';
+			$sql .= ' "' . $dbhandle->escapeString( $data[ 'episode' ] ) . '", ';
+			$sql .= ' "' . $data[ 'bulk' ] . '" ';
+			$sql .= ')';
+			$result = $dbhandle->exec( $sql );
+			if( $result
+			&& ( $lastid = sqlite_lastid() ) 
+            ){
+                $result = $lastid;
+			}
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_idents_delete( $id ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'DELETE FROM idents ';
+			$sql .= '';
+			$sql .= ' WHERE ididents = ' . $id . ' ';
+			//die( $sql );
+			$result = $dbhandle->exec( $sql );
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_idents_checkexist( $file ){
+		//Vars
+		$result = FALSE;
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'SELECT * FROM idents ';
+			$sql .= ' WHERE file LIKE \'' . $dbhandle->escapeString( $file ) . '\'';
+			$sql .= ' ORDER BY ididents ASC';
+			//var_dump( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			if( is_array( $result ) 
+			&& count( $result ) > 0
+			&& is_array( $result[ 0 ] )
+			&& array_key_exists( 'ididents', $result[ 0 ] )
+			){
+                $result = $result[ 0 ][ 'ididents' ];
+			}
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_idents_checkexist_e( $file, $title = FALSE, $imdbid = FALSE ){
+		//Vars
+		$result = FALSE;
+		if( $imdbid === FALSE ){
+            $imdbid = '';
+		}
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'SELECT * FROM idents ';
+			$sql .= ' WHERE file LIKE \'' . $dbhandle->escapeString( $file ) . '\'';
+			if( $title != FALSE ){
+                $sql .= ' AND title LIKE \'' . $dbhandle->escapeString( $title ) . '\'';
+            }
+			if( $imdbid != FALSE ){
+                $sql .= ' AND imdbid LIKE \'' . $dbhandle->escapeString( $imdbid ) . '\'';
+            }
+			$sql .= ' ORDER BY ididents ASC';
+			//var_dump( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			if( is_array( $result ) 
+			&& count( $result ) > 0
+			&& is_array( $result[ 0 ] )
+			&& array_key_exists( 'ididents', $result[ 0 ] )
+			){
+                $result = TRUE;
+			}
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
+	
+	function sqlite_idents_checkexist_et( $file, $title = FALSE, $imdbid = FALSE ){
+		//Vars
+		$result = FALSE;
+		if( $imdbid === FALSE ){
+            $imdbid = '';
+		}
+		
+		if( ( $dbhandle = sqlite_init() ) != FALSE ){
+			$sql = 'SELECT * FROM idents ';
+			$sql .= ' WHERE file LIKE \'' . $dbhandle->escapeString( $file ) . '\'';
+			if( $title != FALSE ){
+                $sql .= ' OR title LIKE \'' . $dbhandle->escapeString( $title ) . '\'';
+            }
+			if( $imdbid != FALSE ){
+                $sql .= ' OR imdbid LIKE \'' . $dbhandle->escapeString( $imdbid ) . '\'';
+            }
+			$sql .= ' ORDER BY ididents ASC';
+			//var_dump( $sql );
+			$result = sqlite_getarray( $dbhandle->query( $sql ) );
+			if( is_array( $result ) 
+			&& count( $result ) > 0
+			&& is_array( $result[ 0 ] )
+			&& array_key_exists( 'ididents', $result[ 0 ] )
+			){
+                $result = TRUE;
+			}
+			sqlite_db_close();
+		}
+		
+		return $result;
+	}
 	
 ?>

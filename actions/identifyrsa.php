@@ -87,6 +87,37 @@
 	
 	$HTML = scrapp_irules_ident( $IDMEDIA, $TITLE, $IMDB, $FILENAME, $PREVIEW, $BSEASON, $BSEASONRE, $BEPISODE, $BEPISODERE );
 	
+	//add to valid prev assings
+	if( stripos( $HTML, get_msg( 'IDENT_DETECTEDOK' ) ) !== FALSE 
+	&& ( $md = sqlite_media_getdata( $IDMEDIA ) ) != FALSE
+    && sqlite_idents_checkexist_et( $md[ 0 ][ 'file' ], $TITLE, $IMDB ) == FALSE
+	){
+        $imdbcode = '';
+        if( $IMDB !== FALSE ){
+            $imdbcode = $IMDB;
+        }
+        $STYPE = 'bulk';
+        $season = $BSEASON;
+        if( $BSEASONRE != '' ){
+            $season = $BSEASONRE;
+        }
+        $episode = $BEPISODE;
+        if( $BEPISODERE != '' ){
+            $episode = $BEPISODERE;
+        }
+        $datai = array(
+            'ididents' => 0,
+            'file' => $md[ 0 ][ 'file' ],
+            'title' => $TITLE,
+            'imdbid' => $FILENAME,
+            'type' => $STYPE,
+            'season' => $season,
+            'episode' => $episode,
+            'bulk' => TRUE,
+        );
+        sqlite_idents_insert( $datai );
+	}
+	
 	echo "" . $HTML;
 	
 ?>

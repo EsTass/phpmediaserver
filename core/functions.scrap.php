@@ -1595,7 +1595,16 @@
         if( $debug ) echo "<br />MEDIAINFO FINDED TITLE: " . $str2;
         similar_text( $str1, $str2, $pc_st );
         if( $debug ) echo "<br />MEDIAINFO SIMILARITY: " . $result;
-        $pc_l = levenshtein( $str1, $str2 );
+        //fix limit 255 chars
+        $lstr1 = $str1;
+        $lstr2 = $str2;
+        if( strlen( $lstr1 ) > 255 ){
+            $lstr1 = substr( $lstr1, -255 );
+        }
+        if( strlen( $lstr2 ) > 255 ){
+            $lstr2 = substr( $lstr2, -255 );
+        }
+        $pc_l = levenshtein( $lstr1, $lstr2 );
         if( $debug ) echo "<br />MEDIAINFO SIMILARITY(L): " . $pc_l;
         similar_text( soundex( $str1 ), soundex( $str2 ), $pc_sd );
         if( $debug ) echo "<br />MEDIAINFO SIMILARITY(SD): " . $pc_sd;
@@ -1773,6 +1782,16 @@
             && strlen( $t ) > 10
             ){
                 $titles[] = str_replace( get_year( $t ), '',  $t );
+            }
+        }
+        
+        //Add titles by saved manual searchs
+        if( ( $etitles = ident_detect_file_db_prev( $file, $title, $movies, $imdb, $season, $episode, $debug ) ) != FALSE 
+        && is_array( $etitles )
+        && count( $etitles ) > 0
+        ){
+            foreach( $etitles AS $e ){
+                $titles[] = $e;
             }
         }
         
@@ -1994,6 +2013,87 @@
             var_dump( $result );
             //die();
         }
+        return $result;
+	}
+	
+	//search manual titles added before by file and title
+	function ident_detect_file_db_prev( $file, $title, $movies = TRUE, $imdb = FALSE, $season = FALSE, $episode = FALSE, $debug = FALSE ){
+        $result = array();
+        $file_similarity = 95;
+        $title_similarity = 95;
+        $tfile_similarity = 100;
+        $ttitle_similarity = 100;
+        $ftitle = clean_filename( $file );
+        
+        if( ( $data = sqlite_idents_getdata() ) != FALSE 
+        && is_array( $data )
+        && count( $data ) > 0
+        ){
+            if( $debug ) echo "<br />PREV DATA: " . nl2br( print_r( count( $data ), TRUE ) );
+            foreach( $data AS $i ){
+                $ftitlen = clean_filename( $i[ 'file' ] );
+                $tpc = strSimilarity( $title, $i[ 'title' ], $debug );
+                $fpc = strSimilarity( $file, $i[ 'file' ], $debug );
+                $ttpc = strSimilarity( $ftitle, $i[ 'title' ], $debug );
+                $tfpc = strSimilarity( $ftitle, $ftitlen, $debug );
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $tpc . "->" . $title . "->" . $i[ 'title' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $fpc . "->" . $file . "->" . $i[ 'file' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $ttpc . "->" . $ftitle . "->" . $i[ 'title' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $tfpc . "->" . $ftitle . "->" . $ftitlen;
+                if( ( $i[ 'type' ] == 'series' && $movies == FALSE ) 
+                ){
+                    //Series
+                    $add = FALSE;
+                    if( $tpc >= $title_similarity ){
+                        //Title similarity
+                        $add = TRUE;
+                    }elseif( $fpc >= $file_similarity ){
+                        //File similarity
+                        $add = TRUE;
+                    }elseif( $ttpc >= $ttitle_similarity ){
+                        //Title file similarity
+                        $add = TRUE;
+                    }elseif( $tfpc >= $tfile_similarity ){
+                        //File to file title similarity
+                        $add = TRUE;
+                    }
+                    //add title or imdbid
+                    if( $add ){
+                        if( strlen( $i[ 'imdbid' ] ) > 0 ){
+                            $result[] = $i[ 'imdbid' ];
+                        }else{
+                            $result[] = $i[ 'title' ];
+                        }
+                    }
+                }elseif( ( $i[ 'type' ] != 'series' && $movies == TRUE ) 
+                ){
+                    //Movies
+                    $add = FALSE;
+                    if( $tpc >= $title_similarity ){
+                        //Title similarity
+                        $add = TRUE;
+                    }elseif( $fpc >= $file_similarity ){
+                        //File similarity
+                        $add = TRUE;
+                    }elseif( $ttpc >= $ttitle_similarity ){
+                        //Title file similarity
+                        $add = TRUE;
+                    }elseif( $tfpc >= $tfile_similarity ){
+                        //File to file title similarity
+                        $add = TRUE;
+                    }
+                    //add title or imdbid
+                    if( $add ){
+                        if( strlen( $i[ 'imdbid' ] ) > 0 ){
+                            $result[] = $i[ 'imdbid' ];
+                        }else{
+                            $result[] = $i[ 'title' ];
+                        }
+                    }
+                }
+            }
+        }
+        
         return $result;
 	}
 	
@@ -2300,7 +2400,7 @@
         return $result;
     }
     
-    function scrapp_irules_ident( $IDMEDIA, $TITLE, $IMDB, $FILENAME, $PREVIEW, $BSEASON, $BSEASONRE, $BEPISODE, $BEPISODERE ){
+    function scrapp_irules_ident( $IDMEDIA, $TITLE, $IMDB, $FILENAME, $PREVIEW, $BSEASON, $BSEASONRE, $BEPISODE, $BEPISODERE, $FORCED = FALSE ){
         $result = '';
         
         //Check filenames
@@ -2308,11 +2408,14 @@
         if( ( $edata = sqlite_media_getdata_identify_orderer( $FILENAME ) ) ){
             $result .= '<br /><br />Files: ' . count( $edata );
             foreach( $edata AS $mdata ){
-                if( $mdata[ 'idmediainfo' ] > 0 
-                && ( strlen( $mdata[ 'season' ] ) == 0
-                    || (
-                        strlen( $mdata[ 'season' ] ) > 0
-                        && strlen( $mdata[ 'episode' ] ) > 0
+                if( $FORCED == FALSE
+                && ( 
+                    $mdata[ 'idmediainfo' ] > 0 
+                    && ( strlen( $mdata[ 'season' ] ) == 0
+                        || (
+                            strlen( $mdata[ 'season' ] ) > 0
+                            && strlen( $mdata[ 'episode' ] ) > 0
+                        )
                     )
                 )
                 ){
@@ -2609,5 +2712,255 @@
         
         return $result;
     }
+	
+	function scrap_irules_prev( $file, $ftitle, $title, $debug = FALSE ){
+        //search for prev irules on files
+        $file_similarity = 98;
+        $title_similarity = 98;
+        $tfile_similarity = 100;
+        $ttitle_similarity = 100;
+        $ftitle = clean_filename( $ftitle );
+        $result = FALSE;
+        if( defined( 'MEDIA_CHAPTERS_MAXSEASON' ) ){
+            $maxseason = MEDIA_CHAPTERS_MAXSEASON;
+        }else{
+            $maxseason = 30;
+        }
+        
+        if( defined( 'MEDIA_CHAPTERS_MAXCHAPTER' ) ){
+            $maxchapter = MEDIA_CHAPTERS_MAXCHAPTER;
+        }else{
+            $maxchapter = 250;
+        }
+        //Combo data
+        $combo_seasons_rules = scrapp_irules_seasons_list( $maxseason );
+        $combo_episodes_rules = scrapp_irules_episodes_list( $maxchapter );
+                
+        
+        if( ( $data = sqlite_idents_getdata( FALSE, 1000, 1 ) ) != FALSE 
+        && is_array( $data )
+        && count( $data ) > 0
+        ){
+            if( $debug ) echo "<br />PREV DATA: " . nl2br( print_r( count( $data ), TRUE ) );
+            foreach( $data AS $i ){
+                //Filename prev on imdbid field
+                $ftitlen = clean_filename( $i[ 'file' ] );
+                $tpc = strSimilarity( $title, $i[ 'title' ], $debug );
+                $fpc = strSimilarity( $file, $i[ 'imdbid' ], $debug );
+                $ttpc = strSimilarity( $ftitle, $i[ 'title' ], $debug );
+                $tfpc = strSimilarity( $ftitle, $ftitlen, $debug );
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $tpc . "->" . $title . "->" . $i[ 'title' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $fpc . "->" . $file . "->" . $i[ 'imdb' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $ttpc . "->" . $ftitle . "->" . $i[ 'title' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $tfpc . "->" . $ftitle . "->" . $ftitlen;
+                $add = FALSE;
+                if( $tpc >= $title_similarity ){
+                    //Title similarity
+                    $add = TRUE;
+                }elseif( $fpc >= $file_similarity ){
+                    //File similarity
+                    $add = TRUE;
+                }elseif( $ttpc >= $ttitle_similarity ){
+                    //Title file similarity
+                    $add = TRUE;
+                }elseif( $tfpc >= $tfile_similarity ){
+                    //File to file title similarity
+                    $add = TRUE;
+                }
+                //add title or imdbid
+                if( $add ){
+                    //Check types for re seasonXepisode
+                    $s = '';
+                    $sre = '';
+                    $e = '';
+                    $ere = '';
+                    if( array_key_exists( $i[ 'season' ], $combo_seasons_rules ) ){
+                        $s = $i[ 'season' ];
+                        $sre = '';
+                    }else{
+                        $sre = $i[ 'season' ];
+                        $s = '';
+                    }
+                    if( array_key_exists( $i[ 'episode' ], $combo_episodes_rules ) ){
+                        $e = $i[ 'episode' ];
+                        $ere = '';
+                    }else{
+                        $ere = $i[ 'episode' ];
+                        $e = '';
+                    }
+                    $result = array(
+                        'filename' => $i[ 'imdbid' ],
+                        'atitle' => $i[ 'title' ],
+                        'season' => $s,
+                        'seasonrel' => $sre,
+                        'episode' => $e,
+                        'episoderel' => $ere,
+                    );
+                    break;
+                }
+            }
+        }
+        
+        return $result;
+        
+	}
+	
+	function scrap_irules_prev_n( $file, $ftitle, $title, $debug = FALSE ){
+        //search for prev irules on files
+        $file_similarity = 98;
+        $title_similarity = 98;
+        $tfile_similarity = 100;
+        $ttitle_similarity = 100;
+        $ftitle = clean_filename( $ftitle );
+        $result = FALSE;
+        if( defined( 'MEDIA_CHAPTERS_MAXSEASON' ) ){
+            $maxseason = MEDIA_CHAPTERS_MAXSEASON;
+        }else{
+            $maxseason = 30;
+        }
+        
+        if( defined( 'MEDIA_CHAPTERS_MAXCHAPTER' ) ){
+            $maxchapter = MEDIA_CHAPTERS_MAXCHAPTER;
+        }else{
+            $maxchapter = 250;
+        }
+        //Combo data
+        $combo_seasons_rules = scrapp_irules_seasons_list( $maxseason );
+        $combo_episodes_rules = scrapp_irules_episodes_list( $maxchapter );
+                
+        
+        if( ( $data = sqlite_idents_getdata( FALSE, 1000, 0 ) ) != FALSE 
+        && is_array( $data )
+        && count( $data ) > 0
+        ){
+            if( $debug ) echo "<br />PREV DATA: " . nl2br( print_r( count( $data ), TRUE ) );
+            foreach( $data AS $i ){
+                //Filename prev on imdbid field
+                $ftitlen = clean_filename( $i[ 'file' ] );
+                $tpc = strSimilarity( $title, $i[ 'title' ], $debug );
+                $fpc = strSimilarity( $file, $i[ 'imdbid' ], $debug );
+                $ttpc = strSimilarity( $ftitle, $i[ 'title' ], $debug );
+                $tfpc = strSimilarity( $ftitle, $ftitlen, $debug );
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $tpc . "->" . $title . "->" . $i[ 'title' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $fpc . "->" . $file . "->" . $i[ 'imdb' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $ttpc . "->" . $ftitle . "->" . $i[ 'title' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $tfpc . "->" . $ftitle . "->" . $ftitlen;
+                $add = FALSE;
+                if( $tpc >= $title_similarity ){
+                    //Title similarity
+                    $add = TRUE;
+                }elseif( $fpc >= $file_similarity ){
+                    //File similarity
+                    $add = TRUE;
+                }elseif( $ttpc >= $ttitle_similarity ){
+                    //Title file similarity
+                    $add = TRUE;
+                }elseif( $tfpc >= $tfile_similarity ){
+                    //File to file title similarity
+                    $add = TRUE;
+                }
+                //add title or imdbid
+                if( $add ){
+                    //Check types for re seasonXepisode
+                    $s = '';
+                    $sre = '';
+                    $e = '';
+                    $ere = '';
+                    if( array_key_exists( $i[ 'season' ], $combo_seasons_rules ) ){
+                        $s = $i[ 'season' ];
+                        $sre = '';
+                    }else{
+                        $sre = $i[ 'season' ];
+                        $s = '';
+                    }
+                    if( array_key_exists( $i[ 'episode' ], $combo_episodes_rules ) ){
+                        $e = $i[ 'episode' ];
+                        $ere = '';
+                    }else{
+                        $ere = $i[ 'episode' ];
+                        $e = '';
+                    }
+                    if( strlen( $i[ 'imdbid' ] ) > 0 ){
+                        $atitle = $i[ 'imdbid' ];
+                    }else{
+                        $atitle = $i[ 'title' ];
+                    }
+                    $result = array(
+                        'filename' => $ftitle,
+                        'atitle' => $atitle,
+                        'season' => $s,
+                        'seasonrel' => $sre,
+                        'episode' => $e,
+                        'episoderel' => $ere,
+                    );
+                    break;
+                }
+            }
+        }
+        
+        return $result;
+        
+	}
+	
+	function ident_irules_prev( $file, $title, $season, $episode, $debug = FALSE ){
+        //search for prev irules on files
+        $file_similarity = 98;
+        $title_similarity = 98;
+        $tfile_similarity = 100;
+        $ttitle_similarity = 100;
+        $ftitle = clean_filename( $file );
+        $result = FALSE;
+        $limit = 1000;
+        
+        if( ( $data = sqlite_idents_getdata_e( FALSE, $limit, FALSE ) ) != FALSE 
+        && is_array( $data )
+        && count( $data ) > 0
+        ){
+            if( $debug ) echo "<br />PREV DATA: " . nl2br( print_r( count( $data ), TRUE ) );
+            foreach( $data AS $i ){
+                $ftitlen = clean_filename( $i[ 'file' ] );
+                $tpc = strSimilarity( $title, $i[ 'title' ], $debug );
+                $fpc = strSimilarity( $file, $i[ 'file' ], $debug );
+                $ttpc = strSimilarity( $ftitle, $i[ 'title' ], $debug );
+                $tfpc = strSimilarity( $ftitle, $ftitlen, $debug );
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $tpc . "->" . $title . "->" . $i[ 'title' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $fpc . "->" . $file . "->" . $i[ 'file' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $ttpc . "->" . $ftitle . "->" . $i[ 'title' ];
+                if( $debug ) echo "<br />TITLES SIMILARITY: " . $tfpc . "->" . $ftitle . "->" . $ftitlen;
+                if( ( $i[ 'type' ] == 'series' && $season != FALSE ) 
+                || ( $i[ 'type' ] == 'movies' && $season == FALSE ) 
+                ){
+                    $add = FALSE;
+                    if( $tpc >= $title_similarity ){
+                        //Title similarity
+                        $add = TRUE;
+                    }elseif( $fpc >= $file_similarity ){
+                        //File similarity
+                        $add = TRUE;
+                    }elseif( $ttpc >= $ttitle_similarity ){
+                        //Title file similarity
+                        $add = TRUE;
+                    }elseif( $tfpc >= $tfile_similarity ){
+                        //File to file title similarity
+                        $add = TRUE;
+                    }
+                    //add title or imdbid
+                    if( $add ){
+                        $result = array(
+                            'title' => $i[ 'title' ],
+                            'type' => $i[ 'type' ],
+                            'imdb' => $i[ 'imdbid' ],
+                            'season' => '',
+                            'episode' => '',
+                        );
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return $result;
+        
+	}
 	
 ?>

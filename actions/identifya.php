@@ -72,6 +72,7 @@
 	}
 	
 	//ADDING FOR DATA
+	$DETECTED = FALSE;
 	
 	if( array_key_exists( 1, $G_SCRAPPERS[ $SCRAPPER ] )
 	&& function_exists( $G_SCRAPPERS[ $SCRAPPER ][ 1 ] )
@@ -147,6 +148,7 @@
                         }
                     }
                     echo get_msg( 'IDENT_DETECTEDOK' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $media[ 0 ][ 'file' ];
+                    $DETECTED = TRUE;
                 }else{
                     echo get_msg( 'IDENT_DETECTEDKO' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $media[ 0 ][ 'file' ];
                 }
@@ -189,12 +191,35 @@
                         }
                     }
                     echo get_msg( 'IDENT_DETECTEDOK' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $media[ 0 ][ 'file' ];
+                    $DETECTED = TRUE;
                 }else{
                     echo get_msg( 'IDENT_DETECTEDKO' ) . ' ' . $info_data[ 'data' ][ 'title' ] . ' => ' . $media[ 0 ][ 'file' ];
                 }
             }
         }else{
             echo get_msg( 'IDENT_NOTDETECTED' );
+        }
+        
+        //Check valid ident and save data, only with valid id imdb
+        if( $DETECTED 
+        //&& $IMDB != FALSE
+        && sqlite_idents_checkexist_e( $media[ 0 ][ 'file' ], $TITLE, $IMDB ) == FALSE
+        ){
+            $imdbcode = '';
+            if( $IMDB !== FALSE ){
+                $imdbcode = $IMDB;
+            }
+            $datai = array(
+                'ididents' => 0,
+                'file' => $media[ 0 ][ 'file' ],
+                'title' => $TITLE,
+                'imdbid' => $imdbcode,
+                'type' => $STYPE,
+                'season' => '',
+                'episode' => '',
+                'bulk' => FALSE,
+            );
+            sqlite_idents_insert( $datai );
         }
     }
 ?>

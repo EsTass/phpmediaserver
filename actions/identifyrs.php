@@ -33,10 +33,16 @@
 	&& count( $media ) > 0
 	){
         $FILENAME = basename( $media[ 0 ][ 'file' ] );
+        $FILENAMEBASE = $FILENAME;
         $FOLDERNAME = basename( dirname( $media[ 0 ][ 'file' ] ) );
         $TITLE = clean_filename( $FILENAME );
         $TITLEFOLDER = clean_filename( $FOLDERNAME );
         $FILE = $media[ 0 ][ 'file' ];
+        $SEASONV = '';
+        $SEASONVRE = '';
+        $EPISODEV = '';
+        $EPISODEVRE = '';
+        
         //CLEAN INEXISTENT
         if( !file_exists( $FILE ) ){
             echo get_msg( 'DEF_FILENOTEXIST' );
@@ -85,6 +91,18 @@
             //Combo data
             $combo_seasons_rules = scrapp_irules_seasons_list( $maxseason );
             $combo_episodes_rules = scrapp_irules_episodes_list( $maxchapter );
+            
+            //Search previous sets and force rules if finded
+            if( ( $pdata = scrap_irules_prev( $FILENAME, $media[ 0 ][ 'file' ], $TITLE, FALSE ) ) != FALSE
+            || ( $pdata = scrap_irules_prev_n( $FILENAME, $media[ 0 ][ 'file' ], $TITLE, FALSE ) ) != FALSE 
+            ){
+                $FILENAME = $pdata[ 'filename' ];
+                $TITLE = $pdata[ 'atitle' ];
+                $SEASONV = $pdata[ 'season' ];
+                $SEASONVRE = $pdata[ 'seasonrel' ];
+                $EPISODEV = $pdata[ 'episode' ];
+                $EPISODEVRE = $pdata[ 'episoderel' ];
+            }
             
 ?>
 <script type="text/javascript">
@@ -147,7 +165,7 @@ function ident_rs(){
         </tr>
         <tr>
             <td>
-                <p><?php echo $FILENAME; ?></p>
+                <p><?php echo $FILENAMEBASE; ?></p>
                 <input type='text' id='filename' name='filename' value='<?php echo $FILENAME; ?>' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" />
             </td>
             <td>
@@ -161,15 +179,22 @@ function ident_rs(){
             </td>
             <td>
                 <select id='season' name='season'>
-                    <?php foreach( $combo_seasons_rules AS $k => $t ){  ?>
-                    <option value='<?php echo $k; ?>'><?php echo $t; ?></option>
+                    <?php 
+                        foreach( $combo_seasons_rules AS $k => $t ){  
+                            if( $SEASONV == $k ){
+                                $selected = ' selected';
+                            }else{
+                                $selected = '';
+                            }
+                    ?>
+                    <option value='<?php echo $k; ?>' <?php echo $selected; ?>><?php echo $t; ?></option>
                     <?php } ?>
                 </select>
                 <br />
                 <br />
-                <input list="seasonrel" type='text' id='seasonre' name='seasonre' value='' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" placeholder="Forced RegExp" />
+                <input list="seasonrel" type='text' id='seasonre' name='seasonre' value='<?php echo $SEASONVRE; ?>' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" placeholder="Forced RegExp" />
                 <datalist id="seasonrel">
-                    <option value="[sS]()\d{1,2})[xXeE]\d{1,2}">
+                    <option value="[sS](\d{1,2})[xXeE]\d{1,2}">
                     <option value="Season.(\d{2})">
                     <option value="S.{1,5}\d{1}(\d{2})">
                     <option value="Season.{1,2}(\d{2})">
@@ -178,13 +203,20 @@ function ident_rs(){
             </td>
             <td>
                 <select id='episode' name='episode'>
-                    <?php foreach( $combo_episodes_rules AS $k => $t ){  ?>
-                    <option value='<?php echo $k; ?>'><?php echo $t; ?></option>
+                    <?php 
+                        foreach( $combo_episodes_rules AS $k => $t ){
+                            if( $EPISODEV == $k ){
+                                $selected = ' selected';
+                            }else{
+                                $selected = '';
+                            }
+                    ?>
+                    <option value='<?php echo $k; ?>' <?php echo $selected; ?>><?php echo $t; ?></option>
                     <?php } ?>
                 </select>
                 <br />
                 <br />
-                <input list="episoderel" type='text' id='episodere' name='episodere' value='' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" placeholder="Forced RegExp" />
+                <input list="episoderel" type='text' id='episodere' name='episodere' value='<?php echo $EPISODEVRE; ?>' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" placeholder="Forced RegExp" />
                 <datalist id="episoderel">
                     <option value="[sS]\d{1,2}[xXeE](\d{1,2})">
                     <option value="Cap\.(\d{2})">

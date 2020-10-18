@@ -15,6 +15,7 @@
 	
 	$SEASON = FALSE;
     $EPISODE = FALSE;
+    $IMDB = '';
 	
 	if( defined( 'MEDIA_CHAPTERS_MAXSEASON' ) ){
         $maxseason = MEDIA_CHAPTERS_MAXSEASON;
@@ -82,6 +83,11 @@
                 //$TITLE .= ' ' . $SEASON . 'x' . sprintf( '%02d', $EPISODE );
             }
             
+            //Search on prev idents and set data if possible
+            if( ( $pdata = ident_irules_prev( $media[ 0 ][ 'file' ], $TITLE, $SEASON, $EPISODE ) ) != FALSE ){
+                $TITLE = $pdata[ 'title' ];
+                $IMDB = $pdata[ 'imdb' ];
+            }
 ?>
 <script type="text/javascript">
 $(function () {
@@ -217,7 +223,7 @@ function new_mediainfo(){
                 <input type='text' id='title' name='title' value='<?php echo $TITLE; ?>' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" />
             </td>
             <td style='width:20%;'>
-                <input type='text' id='imdb' name='imdb' value='' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" />
+                <input type='text' id='imdb' name='imdb' value='<?php echo $IMDB; ?>' style='width:80%;height:60%;' onkeypress="return event.keyCode != 13;" />
             </td>
             <td>
                 <select id='scrapper' name='scrapper'>
