@@ -11,6 +11,9 @@
 	if( file_exists( PPATH_CRON_FILE ) ){
         $data = file_get_contents( PPATH_CRON_FILE );
         $data = str_ireplace( PHP_EOL, '<br />', $data );
+        $data = str_ireplace( '<br />', '--br--', $data );
+        $data = htmlspecialchars( $data );
+        $data = str_ireplace( '--br--', '<br />', $data );
         echo $data;
     }else{
         echo "<br />";
@@ -26,6 +29,9 @@
 	if( file_exists( PPATH_CRON_HOUR_FILE ) ){
         $data = file_get_contents( PPATH_CRON_HOUR_FILE );
         $data = str_ireplace( PHP_EOL, '<br />', $data );
+        $data = str_ireplace( '<br />', '--br--', $data );
+        $data = htmlspecialchars( $data );
+        $data = str_ireplace( '--br--', '<br />', $data );
         echo $data;
     }else{
         echo "<br />";
