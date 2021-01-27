@@ -40,6 +40,7 @@
 	define( 'O_LANG_AUDIO_TRACK', array( 'eng', 'en' ) );
 	
 	//Countrys allowed (http://www.geoplugin.net)
+	//FALSE: All countrys allowed
 	define( 'O_COUNTRYALLOWED', array( '' ) );
 	
 	//ipgeolocation.io APIKEY
