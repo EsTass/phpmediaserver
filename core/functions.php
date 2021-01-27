@@ -109,6 +109,11 @@
             $result = TRUE;
         }elseif( checkWhitedIP( $IP ) ){
             $result = TRUE;
+        }elseif( !is_array( $COUNTRY ) 
+        || ( is_array( $COUNTRY ) && count( $COUNTRY ) == 0 )
+        ){
+            addWhitedIP( $IP );
+            $result = TRUE;
         }elseif( ( $ipcountry = ip_info2( $IP, 'country' ) ) != FALSE 
         && is_string( $ipcountry )
         && strlen( $ipcountry ) > 0
