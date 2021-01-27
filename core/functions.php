@@ -92,53 +92,54 @@
 	
 	//FALSE, not valid
 	function check_ip_country( $IP ){
-        $result = FALSE;
-        $COUNTRY = O_COUNTRYALLOWED;
-        $VALID_IPs = array( 
-            '192.168.',
-            '10.0.',
-        );
-        
-        //Add external msg server ips if needed
-        msgExternalIPs( $VALID_IPs );
-        
-        $ipcountry = '';
-        $ipcountry2 = '';
-        
-        if( inString( $IP, $VALID_IPs ) ){
-            $result = TRUE;
-        }elseif( checkWhitedIP( $IP ) ){
-            $result = TRUE;
-        }elseif( !is_array( $COUNTRY ) 
-        || ( is_array( $COUNTRY ) && count( $COUNTRY ) == 0 )
-        ){
-            addWhitedIP( $IP );
-            $result = TRUE;
-        }elseif( ( $ipcountry = ip_info2( $IP, 'country' ) ) != FALSE 
-        && is_string( $ipcountry )
-        && strlen( $ipcountry ) > 0
-        && in_array( $ipcountry, $COUNTRY )
-        ){
-            addWhitedIP( $IP );
-            $result = TRUE;
-        }elseif( ( $ipcountry2 = ip_info( $IP, 'country' ) ) != FALSE 
-        && is_string( $ipcountry2 )
-        && strlen( $ipcountry2 ) > 0
-        && in_array( $ipcountry2, $COUNTRY )
-        ){
-            $ipcountry = $ipcountry2;
-            addWhitedIP( $IP );
-            $result = TRUE;
-        }else{
-            //$ipcountry .= $ipcountry2;
-            if( addBannedIP( $IP, ' COUNTRY: ' . $ipcountry, ( 24 * 365 ) ) ){
-            
-            }else{
-                die( 'error: ' . $IP );
-            }
-        }
-        
-        return $result;
+		$result = FALSE;
+		$COUNTRY = O_COUNTRYALLOWED;
+		$VALID_IPs = array( 
+		    '192.168.',
+		    '10.0.',
+		);
+
+		//Add external msg server ips if needed
+		msgExternalIPs( $VALID_IPs );
+
+		$ipcountry = '';
+		$ipcountry2 = '';
+
+		if( inString( $IP, $VALID_IPs ) ){
+		    $result = TRUE;
+		}elseif( checkWhitedIP( $IP ) ){
+		    $result = TRUE;
+		}elseif( !is_array( $COUNTRY ) 
+		|| ( is_array( $COUNTRY ) && count( $COUNTRY ) == 0 )
+		|| ( is_array( $COUNTRY ) && count( $COUNTRY ) == 1 && strlen( $COUNTRY[ 0 ] ) == 0 )
+		){
+		    addWhitedIP( $IP );
+		    $result = TRUE;
+		}elseif( ( $ipcountry = ip_info2( $IP, 'country' ) ) != FALSE 
+		&& is_string( $ipcountry )
+		&& strlen( $ipcountry ) > 0
+		&& in_array( $ipcountry, $COUNTRY )
+		){
+		    addWhitedIP( $IP );
+		    $result = TRUE;
+		}elseif( ( $ipcountry2 = ip_info( $IP, 'country' ) ) != FALSE 
+		&& is_string( $ipcountry2 )
+		&& strlen( $ipcountry2 ) > 0
+		&& in_array( $ipcountry2, $COUNTRY )
+		){
+		    $ipcountry = $ipcountry2;
+		    addWhitedIP( $IP );
+		    $result = TRUE;
+		}else{
+		    //$ipcountry .= $ipcountry2;
+		    if( addBannedIP( $IP, ' COUNTRY: ' . $ipcountry, ( 24 * 365 ) ) ){
+
+		    }else{
+			die( 'error: ' . $IP );
+		    }
+		}
+
+		return $result;
 	}
 	
 	function ip_info($ip = NULL, $purpose = "location", $deep_detect = TRUE) {
