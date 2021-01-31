@@ -1191,14 +1191,11 @@
 		if( ( $html = @file_get_contents_timed( $url ) ) != FALSE ){
 			$result = array();
 
-			$doc = new DOMDocument();
-			@$doc->loadHTML($html);
-            
             //file_put_contents( PPATH_CACHE . DS . 'QWant-html-' . date( 'd-m-y-H-i-s' ), $html );
             
             // Create a new DOMDocument
             $dom = new DOMDocument();
-            @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+            @$dom->loadHTML( mb_convert_encoding( $html, 'HTML-ENTITIES', 'utf-8' ) );
             $xp = new DOMXPath($dom);
             $nodes = $xp->query('*/a/img');
             $n = 0;
