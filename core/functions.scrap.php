@@ -100,20 +100,24 @@
         
         $data = @file_get_contents_timed( $URL );
         
-        // Create a new DOMDocument
-        $dom = new DOMDocument();
-        @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
-        $xp = new DOMXPath($dom);
-        $nodes = $xp->query('//a[@class="result__a"]');
-        foreach ( $nodes as $re ){
-            $href = $re->getAttribute( "href" );
-            $href = substr( $href, stripos( $href, 'http' ) );
-            $href = urldecode( $href );
-            $title = $re->nodeValue;
-            if( strlen( $filterurl ) == 0
-            || stripos( $href, $filterurl ) !== FALSE
-            ){
-                $result[ $title ] = $href;
+        if( is_string( $data ) 
+        && strlen( $data ) > 0
+        ){
+            // Create a new DOMDocument
+            $dom = new DOMDocument();
+            @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+            $xp = new DOMXPath($dom);
+            $nodes = $xp->query('//a[@class="result__a"]');
+            foreach ( $nodes as $re ){
+                $href = $re->getAttribute( "href" );
+                $href = substr( $href, stripos( $href, 'http' ) );
+                $href = urldecode( $href );
+                $title = $re->nodeValue;
+                if( strlen( $filterurl ) == 0
+                || stripos( $href, $filterurl ) !== FALSE
+                ){
+                    $result[ $title ] = $href;
+                }
             }
         }
         
@@ -177,28 +181,33 @@
         $URL .= '&format=rss';
         
         $data = @file_get_contents_timed( $URL );
-        //XML DOC
-        if( ( $xml = @simplexml_load_string( $data ) ) != FALSE
-		&& ( $xml = object2array( $xml ) ) != FALSE
-		&& array_key_exists( 'channel', $xml )
-		&& array_key_exists( 'item', $xml[ 'channel' ] )
-		&& is_array( $xml[ 'channel' ][ 'item' ] )
-		){
-            foreach( $xml[ 'channel' ][ 'item' ] AS $item ){
-                if( is_array( $item )
-                && array_key_exists( 'title', $item ) 
-                && array_key_exists( 'link', $item ) 
-                ){
-                    $title = $item[ 'title' ];
-                    $href = $item[ 'link' ];
-                    if( strlen( $filterurl ) == 0
-                    || stripos( $href, $filterurl ) !== FALSE
+        
+        if( is_string( $data ) 
+        && strlen( $data ) > 0
+        ){
+            //XML DOC
+            if( ( $xml = @simplexml_load_string( $data ) ) != FALSE
+            && ( $xml = object2array( $xml ) ) != FALSE
+            && array_key_exists( 'channel', $xml )
+            && array_key_exists( 'item', $xml[ 'channel' ] )
+            && is_array( $xml[ 'channel' ][ 'item' ] )
+            ){
+                foreach( $xml[ 'channel' ][ 'item' ] AS $item ){
+                    if( is_array( $item )
+                    && array_key_exists( 'title', $item ) 
+                    && array_key_exists( 'link', $item ) 
                     ){
-                        $result[ $title ] = $href;
+                        $title = $item[ 'title' ];
+                        $href = $item[ 'link' ];
+                        if( strlen( $filterurl ) == 0
+                        || stripos( $href, $filterurl ) !== FALSE
+                        ){
+                            $result[ $title ] = $href;
+                        }
                     }
                 }
             }
-		}
+        }
         
         return $result;
     }
@@ -261,20 +270,24 @@
         
         $data = @file_get_contents_timed( $URL );
         
-        // Create a new DOMDocument
-        $dom = new DOMDocument();
-        @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
-        $xp = new DOMXPath($dom);
-        $nodes = $xp->query('//a[starts-with(@id, "title_")]');
-        foreach ( $nodes as $re ){
-            $href = $re->getAttribute( "href" );
-            $href = substr( $href, stripos( $href, 'http' ) );
-            $href = urldecode( $href );
-            $title = $re->nodeValue;
-            if( strlen( $filterurl ) == 0
-            || stripos( $href, $filterurl ) !== FALSE
-            ){
-                $result[ $title ] = $href;
+        if( is_string( $data ) 
+        && strlen( $data ) > 0
+        ){
+            // Create a new DOMDocument
+            $dom = new DOMDocument();
+            @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+            $xp = new DOMXPath($dom);
+            $nodes = $xp->query('//a[starts-with(@id, "title_")]');
+            foreach ( $nodes as $re ){
+                $href = $re->getAttribute( "href" );
+                $href = substr( $href, stripos( $href, 'http' ) );
+                $href = urldecode( $href );
+                $title = $re->nodeValue;
+                if( strlen( $filterurl ) == 0
+                || stripos( $href, $filterurl ) !== FALSE
+                ){
+                    $result[ $title ] = $href;
+                }
             }
         }
         
@@ -339,20 +352,24 @@
         
         $data = @file_get_contents_timed( $URL );
         
-        // Create a new DOMDocument
-        $dom = new DOMDocument();
-        @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
-        $xp = new DOMXPath($dom);
-        $nodes = $xp->query('//a[@class="result-link"]');
-        foreach ( $nodes as $re ){
-            $href = $re->getAttribute( "href" );
-            $href = substr( $href, stripos( $href, 'http' ) );
-            $href = urldecode( $href );
-            $title = $re->nodeValue;
-            if( strlen( $filterurl ) == 0
-            || stripos( $href, $filterurl ) !== FALSE
-            ){
-                $result[ $title ] = $href;
+        if( is_string( $data ) 
+        && strlen( $data ) > 0
+        ){
+            // Create a new DOMDocument
+            $dom = new DOMDocument();
+            @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+            $xp = new DOMXPath($dom);
+            $nodes = $xp->query('//a[@class="result-link"]');
+            foreach ( $nodes as $re ){
+                $href = $re->getAttribute( "href" );
+                $href = substr( $href, stripos( $href, 'http' ) );
+                $href = urldecode( $href );
+                $title = $re->nodeValue;
+                if( strlen( $filterurl ) == 0
+                || stripos( $href, $filterurl ) !== FALSE
+                ){
+                    $result[ $title ] = $href;
+                }
             }
         }
         
@@ -417,21 +434,25 @@
         
         $data = @file_get_contents_timed( $URL );
         
-        // Create a new DOMDocument
-        $dom = new DOMDocument();
-        @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
-        $xp = new DOMXPath($dom);
-        $nodes = $xp->query('//h4[@class="result_header"]/a');
-        //$nodes = $xp->query('//a[@rel="noreferrer"]');
-        foreach ( $nodes as $re ){
-            $href = $re->getAttribute( "href" );
-            $href = substr( $href, stripos( $href, 'http' ) );
-            $href = urldecode( $href );
-            $title = $re->nodeValue;
-            if( strlen( $filterurl ) == 0
-            || stripos( $href, $filterurl ) !== FALSE
-            ){
-                $result[ $title ] = $href;
+        if( is_string( $data ) 
+        && strlen( $data ) > 0
+        ){
+            // Create a new DOMDocument
+            $dom = new DOMDocument();
+            @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+            $xp = new DOMXPath($dom);
+            $nodes = $xp->query('//h4[@class="result_header"]/a');
+            //$nodes = $xp->query('//a[@rel="noreferrer"]');
+            foreach ( $nodes as $re ){
+                $href = $re->getAttribute( "href" );
+                $href = substr( $href, stripos( $href, 'http' ) );
+                $href = urldecode( $href );
+                $title = $re->nodeValue;
+                if( strlen( $filterurl ) == 0
+                || stripos( $href, $filterurl ) !== FALSE
+                ){
+                    $result[ $title ] = $href;
+                }
             }
         }
         
@@ -497,23 +518,28 @@
         
         $data = @file_get_contents_timed( $URL );
         
-        // Create a new DOMDocument
-        $dom = new DOMDocument();
-        @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
-        $xp = new DOMXPath($dom);
-        //$nodes = $xp->query('//h3[@class="result--web--link"]/a');
-        $nodes = $xp->query('//a');
-        foreach ( $nodes as $re ){
-            $href = $re->getAttribute( "href" );
-            if( startsWith( $href, '/redirect/' ) ){
-                $href = substr( $href, stripos( $href, 'http' ) );
-                $href = urldecode( $href );
-                $title = $re->nodeValue;
-                $title = strip_tags( $title );
-                if( strlen( $filterurl ) == 0
-                || stripos( $href, $filterurl ) !== FALSE
-                ){
-                    $result[ $title ] = $href;
+        
+        if( is_string( $data ) 
+        && strlen( $data ) > 0
+        ){
+            // Create a new DOMDocument
+            $dom = new DOMDocument();
+            @$dom->loadHTML( mb_convert_encoding( $data, 'HTML-ENTITIES', 'utf-8' ) );
+            $xp = new DOMXPath($dom);
+            //$nodes = $xp->query('//h3[@class="result--web--link"]/a');
+            $nodes = $xp->query('//a');
+            foreach ( $nodes as $re ){
+                $href = $re->getAttribute( "href" );
+                if( startsWith( $href, '/redirect/' ) ){
+                    $href = substr( $href, stripos( $href, 'http' ) );
+                    $href = urldecode( $href );
+                    $title = $re->nodeValue;
+                    $title = strip_tags( $title );
+                    if( strlen( $filterurl ) == 0
+                    || stripos( $href, $filterurl ) !== FALSE
+                    ){
+                        $result[ $title ] = $href;
+                    }
                 }
             }
         }
@@ -573,22 +599,26 @@
         $cmd = O_DDGR . ' --json "' . $search . '"';
         $data = runExtCommand( $cmd );
         
-		if( ( $xml = (array)@json_decode( $data, TRUE ) ) != FALSE
-		){
-            foreach( $xml AS $row ){
-                //title url
-                if( array_key_exists( 'title', $row )
-                && array_key_exists( 'url', $row )
-                && filter_var( $row[ 'url' ], FILTER_VALIDATE_URL ) 
-                ){
-                    if( strlen( $filterurl ) == 0
-                    || stripos( $row[ 'url' ], $filterurl ) !== FALSE
+        if( is_string( $data ) 
+        && strlen( $data ) > 0
+        ){
+            if( ( $xml = (array)@json_decode( $data, TRUE ) ) != FALSE
+            ){
+                foreach( $xml AS $row ){
+                    //title url
+                    if( array_key_exists( 'title', $row )
+                    && array_key_exists( 'url', $row )
+                    && filter_var( $row[ 'url' ], FILTER_VALIDATE_URL ) 
                     ){
-                        $result[ $row[ 'title' ] ] = $row[ 'url' ];
+                        if( strlen( $filterurl ) == 0
+                        || stripos( $row[ 'url' ], $filterurl ) !== FALSE
+                        ){
+                            $result[ $row[ 'title' ] ] = $row[ 'url' ];
+                        }
                     }
                 }
             }
-		}
+        }
         
         return $result;
     }
@@ -645,22 +675,26 @@
         $cmd = O_GOOGLER . ' --json "' . $search . '"';
         $data = runExtCommand( $cmd );
         
-		if( ( $xml = (array)@json_decode( $data, TRUE ) ) != FALSE
-		){
-            foreach( $xml AS $row ){
-                //title url
-                if( array_key_exists( 'title', $row )
-                && array_key_exists( 'url', $row )
-                && filter_var( $row[ 'url' ], FILTER_VALIDATE_URL ) 
-                ){
-                    if( strlen( $filterurl ) == 0
-                    || stripos( $row[ 'url' ], $filterurl ) !== FALSE
+        if( is_string( $data ) 
+        && strlen( $data ) > 0
+        ){
+            if( ( $xml = (array)@json_decode( $data, TRUE ) ) != FALSE
+            ){
+                foreach( $xml AS $row ){
+                    //title url
+                    if( array_key_exists( 'title', $row )
+                    && array_key_exists( 'url', $row )
+                    && filter_var( $row[ 'url' ], FILTER_VALIDATE_URL ) 
                     ){
-                        $result[ $row[ 'title' ] ] = $row[ 'url' ];
+                        if( strlen( $filterurl ) == 0
+                        || stripos( $row[ 'url' ], $filterurl ) !== FALSE
+                        ){
+                            $result[ $row[ 'title' ] ] = $row[ 'url' ];
+                        }
                     }
                 }
             }
-		}
+        }
         
         return $result;
     }
