@@ -574,246 +574,248 @@
                 //Normal Page
                 $htmldata = file_get_contents_timed( $url );
                 
-                $dom = new DOMDocument();
-                if( array_key_exists( 'htmlformat', $scrapperdata ) 
-                && strlen( $scrapperdata[ 'htmlformat' ] ) > 0
-                ){
-                    @$dom->loadHTML( mb_convert_encoding( $htmldata, 'HTML-ENTITIES', $scrapperdata[ 'htmlformat' ] ) );
-                }else{
-                    @$dom->loadHTML( $htmldata );
-                }
-                
-                $neededtitle = FALSE;
-                if( array_key_exists( 'linktitleneeded', $scrapperdata[ 'passdata' ][ $pass ] ) ){
-                    $neededtitle = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleneeded' ];
-                }
-                $neededtitlere = FALSE;
-                if( array_key_exists( 'linktitleneededregexp', $scrapperdata[ 'passdata' ][ $pass ] ) ){
-                    $neededtitlere = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleneededregexp' ];
-                }
-                $neededurl = FALSE;
-                if( array_key_exists( 'linkurlneeded', $scrapperdata[ 'passdata' ][ $pass ] ) ){
-                    $neededurl = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlneeded' ];
-                }
-                $neededurlre = FALSE;
-                if( array_key_exists( 'linkurlneededregexp', $scrapperdata[ 'passdata' ][ $pass ] ) ){
-                    $neededurlre = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlneededregexp' ];
-                }
-                $excludetitle = FALSE;
-                if( array_key_exists( 'linktitleexclude', $scrapperdata[ 'passdata' ][ $pass ] ) ){
-                    $excludetitle = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleexclude' ];
-                }
-                $excludeurl = FALSE;
-                if( array_key_exists( 'linkurlexclude', $scrapperdata[ 'passdata' ][ $pass ] ) ){
-                    $excludeurl = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlexclude' ];
-                }
-                
-                if( function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] ) ){
-                    $elements = $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ]( $htmldata, $title );
-                }else{
-                    $elements = $dom->getElementsByTagName( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] );
-                }
-                
-                foreach( $elements AS $link ){
-                    if( function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] ) ){
-                        $href = $link;
-                        $titlelink = $title;
+                if( strlen( $htmldata ) > 0 ){
+                    $dom = new DOMDocument();
+                    if( array_key_exists( 'htmlformat', $scrapperdata )
+                    && strlen( $scrapperdata[ 'htmlformat' ] ) > 0
+                    ){
+                        @$dom->loadHTML( mb_convert_encoding( $htmldata, 'HTML-ENTITIES', $scrapperdata[ 'htmlformat' ] ) );
                     }else{
-                        $href = $link->getAttribute( "href" );
-                        $titlelink = $link->nodeValue;
-                        if( strlen( $title ) == 0 ){
-                            $title = $link->textContent;
-                        }
+                        @$dom->loadHTML( $htmldata );
                     }
-                    
-                    if( array_key_exists( 'linksappend', $scrapperdata[ 'passdata' ][ $pass ] ) 
-                    && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'linksappend' ] ) > 0
-                    && !startsWith( $href, 'http' )
-                    ){
-                        $href = $scrapperdata[ 'passdata' ][ $pass ][ 'linksappend' ] . $href;
+
+                    $neededtitle = FALSE;
+                    if( array_key_exists( 'linktitleneeded', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                        $neededtitle = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleneeded' ];
                     }
-                    
-                    if( $debug ) echo '<br />LINK: ' . $titlelink . ' => ' . $href;
-                    
-                    $VALID = TRUE;
-                    if( $VALID
-                    && is_array( $excludetitle ) 
-                    && count( $excludetitle ) > 0
-                    ){
-                        foreach( $excludetitle AS $e ){
-                            if( $debug ) echo "<br />Needed TITLE str: " . $e . ' - ' . $titlelink;
-                            if( stripos( $titlelink, $e ) !== FALSE ){
-                                if( $debug ) echo "<br />VALID: " . $e;
-                                $VALID = FALSE;
-                                break;
+                    $neededtitlere = FALSE;
+                    if( array_key_exists( 'linktitleneededregexp', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                        $neededtitlere = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleneededregexp' ];
+                    }
+                    $neededurl = FALSE;
+                    if( array_key_exists( 'linkurlneeded', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                        $neededurl = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlneeded' ];
+                    }
+                    $neededurlre = FALSE;
+                    if( array_key_exists( 'linkurlneededregexp', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                        $neededurlre = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlneededregexp' ];
+                    }
+                    $excludetitle = FALSE;
+                    if( array_key_exists( 'linktitleexclude', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                        $excludetitle = $scrapperdata[ 'passdata' ][ $pass ][ 'linktitleexclude' ];
+                    }
+                    $excludeurl = FALSE;
+                    if( array_key_exists( 'linkurlexclude', $scrapperdata[ 'passdata' ][ $pass ] ) ){
+                        $excludeurl = $scrapperdata[ 'passdata' ][ $pass ][ 'linkurlexclude' ];
+                    }
+
+                    if( function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] ) ){
+                        $elements = $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ]( $htmldata, $title );
+                    }else{
+                        $elements = $dom->getElementsByTagName( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] );
+                    }
+
+                    foreach( $elements AS $link ){
+                        if( function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] ) ){
+                            $href = $link;
+                            $titlelink = $title;
+                        }else{
+                            $href = $link->getAttribute( "href" );
+                            $titlelink = $link->nodeValue;
+                            if( strlen( $title ) == 0 ){
+                                $title = $link->textContent;
                             }
                         }
-                    }
-                    
-                    if( $debug ) echo '<br />EXCLUDETITLE-VALID: ' . ( $VALID ? 'TRUE' : 'FALSE' );
-                    
-                    if( $VALID
-                    && is_array( $excludeurl ) 
-                    && count( $excludeurl ) > 0
-                    ){
-                        foreach( $excludeurl AS $e ){
-                            if( $debug ) echo "<br />Needed URL link str: " . $e . ' - ' . $href;
-                            if( stripos( $href, $e ) !== FALSE ){
-                                if( $debug ) echo "<br />VALID: " . $e;
-                                $VALID = FALSE;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if( $debug ) echo '<br />EXCLUDEURL-VALID: ' . ( $VALID ? 'TRUE' : 'FALSE' );
-                    
-                    if( $VALID
-                    && is_array( $neededtitle )
-                    && count( $neededtitle ) > 0
-                    ){
-                        $VALID = FALSE;
-                        foreach( $neededtitle AS $e ){
-                            if( $debug ) echo "<br />Needed TITLE str: " . $e . ' - ' . $titlelink;
-                            if( stripos( $titlelink, $e ) !== FALSE ){
-                                if( $debug ) echo "<br />VALID: " . $e;
-                                $VALID = TRUE;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if( $debug ) echo '<br />NEEDEDTITLE-VALID: ' . ( $VALID ? 'TRUE' : 'FALSE' );
-                    
-                    if( $VALID
-                    && is_array( $neededtitlere )
-                    && count( $neededtitlere ) > 0
-                    ){
-                        $VALID = FALSE;
-                        foreach( $neededtitlere AS $e ){
-                            if( $debug ) echo "<br />Needed TITLE RegExp: " . $e . ' - ' . $titlelink;
-                            preg_match( $e, $titlelink, $match );
-                            if( $match !== FALSE
-                            && is_array( $match )
-                            && count( $match ) > 0
-                            ){
-                                if( $debug ) echo "<br />VALID: " . print_r( $match, TRUE );
-                                $VALID = TRUE;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if( $debug ) echo '<br />NEEDEDTITLE-VALID-RE: ' . ( $VALID ? 'TRUE' : 'FALSE' );
-                    
-                    if( $VALID
-                    && is_array( $neededurl ) 
-                    && count( $neededurl ) > 0
-                    ){
-                        $VALID = FALSE;
-                        foreach( $neededurl AS $e ){
-                            if( $debug ) echo "<br />Needed URL link str: " . $e . ' - ' . $href;
-                            if( stripos( $href, $e ) !== FALSE ){
-                                if( $debug ) echo "<br />VALID: " . $e;
-                                $VALID = TRUE;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if( $VALID
-                    && is_array( $neededurlre ) 
-                    && count( $neededurlre ) > 0
-                    ){
-                        $VALID = FALSE;
-                        foreach( $neededurlre AS $e ){
-                            if( $debug ) echo "<br />Needed URL Link RegExp: " . $e . ' - ' . $href;
-                            preg_match( $e, $href, $match );
-                            if( $match !== FALSE
-                            && is_array( $match )
-                            && count( $match ) > 0
-                            ){
-                                if( $debug ) echo "<br />VALID: " . print_r( $match, TRUE );
-                                $VALID = TRUE;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if( $debug ) echo '<br />NEEDEDURL-VALID: ' . ( $VALID ? 'TRUE' : 'FALSE' );
-                    
-                    //CHECK SIZE
-                    $SIZE = 0;
-                    if( $VALID
-                    && array_key_exists( 'filtersizemax', $scrapperdata[ 'passdata' ][ $pass ] ) 
-                    && (int)$scrapperdata[ 'passdata' ][ $pass ][ 'filtersizemax' ] > 0
-                    ){
-                        //filtersizefunction
-                        if( array_key_exists( 'filtersizefunction', $scrapperdata[ 'passdata' ][ $pass ] ) 
-                        && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizefunction' ] ) > 0
-                        && function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizefunction' ] )
-                        && ( $SIZE = $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizefunction' ]( $webscrapperdata, $htmldata, $href ) ) != FALSE
-                        && $SIZE > 0
+
+                        if( array_key_exists( 'linksappend', $scrapperdata[ 'passdata' ][ $pass ] )
+                        && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'linksappend' ] ) > 0
+                        && !startsWith( $href, 'http' )
                         ){
-                            if( $debug ) echo '<br />SIZE FUNCTION: ' . $SIZE;
-                    
-                        }elseif( 
-                        (
-                            (
-                                array_key_exists( 'filtersizetextpre', $scrapperdata[ 'passdata' ][ $pass ] )
-                                && array_key_exists( 'filtersizetextpos', $scrapperdata[ 'passdata' ][ $pass ] ) 
-                                && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpre' ] ) > 0
-                                && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpos' ] ) > 0
-                            )
-                            ||
-                            (
-                                array_key_exists( 'filtersizetextpreg', $scrapperdata[ 'passdata' ][ $pass ] )
-                                && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpreg' ] ) > 0
-                            )
-                        )
-                        && ( $SIZE = webscrapp_get_size( $scrapperdata, $htmldata, $href, $pass, $debug ) ) != FALSE
-                        && $SIZE > 0
-                        ){
-                            if( $debug ) echo '<br />SIZE GENERIC: ' . $SIZE;
+                            $href = $scrapperdata[ 'passdata' ][ $pass ][ 'linksappend' ] . $href;
                         }
-                        if( $SIZE > 0
-                        && $SIZE > (int)$scrapperdata[ 'passdata' ][ $pass ][ 'filtersizemax' ] 
+
+                        if( $debug ) echo '<br />LINK: ' . $titlelink . ' => ' . $href;
+
+                        $VALID = TRUE;
+                        if( $VALID
+                        && is_array( $excludetitle )
+                        && count( $excludetitle ) > 0
                         ){
-                            if( $echo ) echo '<br />' . get_msg( 'WEBSCRAP_CHECKSIZE_KO', FALSE ) . $titlelink . ' ' . formatSizeUnits( $SIZE * 1024 * 1024 );
+                            foreach( $excludetitle AS $e ){
+                                if( $debug ) echo "<br />Needed TITLE str: " . $e . ' - ' . $titlelink;
+                                if( stripos( $titlelink, $e ) !== FALSE ){
+                                    if( $debug ) echo "<br />VALID: " . $e;
+                                    $VALID = FALSE;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if( $debug ) echo '<br />EXCLUDETITLE-VALID: ' . ( $VALID ? 'TRUE' : 'FALSE' );
+
+                        if( $VALID
+                        && is_array( $excludeurl )
+                        && count( $excludeurl ) > 0
+                        ){
+                            foreach( $excludeurl AS $e ){
+                                if( $debug ) echo "<br />Needed URL link str: " . $e . ' - ' . $href;
+                                if( stripos( $href, $e ) !== FALSE ){
+                                    if( $debug ) echo "<br />VALID: " . $e;
+                                    $VALID = FALSE;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if( $debug ) echo '<br />EXCLUDEURL-VALID: ' . ( $VALID ? 'TRUE' : 'FALSE' );
+
+                        if( $VALID
+                        && is_array( $neededtitle )
+                        && count( $neededtitle ) > 0
+                        ){
                             $VALID = FALSE;
-                        }else{
-                            if( $echo ) echo '<br />' . get_msg( 'WEBSCRAP_CHECKSIZE_OK', FALSE ) . $titlelink . ' ' . formatSizeUnits( $SIZE * 1024 * 1024 );
-                        }
-                    }
-                    
-                    if( $VALID ){
-                        if( $debug ) echo '<br />END VALID: ' . $title . ' => ' . $titlelink;
-                        if( array_key_exists( 'titleclean', $scrapperdata ) 
-                        && is_array( $scrapperdata[ 'titleclean' ] )
-                        && count( $scrapperdata[ 'titleclean' ] ) > 0
-                        ){
-                            foreach( $scrapperdata[ 'titleclean' ] AS $e ){
-                                $title = str_ireplace( $e, '', $title );
+                            foreach( $neededtitle AS $e ){
+                                if( $debug ) echo "<br />Needed TITLE str: " . $e . ' - ' . $titlelink;
+                                if( stripos( $titlelink, $e ) !== FALSE ){
+                                    if( $debug ) echo "<br />VALID: " . $e;
+                                    $VALID = TRUE;
+                                    break;
+                                }
                             }
                         }
-                        $title = trim( $title );
-                        //Send Next Pass
-                        if( array_key_exists( 'passnext', $scrapperdata[ 'passdata' ][ $pass ] ) 
-                        && $scrapperdata[ 'passdata' ][ $pass ][ 'passnext' ] > 0
-                        && array_key_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'passnext' ], $scrapperdata[ 'passdata' ] )
+
+                        if( $debug ) echo '<br />NEEDEDTITLE-VALID: ' . ( $VALID ? 'TRUE' : 'FALSE' );
+
+                        if( $VALID
+                        && is_array( $neededtitlere )
+                        && count( $neededtitlere ) > 0
                         ){
-                            $passnext = $scrapperdata[ 'passdata' ][ $pass ][ 'passnext' ];
-                        }else{
-                            $passnext = $pass + 1;
+                            $VALID = FALSE;
+                            foreach( $neededtitlere AS $e ){
+                                if( $debug ) echo "<br />Needed TITLE RegExp: " . $e . ' - ' . $titlelink;
+                                preg_match( $e, $titlelink, $match );
+                                if( $match !== FALSE
+                                && is_array( $match )
+                                && count( $match ) > 0
+                                ){
+                                    if( $debug ) echo "<br />VALID: " . print_r( $match, TRUE );
+                                    $VALID = TRUE;
+                                    break;
+                                }
+                            }
                         }
-                        
-                        if( webscrapp_pass( $wscrapper, $passnext, $href, $title, $echo, $debug ) ){
-                            $result = TRUE;
-                            //downloadmultiple
-                            if( !array_key_exists( 'downloadmultiple', $scrapperdata[ 'passdata' ][ $pass ] ) 
-                            || $scrapperdata[ 'passdata' ][ $pass ][ 'downloadmultiple' ] == FALSE
+
+                        if( $debug ) echo '<br />NEEDEDTITLE-VALID-RE: ' . ( $VALID ? 'TRUE' : 'FALSE' );
+
+                        if( $VALID
+                        && is_array( $neededurl )
+                        && count( $neededurl ) > 0
+                        ){
+                            $VALID = FALSE;
+                            foreach( $neededurl AS $e ){
+                                if( $debug ) echo "<br />Needed URL link str: " . $e . ' - ' . $href;
+                                if( stripos( $href, $e ) !== FALSE ){
+                                    if( $debug ) echo "<br />VALID: " . $e;
+                                    $VALID = TRUE;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if( $VALID
+                        && is_array( $neededurlre )
+                        && count( $neededurlre ) > 0
+                        ){
+                            $VALID = FALSE;
+                            foreach( $neededurlre AS $e ){
+                                if( $debug ) echo "<br />Needed URL Link RegExp: " . $e . ' - ' . $href;
+                                preg_match( $e, $href, $match );
+                                if( $match !== FALSE
+                                && is_array( $match )
+                                && count( $match ) > 0
+                                ){
+                                    if( $debug ) echo "<br />VALID: " . print_r( $match, TRUE );
+                                    $VALID = TRUE;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if( $debug ) echo '<br />NEEDEDURL-VALID: ' . ( $VALID ? 'TRUE' : 'FALSE' );
+
+                        //CHECK SIZE
+                        $SIZE = 0;
+                        if( $VALID
+                        && array_key_exists( 'filtersizemax', $scrapperdata[ 'passdata' ][ $pass ] )
+                        && (int)$scrapperdata[ 'passdata' ][ $pass ][ 'filtersizemax' ] > 0
+                        ){
+                            //filtersizefunction
+                            if( array_key_exists( 'filtersizefunction', $scrapperdata[ 'passdata' ][ $pass ] )
+                            && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizefunction' ] ) > 0
+                            && function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizefunction' ] )
+                            && ( $SIZE = $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizefunction' ]( $webscrapperdata, $htmldata, $href ) ) != FALSE
+                            && $SIZE > 0
                             ){
-                                break;
+                                if( $debug ) echo '<br />SIZE FUNCTION: ' . $SIZE;
+
+                            }elseif(
+                            (
+                                (
+                                    array_key_exists( 'filtersizetextpre', $scrapperdata[ 'passdata' ][ $pass ] )
+                                    && array_key_exists( 'filtersizetextpos', $scrapperdata[ 'passdata' ][ $pass ] )
+                                    && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpre' ] ) > 0
+                                    && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpos' ] ) > 0
+                                )
+                                ||
+                                (
+                                    array_key_exists( 'filtersizetextpreg', $scrapperdata[ 'passdata' ][ $pass ] )
+                                    && strlen( $scrapperdata[ 'passdata' ][ $pass ][ 'filtersizetextpreg' ] ) > 0
+                                )
+                            )
+                            && ( $SIZE = webscrapp_get_size( $scrapperdata, $htmldata, $href, $pass, $debug ) ) != FALSE
+                            && $SIZE > 0
+                            ){
+                                if( $debug ) echo '<br />SIZE GENERIC: ' . $SIZE;
+                            }
+                            if( $SIZE > 0
+                            && $SIZE > (int)$scrapperdata[ 'passdata' ][ $pass ][ 'filtersizemax' ]
+                            ){
+                                if( $echo ) echo '<br />' . get_msg( 'WEBSCRAP_CHECKSIZE_KO', FALSE ) . $titlelink . ' ' . formatSizeUnits( $SIZE * 1024 * 1024 );
+                                $VALID = FALSE;
+                            }else{
+                                if( $echo ) echo '<br />' . get_msg( 'WEBSCRAP_CHECKSIZE_OK', FALSE ) . $titlelink . ' ' . formatSizeUnits( $SIZE * 1024 * 1024 );
+                            }
+                        }
+
+                        if( $VALID ){
+                            if( $debug ) echo '<br />END VALID: ' . $title . ' => ' . $titlelink;
+                            if( array_key_exists( 'titleclean', $scrapperdata )
+                            && is_array( $scrapperdata[ 'titleclean' ] )
+                            && count( $scrapperdata[ 'titleclean' ] ) > 0
+                            ){
+                                foreach( $scrapperdata[ 'titleclean' ] AS $e ){
+                                    $title = str_ireplace( $e, '', $title );
+                                }
+                            }
+                            $title = trim( $title );
+                            //Send Next Pass
+                            if( array_key_exists( 'passnext', $scrapperdata[ 'passdata' ][ $pass ] )
+                            && $scrapperdata[ 'passdata' ][ $pass ][ 'passnext' ] > 0
+                            && array_key_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'passnext' ], $scrapperdata[ 'passdata' ] )
+                            ){
+                                $passnext = $scrapperdata[ 'passdata' ][ $pass ][ 'passnext' ];
+                            }else{
+                                $passnext = $pass + 1;
+                            }
+
+                            if( webscrapp_pass( $wscrapper, $passnext, $href, $title, $echo, $debug ) ){
+                                $result = TRUE;
+                                //downloadmultiple
+                                if( !array_key_exists( 'downloadmultiple', $scrapperdata[ 'passdata' ][ $pass ] )
+                                || $scrapperdata[ 'passdata' ][ $pass ][ 'downloadmultiple' ] == FALSE
+                                ){
+                                    break;
+                                }
                             }
                         }
                     }
