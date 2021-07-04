@@ -135,7 +135,10 @@
 	//PATH ffprobe
 	define( 'O_FFPROBE', 'timeout 10s ffprobe' );
 	//PATH filebot
+	//Using filebot version < 4.8
 	define( 'O_FILEBOT', 'export HOME="' . PPATH_CACHE . '" && filebot' );
+	//SET Using filebot version >= 4.8, need to import license to this home folder .cache/filebot
+	define( 'O_FILEBOT_48', 'export HOME="' . PPATH_CACHE . '/filebot" && filebot' );
 	//PATH PHP (run cron jobs)
 	define( 'O_PHP', 'php' );
 	//WGET (run cron jobs)
