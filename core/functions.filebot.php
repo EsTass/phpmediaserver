@@ -38,7 +38,7 @@
         ){
             if( ( $fb_r = ident_detect_filebot( $filet, $movies ) ) != FALSE ){
                 $folder = $TMP_FOLDER;
-                //Check folder have data
+                //Check folder have data FIRST FOLDER
                 if( ( $files = getFiles( $folder ) ) != FALSE 
                 && count( $files ) > 1
                 ){
@@ -64,6 +64,52 @@
                     
                     //if have nfo data
                     if( is_array( $data_nfo ) 
+                    && array_key_exists( 'title', $data_nfo )
+                    && strlen( $data_nfo[ 'title' ] ) > 0
+                    ){
+                        //Get Images
+                        foreach( $files AS $f ){
+                            foreach( $result AS $k => $v ){
+                                if( $k != 'data'
+                                && is_file( $f )
+                                && startsWith( basename( $f ), $k )
+                                && getFileMimeTypeImg( $f )
+                                ){
+                                    $result[ $k ] = $f;
+                                }
+                            }
+                        }
+                    }else{
+                        $result = FALSE;
+                    }
+                }
+                //Check folder have data SECOND FOLDER FOLDER-2
+                $folder = $TMP_FOLDER . '-2';
+                if( ( $files = getFiles( $folder ) ) != FALSE
+                && count( $files ) > 1
+                ){
+                    $data_nfo = FALSE;
+                    //Get NFO Data To Add
+                    foreach( $files AS $f ){
+                        if( endsWith( $f, '.nfo' ) ){
+                            if( ( $data_nfo = ident_filebot_read_nfo( $f, $file ) ) != FALSE ){
+                                $result[ 'data' ] = $data_nfo;
+                            }
+                        }
+                    }
+                    //EXTRA SEASON && EPISODE FROM FILENAME SSxCC
+                    foreach( $files AS $f ){
+                        if( $filet != $f
+                        && getFileMimeTypeVideo( $f )
+                        && ( $d = get_media_chapter( basename( $f ) ) ) != FALSE
+                        ){
+                            $result[ 'data' ][ 'season' ] = (int)$d[ 0 ];
+                            $result[ 'data' ][ 'episode' ] = (int)$d[ 1 ];
+                        }
+                    }
+
+                    //if have nfo data
+                    if( is_array( $data_nfo )
                     && array_key_exists( 'title', $data_nfo )
                     && strlen( $data_nfo[ 'title' ] ) > 0
                     ){
@@ -120,12 +166,35 @@
         $cmd = O_FILEBOT . ' -script fn:xattr --action clear "' . $folder . '"';
         runExtCommand( $cmd );
         
-        //AMC SCRIPT
-        $cmd = O_FILEBOT . ' -script fn:amc --encoding UTF-8 -non-strict "' . $folder . '" --db ' . $db . ' --action move --lang ' . O_LANG . ' --conflict auto ' . $force_type . ' --def clean=y --def artwork=y --def movieFormat="' . $movie_filter . '" --def seriesFormat="' . $tv_filter . '" --def animeFormat="' . $tv_filter . '" musicFormat=""';
-        
+        //Set options for filebot >=4.8
+        if( !defined( 'O_FILEBOT_48' )
+        || O_FILEBOT_48 == FALSE
+        ){
+            //AMC SCRIPT OLD VERSION
+            $cmd = O_FILEBOT . ' -script fn:amc --encoding UTF-8 -non-strict "' . $folder . '" --db ' . $db . ' --action move --lang ' . O_LANG . ' --conflict auto ' . $force_type . ' --def clean=y --def artwork=y --def movieFormat="' . $movie_filter . '" --def seriesFormat="' . $tv_filter . '" --def animeFormat="' . $tv_filter . '" musicFormat=""';
+
+        }else{
+            //On new versions output is needed and cant be same as base for search nfo
+            mkdir( '' . $folder . '-2' );
+
+            //AMC SCRIPT NEW VERSIONS
+            $cmd = O_FILEBOT_48 . ' -script fn:amc  --output "' . $folder . '-2" --encoding UTF-8 -non-strict "' . $folder . '" --db ' . $db . ' --action move --lang ' . O_LANG . ' --conflict auto ' . $force_type . ' --def clean=y --def artwork=y --def movieFormat="' . $movie_filter . '" --def seriesFormat="' . $tv_filter . '" --def animeFormat="' . $tv_filter . '" musicFormat=""';
+
+            //Force load license if needed
+            //$cmd = O_FILEBOT_48 . ' --license licensefile';
+        }
+
         $result = '';
 		
 		$result = runExtCommand( $cmd );
+
+		//Show DEBUG
+		if( substr_count( $result, 'error' ) > 0
+		|| substr_count( $result, 'Error' ) > 0
+		){
+            //Show DEBUG
+            echo nl2br( $result );
+		}
 		
 		if( $cmd2 != FALSE ){
             $result .= '<br />' . runExtCommand( $cmd2 );
