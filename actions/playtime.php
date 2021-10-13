@@ -245,6 +245,29 @@
                     
                     header('Content-type: video/mp4');
                 break;
+                case 'mp4amdgpu':
+                    //testing
+                    //$encoder_outformat = 'mpegts';
+                    $encoder_outformat = 'mp4';
+                    //$encoder = 'h264';
+                    //$encoder = 'libx264';
+                    //AMDGPU
+                    $encoder = 'h264_vaapi';
+                    //$encoder = 'hevc_vaapi';
+                    $AUDIOCODEC = 'aac';
+                    //$AUDIOCODEC = 'mp3';
+                    //$AUDIOCODEC = 'opus';
+                    //FORCE NO FILTERS SCALE
+                    $SCALE = '';
+                    //$cmd = O_FFMPEG . " -nostdin -re " . $extra_params . " -hwaccel vaapi -hwaccel_device /dev/dri/renderD128 -hwaccel_output_format vaapi -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -movflags +faststart -bufsize 1000k -g 74 -strict experimental -pix_fmt yuv420p " . $SCALE . " -aspect 16:9 -level " . $G_FFMPEGLVL . " -profile:v baseline -level 3.0 -preset ultrafast -tune zerolatency -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 64k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+                    //ONLY IF DECODER IS FULL COMPATIBLE
+                    //$cmd = O_FFMPEG . " -nostdin -hwaccel vaapi -hwaccel_device /dev/dri/renderD128 -hwaccel_output_format vaapi -i " . escapeshellarg( $dir ) . " -c:v h264_vaapi -b:v 2M -maxrate 2M -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 64k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+                    //WITH OPTIONAL DECODER COMPATIBLE
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -init_hw_device vaapi=foo:/dev/dri/renderD128 -hwaccel vaapi -hwaccel_output_format vaapi -hwaccel_device foo -i " . escapeshellarg( $dir ) . " -filter_hw_device foo -vf 'format=nv12|vaapi,hwupload' " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -b:v 2M -maxrate 4M " . $SCALE . " -aspect 16:9 -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+                    //die( $cmd );
+
+                    header('Content-type: video/mp4');
+                break;
                 case 'webm2':
                     //slow
                     $AUDIOCODEC = 'libvorbis';
