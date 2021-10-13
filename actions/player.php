@@ -120,12 +120,25 @@
         $subslist = array();
         $subslistv = array();
         $AUDIOTRACK = 1;
-        $CODECORDER = array(
-            //url ident = header type
-            'webm' => 'webm',
-            'mp4' => 'mp4',
-            'webm2' => 'webm',
-        );
+        //TEST HARDWARE DECODING AMDGPU
+        if( defined( 'O_VIDEO_AMDGPU_ENCODE' )
+        && O_VIDEO_AMDGPU_ENCODE == TRUE
+        ){
+            $CODECORDER = array(
+                //url ident = header type
+                'mp4amdgpu' => 'mp4',
+                'webm' => 'webm',
+                'mp4' => 'mp4',
+                'webm2' => 'webm',
+            );
+        }else{
+            $CODECORDER = array(
+                //url ident = header type
+                'webm' => 'webm',
+                'mp4' => 'mp4',
+                'webm2' => 'webm',
+            );
+        }
         
         if( ( $videoinfo = ffprobe_get_data( $FMEDIA, FALSE ) ) != FALSE 
         && is_array( $videoinfo )
