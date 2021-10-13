@@ -90,6 +90,10 @@
 	//SHOW PLAYSAFE
 	define( 'O_VIDEO_PLAYSAFE', TRUE );
 	
+	//ADD AMDGPU HARDWARE ENCONDING h264_vaapi
+    	//TESTED ON LINUX
+	define( 'O_VIDEO_AMDGPU_ENCODE', FALSE );
+
 	//Search Media Types
 	$G_STYPE = array( 'movies', 'series' );
 	
