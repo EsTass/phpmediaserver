@@ -9,6 +9,9 @@
 	define( 'APPVERSION', '0.6' );
 	define( 'AUTHOR', 'tass' );
 	
+	//LOCALE CHARSET FOR FIX FILENAMES CMD SLASHING FALSE|xx_XX.UTF-8
+	define( 'O_FORCE_LOCALE', 'en_US.UTF-8' );
+	
 	//HTTP folders
 	define( 'HPATH_MEDIA', getURLBase() . '/imgs' );
 	
