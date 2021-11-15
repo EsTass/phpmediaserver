@@ -62,6 +62,15 @@
 		exit();
 	}
 	
+	//LOCALE SET CHARSET IF NEEDED
+	if ( function_exists( 'setlocale' )
+	&& defined( 'O_FORCE_LOCALE' )
+	&& is_string( O_FORCE_LOCALE )
+	&& strlen( O_FORCE_LOCALE ) > 0
+	){
+		setlocale( LC_ALL, O_FORCE_LOCALE );
+	}
+
 	header( 'Content-Type: text/html; charset=UTF-8' );
 	header('Cache-control: max-age='.(60*60*24*365));
 	header('Expires: '.gmdate(DATE_RFC1123,time()+60*60*24*365));
