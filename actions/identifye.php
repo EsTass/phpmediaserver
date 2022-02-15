@@ -53,6 +53,7 @@
             $imdb = FALSE;
             $movies = TRUE;
             if( ( $d = get_media_chapter( $FOLDERNAME ) ) == FALSE ){
+		$d = array();
                 $d[ 0 ] = FALSE;
                 $d[ 1 ] = FALSE;
                 $movies = FALSE;
