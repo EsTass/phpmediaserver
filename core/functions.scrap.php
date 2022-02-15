@@ -1872,7 +1872,7 @@
                         }
                         
                         if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
-                        $similars[ $pc ] = $mi;
+                        $similars[ (int)$pc ] = $mi;
                     }
                 }
                 krsort( $similars );
@@ -1929,7 +1929,7 @@
                         }
                         
                         if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
-                        $similars[ $pc ] = $mi;
+                        $similars[ (int)$pc ] = $mi;
                     }
                 }
                 krsort( $similars );
@@ -1985,7 +1985,7 @@
                             }
                             
                             if( $debug ) echo "<br />MEDIAINFO FINAL SIMILARITY: " . $pc;
-                            $similars[ $pc ] = $mi;
+                            $similars[ (int)$pc ] = $mi;
                         }
                     }
                     krsort( $similars );
