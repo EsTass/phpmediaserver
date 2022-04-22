@@ -268,6 +268,26 @@
 
                     header('Content-type: video/mp4');
                 break;
+                case 'mp4amdgpurel':
+                    //testing, less decode on hard
+                    //$encoder_outformat = 'mpegts';
+                    $encoder_outformat = 'mp4';
+                    //$encoder = 'h264';
+                    //$encoder = 'libx264';
+                    //AMDGPU
+                    $encoder = 'h264_vaapi';
+                    //$encoder = 'hevc_vaapi';
+                    $AUDIOCODEC = 'aac';
+                    //$AUDIOCODEC = 'mp3';
+                    //$AUDIOCODEC = 'opus';
+                    //FORCE NO FILTERS SCALE
+                    $SCALE = '';
+                    //WITH OPTIONAL DECODER COMPATIBLE
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -hwaccel vaapi -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -b:v 5M -maxrate 10M " . $SCALE . " -aspect 16:9 -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+                    //die( $cmd );
+
+                    header('Content-type: video/mp4');
+                break;
                 case 'mp4nvidia':
                     //testing
                     //$encoder_outformat = 'mpegts';
