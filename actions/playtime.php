@@ -302,7 +302,7 @@
                     //$AUDIOCODEC = 'opus';
                     //FORCE NO FILTERS SCALE
                     $SCALE = '';
-                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -hwaccel cuvid -c:v h264_cuvid -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -b:v 5M -maxrate 10M " . $SCALE . " -aspect 16:9 -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -hwaccel cuvid -c:v h264_cuvid -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -b:v 5M -maxrate 10M " . $SCALE . " -aspect 16:9 -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov+faststart - ";
                     //die( $cmd );
 
                     header('Content-type: video/mp4');
