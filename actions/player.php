@@ -120,25 +120,34 @@
         $subslist = array();
         $subslistv = array();
         $AUDIOTRACK = 1;
+	
+        //LIST OF ENCODERS
+        $CODECORDER = array();
         //TEST HARDWARE DECODING AMDGPU
-        if( defined( 'O_VIDEO_AMDGPU_ENCODE' )
-        && O_VIDEO_AMDGPU_ENCODE == TRUE
+        if( ( defined( 'O_VIDEO_AMDGPU_ENCODE' )
+            && O_VIDEO_AMDGPU_ENCODE == TRUE
+        )
+        || ( defined( 'O_VIDEO_AMDGPU_ENCODE_ADMIN' )
+            && O_VIDEO_AMDGPU_ENCODE_ADMIN == TRUE
+            && check_user_admin()
+        )
         ){
-            $CODECORDER = array(
-                //url ident = header type
-                'mp4amdgpu' => 'mp4',
-                'webm' => 'webm',
-                'mp4' => 'mp4',
-                'webm2' => 'webm',
-            );
-        }else{
-            $CODECORDER = array(
-                //url ident = header type
-                'webm' => 'webm',
-                'mp4' => 'mp4',
-                'webm2' => 'webm',
-            );
+            $CODECORDER[ 'mp4amdgpu' ] = 'mp4';
         }
+        //TEST HARDWARE DECODING NVIDIA
+        if( ( defined( 'O_VIDEO_NVIDIA_ENCODE' )
+            && O_VIDEO_NVIDIA_ENCODE == TRUE
+        )
+        || ( defined( 'O_VIDEO_NVIDIA_ENCODE_ADMIN' )
+            && O_VIDEO_NVIDIA_ENCODE_ADMIN == TRUE
+            && check_user_admin()
+        )
+        ){
+            $CODECORDER[ 'mp4nvidia' ] = 'mp4';
+        }
+        $CODECORDER[ 'webm' ] = 'webm';
+        $CODECORDER[ 'mp4' ] = 'mp4';
+        $CODECORDER[ 'webm2' ] = 'webm2';
         
         if( ( $videoinfo = ffprobe_get_data( $FMEDIA, FALSE ) ) != FALSE 
         && is_array( $videoinfo )
