@@ -37,6 +37,8 @@ A bunch of utilities for:
  - [Kodi pluging](https://github.com/EsTass/phpmediaserver-kodi)
  - Multilanguaje (lang/CODE.php and select on config, default ENG)
  - Logo thanks to [leonardoderoy](https://github.com/leonardoderoy)
+ - AMD Hardware vaapi transcoding support
+ - NVIDIA Hardware nvenc transcoding support
 
 ## Default User (Important: change pass on first login)
  - User: admin
