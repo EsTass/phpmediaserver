@@ -294,7 +294,11 @@
                     $encoder = 'libvpx-vp9'; //webm 9
                     //better compatible
                     $G_FFMPEGLVL = '4.0';
-                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -threads 4 -speed 8 -quality realtime -b:v " . $minbitrate . " -maxrate " . $minbitrate . " -bufsize 1000k -pix_fmt yuv420p " . $SCALE . " -aspect 16:9 -preset baseline " . $QUALITY . " -level " . $G_FFMPEGLVL . " -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -f " . $encoder_outformat . " - ";
+                    //Forced
+                    //-hwaccel cuvid -c:v h264_cuvid
+                    //Decode on GPU
+                    //-hwaccel cuda -hwaccel_output_format cuda
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -hwaccel cuda -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -b:v 5M -maxrate 10M " . $SCALE . " -aspect 16:9 -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
                     //die( $cmd );
                     
                     header('Content-type: video/webm');
