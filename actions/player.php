@@ -133,6 +133,7 @@
         )
         ){
             $CODECORDER[ 'mp4amdgpu' ] = 'mp4';
+            $CODECORDER[ 'mp4amdgpurel' ] = 'mp4';
         }
         //TEST HARDWARE DECODING NVIDIA
         if( ( defined( 'O_VIDEO_NVIDIA_ENCODE' )
