@@ -41,6 +41,7 @@ function action_spacerecover(){
                 <select id='action' name='action'>
                     <option value='mediaspaceclean'>Only Bigger files than</option>
                     <option value='mediaspacerecovera'>All Options</option>
+                    <option value='mediaspacerecold'>Old Files First</option>
                 </select>
             </td>
             <td>
