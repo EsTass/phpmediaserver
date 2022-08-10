@@ -64,16 +64,18 @@
         ){
             $q = 0;
             foreach( $MIDATA2 AS $row ){
-                $FTARGET2 = PPATH_MEDIAINFO . DS . $row[ 'idmediainfo' ] . '.' . $TYPE;
-                if( file_exists( $FTARGET2 ) ) @unlink( $FTARGET2 );
-                if( ( @link( $FMEDIA, $FTARGET2 ) || @copy( $FMEDIA, $FTARGET2 ) ) ){
-                    if( $q < 6 ){
-                        echo "<br />" . get_msg( 'DEF_ELEMENTUPDATED' , FALSE ) . $row[ 'title' ] . ' ' . $row[ 'season' ] . 'x' . $row[ 'episode' ];
-                    }else{
-                        echo " +1";
-                    }
-                    $q++;
-                }
+				if( $row[ 'year' ] == $MIDATA[ 'year' ] ){
+	                $FTARGET2 = PPATH_MEDIAINFO . DS . $row[ 'idmediainfo' ] . '.' . $TYPE;
+	                if( file_exists( $FTARGET2 ) ) @unlink( $FTARGET2 );
+	                if( ( @link( $FMEDIA, $FTARGET2 ) || @copy( $FMEDIA, $FTARGET2 ) ) ){
+	                    if( $q < 6 ){
+	                        echo "<br />" . get_msg( 'DEF_ELEMENTUPDATED' , FALSE ) . $row[ 'title' ] . ' ' . $row[ 'season' ] . 'x' . $row[ 'episode' ];
+	                    }else{
+	                        echo " +1";
+	                    }
+	                    $q++;
+	                }
+				}
             }   
         }else{
             echo "<br />" . get_msg( 'DEF_ELEMENTUPDATED' , FALSE ) . $MIDATA[ 'title' ];
