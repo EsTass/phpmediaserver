@@ -18,6 +18,8 @@
             'htmlformat' => 'UTF-8',
             //Check Duplicates: search if file media title exist and cancel download
             'duplicatescheck' => FALSE,
+            //Session array date to send on each petition: array( sessionname => value, ... )
+            'sessiondata' => FALSE,
             //Title Clean, remove strings from title for duplicates scan
             'titleclean' => array(
                 'domain.com',
@@ -133,6 +135,19 @@
         $scrapper = FALSE;
         $result = FALSE;
         $resultimgs = array();
+        $sessiondata = FALSE;
+
+        //TEST Check sessiondata send
+        if( array_key_exists( $wscrapper, $G_WEBSCRAPPER )
+        && ( $scrapperdata = $G_WEBSCRAPPER[ $wscrapper ] ) != FALSE
+        && is_array( $scrapperdata )
+        && array_key_exists( 'sessiondata', $scrapperdata )
+        && is_array( $scrapperdata[ 'sessiondata' ] )
+        && count( $scrapperdata[ 'sessiondata' ] ) > 0
+        ){
+            $sessiondata = $scrapperdata[ 'sessiondata' ];
+            if( $debug ) echo "<br />SESSION DATA: " . print_r( $sessiondata, TRUE );
+        }
         
         $exturl = '';
         //searchfunction
@@ -167,7 +182,7 @@
             )
         )
         //Get/Post
-        && ( $htmldata = webscrapp_send_data_search( $scrapperdata, $search, $exturl, 5, '', $debug ) ) != FALSE
+        && ( $htmldata = webscrapp_send_data_search( $scrapperdata, $search, $exturl, 5, $sessiondata, $debug ) ) != FALSE
         ){
             $dom = new DOMDocument();
             if( array_key_exists( 'htmlformat', $scrapperdata ) 
@@ -451,11 +466,24 @@
         global $G_WEBSCRAPPER;
         $scrapper = FALSE;
         $result = FALSE;
+        $sessiondata = FALSE;
         
         if( $debug ){
             $echo = TRUE;
         }
         
+        //TEST Check sessiondata send
+        if( array_key_exists( $wscrapper, $G_WEBSCRAPPER )
+        && ( $scrapperdata = $G_WEBSCRAPPER[ $wscrapper ] ) != FALSE
+        && is_array( $scrapperdata )
+        && array_key_exists( 'sessiondata', $scrapperdata )
+        && is_array( $scrapperdata[ 'sessiondata' ] )
+        && count( $scrapperdata[ 'sessiondata' ] ) > 0
+        ){
+            $sessiondata = $scrapperdata[ 'sessiondata' ];
+            if( $debug ) echo "<br />SESSION DATA: " . print_r( $sessiondata, TRUE );
+        }
+
         if( $echo ) echo "<br /> START PASS: " . $wscrapper . ' > ' . $pass . ' > ' . $url;
         
         if( array_key_exists( $wscrapper, $G_WEBSCRAPPER ) 
@@ -466,6 +494,7 @@
         && array_key_exists( $pass, $scrapperdata[ 'passdata' ] )
         //&& filter_var( $url, FILTER_VALIDATE_URL )
         ){
+            if( $echo ) echo "<br /> NOW PASS FINDED: " . $wscrapper . ' > ' . $pass . ' > ' . $url;
             //REG EXP Check Valid or search valid $pass
             //Check Valid or search valid $pass
             if( 
@@ -481,6 +510,7 @@
                 )
             ){
                 //Valid pass
+                if( $echo ) echo "<br /> NOW PASS VALID: " . $wscrapper . ' > ' . $pass . ' > ' . $url;
             }else{
                 //check next
                 if( $echo ) echo '<br />' . get_msg( 'WEBSCRAP_PASS_INVALID', FALSE ) . $pass . ' => ' . $url;
@@ -529,6 +559,7 @@
             if( array_key_exists( 'passnext', $scrapperdata[ 'passdata' ][ $pass ] )
             && $scrapperdata[ 'passdata' ][ $pass ][ 'passnext' ] == FALSE
             ){
+                if( $echo ) echo "<br /> LAST PASS VALID-DOWNLOADING: " . $wscrapper . ' > ' . $pass . ' > ' . $url;
                 if( array_key_exists( 'downloadfunction', $scrapperdata[ 'passdata' ][ $pass ] )
                 && function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'downloadfunction' ] )
                 ){
@@ -563,7 +594,7 @@
                 && $scrapperdata[ 'type' ] == 'torrent'
                 ){
                     //Torrent
-                    if( torrentAdd( $url, PPATH_WEBSCRAP_DOWNLOAD . DS . $title, $debug ) != FALSE ){
+                    if( torrentAdd( $url, PPATH_WEBSCRAP_DOWNLOAD . DS . $title, $sessiondata, $debug ) != FALSE ){
                         if( $echo ) echo get_msg( 'WEBSCRAP_FILEDOWNLOADED', FALSE ) . $url;
                         $result = TRUE;
                     }else{
@@ -571,10 +602,14 @@
                     }
                 }
             }else{
+                if( $echo ) echo "<br /> NOW PASS VALID-GETTING HTML: " . $wscrapper . ' > ' . $pass . ' > ' . $url;
                 //Normal Page
-                $htmldata = file_get_contents_timed( $url );
+                $htmldata = file_get_contents_timed( $url, 5, $sessiondata );
                 
                 if( strlen( $htmldata ) > 0 ){
+
+                    if( $echo ) echo "<br /> NOW PASS VALID-HTML RETRIEVED: " . $wscrapper . ' > ' . $pass . ' > ' . $url . ' > ' . strlen( $htmldata );
+
                     $dom = new DOMDocument();
                     if( array_key_exists( 'htmlformat', $scrapperdata )
                     && strlen( $scrapperdata[ 'htmlformat' ] ) > 0
@@ -611,8 +646,10 @@
 
                     if( function_exists( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] ) ){
                         $elements = $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ]( $htmldata, $title );
+                        if( $echo ) echo "<br /> NOW PASS VALID-ELEMENTS EXTRACT FUNCTION: " . $wscrapper . ' > ' . $pass . ' > ' . $url . ' > ' . count( $elements );
                     }else{
                         $elements = $dom->getElementsByTagName( $scrapperdata[ 'passdata' ][ $pass ][ 'linksobject' ] );
+                        if( $echo ) echo "<br /> NOW PASS VALID-ELEMENTS EXTRACT DOM: " . $wscrapper . ' > ' . $pass . ' > ' . $url . ' > ' . count( $elements );
                     }
 
                     foreach( $elements AS $link ){
@@ -819,6 +856,8 @@
                             }
                         }
                     }
+                }else{
+                    if( $echo ) echo "<br /> NOW PASS VALID-NO DOWNLOAD DATA: " . $wscrapper . ' > ' . $pass . ' > ' . $url;
                 }
             }
         }
@@ -826,11 +865,11 @@
         return $result;
 	}
 	
-	function downloadFile( $url, $file ){
+	function downloadFile( $url, $file, $sessiondata = FALSE ){
 		$result = TRUE;
 		
 		if( !file_exists( $file ) ){
-            $result = @file_put_contents( $file, @file_get_contents_timed( $url ) );
+            $result = @file_put_contents( $file, @file_get_contents_timed( $url, 5, $sessiondata ) );
             
             if( !@file_exists( $file )
             || @filesize( $file ) == 0 
@@ -874,7 +913,7 @@
 		
 	}
 	
-	function torrentAdd( $url, $file, $debug = PPATH_WEBSCRAP_DEBUG ){
+	function torrentAdd( $url, $file, $sessiondata = FALSE, $debug = PPATH_WEBSCRAP_DEBUG ){
 		//$url = 'ed2K....';
 		$result = FALSE;
 		
@@ -894,7 +933,7 @@
 		){
             if( $debug ) echo "<br />Torrent File Exist: " . $file . ' => ' . $url;
             $result = TRUE;
-		}elseif( ( $result = downloadFile( $url, $file ) ) != FALSE ){
+		}elseif( ( $result = downloadFile( $url, $file, $sessiondata ) ) != FALSE ){
             if( $debug ) echo "<br />Torrent File Downloaded: " . $file . ' => ' . $url;
             if( strlen( PPATH_WEBSCRAP_TORRENT_CMD ) > 0 ){
                 $cmd = str_ireplace( '%FILE%', $url, PPATH_WEBSCRAP_TORRENT_CMD );
@@ -1156,7 +1195,7 @@
         return $result;
 	}
 	
-	function webscrapp_send_data_search( $scrapper_data, $search, $url, $time = 5, $sessionid = '', $debug = FALSE ){
+	function webscrapp_send_data_search( $scrapper_data, $search, $url, $time = 5, $sessiondata = FALSE, $debug = FALSE ){
         $result = FALSE;
         
         if( strlen( $search ) > 0
@@ -1166,7 +1205,7 @@
         ){
             $post_data = $scrapper_data[ 'searchdata' ][ 'postdata' ];
             foreach( $post_data AS $k => $v ){
-                
+                //TODO encode post data?
             }
             if( array_key_exists( 'urlsearchparamencode', $scrapper_data[ 'searchdata' ] ) 
             && $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ] != FALSE
@@ -1175,7 +1214,7 @@
                 $search = $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ]( $search );
             }
             $post_data[ $k ] = $search;
-            $result = file_get_contents_timed_post( $url, $post_data, $time, $sessionid, $debug );
+            $result = file_get_contents_timed_post( $url, $post_data, $time, $sessiondata, $debug );
         }else{
             if( array_key_exists( 'urlsearchparamencode', $scrapper_data[ 'searchdata' ] ) 
             && $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ] != FALSE
@@ -1183,7 +1222,7 @@
             ){
                 $search = $scrapper_data[ 'searchdata' ][ 'urlsearchparamencode' ]( $search );
             }
-            $result = file_get_contents_timed( $url . $search, $time, $sessionid, $debug );
+            $result = file_get_contents_timed( $url . $search, $time, $sessiondata, $debug );
         }
         
         return $result;
@@ -1388,10 +1427,10 @@
         return $result;
     }
     
-	function extract_elinks_title( $magnet ){
+	function extract_elinks_title( $elinks ){
         $result = '';
-        $magnet = urldecode( $magnet ); 
-        preg_match( '/file\|(.*?)\|\d+\|/', $magnet, $magnet_link );
+        $elinks = urldecode( $elinks );
+        preg_match( '/file\|(.*?)\|\d+\|/', $elinks, $magnet_link );
         if( array_key_exists( 1, $magnet_link ) ){
             $result = $magnet_link[ 1 ];
         }

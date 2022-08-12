@@ -39,7 +39,7 @@ function webscrap_add( scrapper, eurl, title ){
     url += '&webscrapper=' + scrapper;
     url += '&title=' + title;
     url += '&pass=0';
-    url += '&url=' + eurl;
+    url += '&url=' + encodeURIComponent(eurl);
     $( '#dResultWebScrappAdd' ).html( '' );
     loading_show();
     $.get( url )

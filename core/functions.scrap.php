@@ -1387,7 +1387,7 @@
         return file_get_contents( $url, FALSE, $ctx );
 	}
 	
-	function file_get_contents_timed( $url, $time = 5, $sessionid = '', $debug = FALSE ){
+	function file_get_contents_timed( $url, $time = 5, $sessiondata = FALSE, $debug = FALSE ){
         
         $curl = curl_init();
 
@@ -1395,8 +1395,17 @@
         $header[] = "Accept: text/xml,application/xml,application/json,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
         //q=0.7,en;q=0.3
         $header[] = "Accept-Language: " . O_LANG . ";";
-        if( strlen( $sessionid ) > 0 ){
-            $header[] = "Cookie: PHPSESSID=" . $sessionid . "";
+        if( is_array( $sessiondata )
+        && count( $sessiondata ) > 0
+        ){
+            $sdata = '';
+            foreach( $sessiondata AS $n => $v ){
+                $sdata .= $n . '=' . $v . '; ';
+            }
+            //Remove last ;space
+            $sdata = trim( $sdata, ' ' );
+            $sdata = trim( $sdata, ';' );
+            $header[] = "Cookie: " . $sdata . "";
         }
         $header[] = "Cache-Control: max-age=0";
         $header[] = "Connection: keep-alive";
@@ -1440,15 +1449,24 @@
         return $response;
 	}
 	
-	function file_get_contents_timed_post( $url, $post_data, $time = 5, $sessionid = '', $debug = FALSE ){
+	function file_get_contents_timed_post( $url, $post_data, $time = 5, $sessiondata = FALSE, $debug = FALSE ){
         
         $curl = curl_init();
 
         $header = array();
         $header[] = "Accept: text/xml,application/xml,application/json,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
         $header[] = "Accept-Language: " . O_LANG . ";";
-        if( strlen( $sessionid ) > 0 ){
-            $header[] = "Cookie: PHPSESSID=" . $sessionid . "";
+        if( is_array( $sessiondata )
+        && count( $sessiondata ) > 0
+        ){
+            $sdata = '';
+            foreach( $sessiondata AS $n => $v ){
+                $sdata .= $n . '=' . $v . '; ';
+            }
+            //Remove last ;space
+            $sdata = trim( $sdata, ' ' );
+            $sdata = trim( $sdata, ';' );
+            $header[] = "Cookie: " . $sdata . "";
         }
         $header[] = "Cache-Control: max-age=0";
         $header[] = "Connection: keep-alive";
