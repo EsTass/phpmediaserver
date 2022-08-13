@@ -136,6 +136,9 @@ function ident_preview_media( idmedia, starttime ){
                         foreach( $fields AS $field ){
                             if( array_key_exists( $field, $lrow ) ){
                                 $data = $lrow[ $field ];
+                                if( $data == NULL ){
+                                    $data = '';
+                                }
                 ?>
             <td class='<?php echo $css_extra; ?>' title='<?php echo $data; ?>'><?php echo substr( $data, 0, 250 ); ?></td>
                 <?php
