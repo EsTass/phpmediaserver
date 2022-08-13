@@ -117,7 +117,7 @@
                     'filtersizefunction' => '',
                     //DOWNLOAD MULTIPLE
                     'downloadmultiple' => FALSE,
-                    //DOWNLOAD function  function( link, debug ) (wget_downloader, wget_downloader_torrent, jdownloader_downloader, youtube_download)
+                    //DOWNLOAD function  function( link, debug ) (wget_downloader, wget_downloader_torrent, wget_downloader_torrent_withref, jdownloader_downloader, youtube_download)
                     'downloadfunction' => FALSE,
                 ),
                 //Pass 2 config
@@ -1630,6 +1630,32 @@
 		return $result;
 	}
 	
+	function wget_downloader_torrent_withref( $url, $debug ){
+        $result = FALSE;
+
+        $filename = basename( $url );
+        if( !endsWith( $filename, '.torrent' ) ){
+            $filename .= ".torrent";
+        }
+        $file = PPATH_WEBSCRAP_DOWNLOAD . DS . $filename;
+
+        //TEST REFERER AND BROWSER
+        $referer = '';
+        if( ( $parse = parse_url( $url ) ) != FALSE
+        && is_array( $parse )
+        && array_key_exists( 'host', $parse )
+        ){
+            $referer = ' --header="Accept: text/html" --user-agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36 OPR/38.0.2220.41" --referer ' . $parse[ 'host' ] . ' ';
+        }
+
+        //Get Data
+        $cmd = O_WGET . ' ' . $referer . ' -O "' . $file . '" "' . $url . '"';
+        runExtCommand( $cmd );
+        $result = TRUE;
+
+		return $result;
+	}
+
 	//WGET DOWNLOADER with media check
 	
 	function wget_downloader_image( $url, $filename, $debug = FALSE ){
