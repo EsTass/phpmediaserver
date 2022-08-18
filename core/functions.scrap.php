@@ -1362,14 +1362,22 @@
 	
 	//GET URL WITH MAX TIME
 	
-	function file_get_contents_timed_basic( $url, $time = 5, $sessionid = '' ){
+	function file_get_contents_timed_basic( $url, $time = 5, $sessiondata = FALSE ){
         
-        if( strlen( $sessionid ) > 0 ){
-            $ext_header = "\r\nCookie: PHPSESSID=" . $sessionid . "\r\n";
-        }else{
-            $ext_header = '';
+        $ext_header = '';
+        if( is_array( $sessiondata )
+        && count( $sessiondata ) > 0
+        ){
+            $sdata = '';
+            foreach( $sessiondata AS $n => $v ){
+                $sdata .= $n . '=' . $v . '; ';
+            }
+            //Remove last ;space
+            $sdata = trim( $sdata, ' ' );
+            $sdata = trim( $sdata, ';' );
+            $ext_header = "\r\nCookie: " . $sdata . "\r\n";
         }
-        
+
         $strdata = array(
             'http'=> array(
                 'method' => "GET",

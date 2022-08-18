@@ -63,11 +63,7 @@
 	
 	//SEARCHING FOR DATA
 	
-	if( 
-	//array_key_exists( 0, $G_SCRAPPERS[ $SCRAPPER ] )
-    //&& function_exists( $G_SCRAPPERS[ $SCRAPPER ][ 0 ] )
-    //&& 
-    ( $media = sqlite_media_getdata( $IDMEDIA ) ) != FALSE 
+	if( ( $media = sqlite_media_getdata( $IDMEDIA ) ) != FALSE
 	&& count( $media ) > 0
 	){
         //check scrapper search type $G_SCRAPPERS_SEARCH[ 'filebot' ] = array( 'imdb.com/title/tt', 'imdb.com' );
@@ -93,7 +89,7 @@
         ){
             //Clean Title - imdb | imdb -
             $l2 = array();
-            $CLEAN = array( '- imdb', 'imdb -' );
+            $CLEAN = array( '- imdb', 'imdb -', '- FilmAffinity', 'FilmAffinity -', 'Film Affinity' );
             foreach( $links AS $t => $href ){
                 foreach( $CLEAN AS $c ){
                     $t = str_ireplace( $c, '', $t );

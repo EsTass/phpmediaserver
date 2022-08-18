@@ -6,7 +6,7 @@
     
 	define( 'USER_IP', getIP() );
 	define( 'APPNAME', 'PMS' );
-	define( 'APPVERSION', '0.6' );
+	define( 'APPVERSION', '0.8' );
 	define( 'AUTHOR', 'tass' );
 	
 	//LOCALE CHARSET FOR FIX FILENAMES CMD SLASHING FALSE|xx_XX.UTF-8
@@ -109,7 +109,7 @@
 	//FILE SCRAPPERS
 	
 	//function.[scrapper].php to include
-	define( 'O_SCRAPPERS_INCLUDES', array( 'pymi', 'filebot', 'omdb', 'thetvdb', 'phpimdb' ) );
+	define( 'O_SCRAPPERS_INCLUDES', array( 'pymi', 'filebot', 'omdb', 'thetvdb', 'phpimdb', 'filmaff' ) );
 	//Scrapper List ( title => array( function_search, function_add ) ) filled in each scrapper
 	$G_SCRAPPERS = array();
 	//SCRAPPERS API KEY ( title => function ) filled in each scrapper
