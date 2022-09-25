@@ -302,8 +302,29 @@
                     //$AUDIOCODEC = 'opus';
                     //FORCE NO FILTERS SCALE
                     $SCALE = '';
-                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -hwaccel cuvid -c:v h264_cuvid -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -b:v 5M -maxrate 10M " . $SCALE . " -aspect 16:9 -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov+faststart - ";
-                    //die( $cmd );
+                    //FORCE MAX 1080
+                    $VIDEOHEIGHT = '1080';
+                    //$QUALITY = '-vf scale=-2:' . $VIDEOHEIGHT;
+                    $QUALITY = '';
+		    if( is_numeric( $subtrack )
+                    && $subtrack > -1
+                    ){
+                        //TESTING (check if video is resized/scaled with filter_complex)
+                        $subtrack = ' -filter_complex "[0:v][0:s:' . $subtrack . ']overlay=(main_w-overlay_w)/2:main_h-overlay_h,scale=trunc(iw/2)*2:trunc(ih/2)*2,scale=-2:' . $VIDEOHEIGHT . '"';
+                    }else{
+                        $subtrack = '';
+                        //basic Scale (no use in hardsubs)
+                        //$SCALE = " -vf 'scale=trunc(iw/2)*2:trunc(ih/2)*2' ";
+                    }
+			    
+		    //BASE OLD
+                    //$cmd = O_FFMPEG . " -nostdin " . $extra_params . " -hwaccel cuvid -c:v h264_cuvid -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -b:v 5M -maxrate 10M " . $SCALE . " -aspect 16:9 -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov+faststart - ";
+                    //BASE
+                    //$cmd = O_FFMPEG . " -nostdin " . $extra_params . " -hwaccel cuda -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -c:v " . $encoder . " -b:v 5M -maxrate 10M " . $SCALE . " -aspect 16:9 -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov - ";
+		    //BASE CUDA with 10bit support and max 1080p
+                    $cmd = O_FFMPEG . " -nostdin " . $extra_params . " -hwaccel cuda -hwaccel_output_format cuda -i " . escapeshellarg( $dir ) . " " . $subtrack . " " . $audiotrack . " -vf scale_cuda=-2:1080:interp_algo=lanczos,scale_cuda=format=yuv420p -c:v " . $encoder . " -b:v 5M -maxrate 10M -bufsize 50000k " . $SCALE . " " . $QUALITY . " -af 'volume=" . $audiovol . "' -c:a " . $AUDIOCODEC . " -ab 128k -f " . $encoder_outformat . " -movflags frag_keyframe+empty_moov+faststart - ";
+			    
+		    //die( $cmd );
 
                     header('Content-type: video/mp4');
                 break;
