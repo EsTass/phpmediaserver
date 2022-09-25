@@ -26,7 +26,7 @@
                 $midata = array();
                 foreach( $G_MEDIAINFO AS $k => $v ){
                     if( array_key_exists( $k, $G_DATA ) 
-                    && strlen( $G_DATA[ $k ] ) > 0
+                    //&& strlen( $G_DATA[ $k ] ) > 0
                     ){
                         $midata[ $k ] = $G_DATA[ $k ];
                     }elseif( array_key_exists( $k, $edata ) ){
