@@ -1013,11 +1013,11 @@
         
         //Clean all between: [] ()
         $CLEANNAME = $filename;
-        $CLEANNAME = preg_replace('/\[[\s\S]+?\]/', '', $CLEANNAME);
-        $CLEANNAME = preg_replace('/\([\s\S]+?\)/', '', $CLEANNAME);
+        $CLEANNAME = preg_replace('/\[[\s\S]+?\]/u', '', $CLEANNAME);
+        $CLEANNAME = preg_replace('/\([\s\S]+?\)/u', '', $CLEANNAME);
         //clear excess (... [...
-        $CLEANNAME = preg_replace('/\[[\s\S]+?/', '', $CLEANNAME);
-        //$CLEANNAME = preg_replace('/\([\s\S]+?/', '', $CLEANNAME);
+        $CLEANNAME = preg_replace('/\[[\s\S]+?/u', '', $CLEANNAME);
+        //$CLEANNAME = preg_replace('/\([\s\S]+?/u', '', $CLEANNAME);
         if( $DEBUG ) var_dump( $CLEANNAME );
         
         //Clean domains
@@ -1039,10 +1039,10 @@
         if( $DEBUG ) var_dump( $CLEANNAME );
         
         //Put space before uppercases if not uppercase before
-        // /(?<! )(?<!^)(?<![A-Z])[A-Z]/
-        // /(?<!\ )[A-Z]/
-        $preg = '/(?<! )(?<!^)(?<![A-Z])[A-Z]/';
-        //$preg = '/(?<!\ )[A-Z]/';
+        // /(?<! )(?<!^)(?<![A-Z])[A-Z]/u
+        // /(?<!\ )[A-Z]/u
+        $preg = '/(?<! )(?<!^)(?<![A-Z])[A-Z]/u';
+        //$preg = '/(?<!\ )[A-Z]/u';
         $CLEANNAME = preg_replace( $preg, ' $0', $CLEANNAME );
         if( $DEBUG ) var_dump( $CLEANNAME );
         
@@ -1061,7 +1061,7 @@
 	}
 	
     function clean_string_domains( $string, $debug = FALSE ){
-        $pattern ='/([wW]{3,3}.|)[A-Za-z0-9]+?\.(aero|asia|biz|cat|com|coop|edu|gov|info|int|jobs|mil|mobi|museum|name|net|org|pro|tel|travel|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cu|cv|cx|cy|cz|cz|de|dj|dk|dm|do|dz|ec|ee|eg|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mn|mn|mo|mp|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|nom|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ra|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw|arpa)[^\w\d\.]/i';
+        $pattern ='/([wW]{3,3}.|)[A-Za-z0-9]+?\.(aero|asia|biz|cat|com|coop|edu|gov|info|int|jobs|mil|mobi|museum|name|net|org|pro|tel|travel|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cu|cv|cx|cy|cz|cz|de|dj|dk|dm|do|dz|ec|ee|eg|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mn|mn|mo|mp|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|nom|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ra|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw|arpa)[^\w\d\.]/iu';
         
         $result = preg_replace($pattern, '', $string);
         
