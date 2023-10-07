@@ -27,16 +27,12 @@
 		echo "</tr>";
 		$css_extra = '';
 		foreach( $logdata AS $lrow ){
-			if( array_key_exists( 'ip', $lrow ) 
-			&& $lrow[ 'ip' ] == '127.0.0.1'
+			if( array_key_exists( 'user', $lrow )
+			&& $lrow[ 'user' ] == 'nouser'
 			){
-				$css_extra = 'eColors07';
-			}elseif( array_key_exists( 'ip', $lrow ) 
-			&& $lrow[ 'ip' ] != '192.168.1.1'
-			){
-				$css_extra = 'eColors04';
-			}else{
 				$css_extra = '';
+			}else{
+				$css_extra = 'eColors04';
 			}
 			echo "<tr>";
 			foreach( $lrow AS $data ){
