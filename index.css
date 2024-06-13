@@ -235,6 +235,7 @@ input:hover{
 .imgLogo{
     width: 20%;
     min-width: 40px;
+	max-width: 120px;
     text-align: center;
 	vertical-align: middle;
 }
